@@ -1,0 +1,50 @@
+[
+ {
+  "id": "2026-11-12-jellyfin-como-montar-um-netflix-privado-em-casa",
+  "titulo": "Jellyfin: canal Tecnologia e Classe ensina a montar um “Netflix” privado em casa",
+  "linha": "Em tutorial, o TeClas mostra como instalar um servidor de mídia livre e gratuito para organizar músicas, filmes e séries sem assinatura, sem propaganda e sem entregar dados a empresas",
+  "data": "2026-11-12T23:47:00",
+  "editoria": "Formação",
+  "tags": [
+   "tecnologia",
+   "software livre",
+   "privacidade",
+   "Jellyfin"
+  ],
+  "autor": "Redação",
+  "foto": "https://i.ytimg.com/vi/vWUWZpDP63E/maxresdefault.jpg",
+  "destaque": false
+ },
+ {
+  "id": "2026-11-09-jones-manoel-e-a-luta-antissionista",
+  "titulo": "Jones Manoel e a luta antissionista: da defesa da Palestina à proposta de criminalizar o sionismo",
+  "linha": "Deputado federal eleito pelo PSOL promete levar ao Congresso, a partir de 2027, um debate que trava há anos nas redes, nos livros e nos debates públicos",
+  "data": "2026-11-09T22:30:00",
+  "editoria": "Política",
+  "tags": [
+   "Jones Manoel",
+   "Palestina",
+   "sionismo",
+   "PSOL"
+  ],
+  "autor": "Redação",
+  "foto": "https://f.i.uol.com.br/fotografia/2026/10/06/17912992306ac50e9eae446_1791299230_3x2_rt.jpg",
+  "destaque": false
+ },
+ {
+  "id": "2026-11-09-o-que-sao-os-cieps",
+  "titulo": "O que são os CIEPs, as escolas de tempo integral de Darcy Ribeiro e Brizola",
+  "linha": "Os prédios de Niemeyer espalhados pelo Rio de Janeiro guardam um dos projetos mais ambiciosos da educação pública brasileira",
+  "data": "2026-11-09T21:40:00",
+  "editoria": "Educação",
+  "tags": [
+   "Rio de Janeiro",
+   "Darcy Ribeiro",
+   "Brizola",
+   "educação"
+  ],
+  "autor": "Redação",
+  "foto": "https://rioonwatch.org.br/wp-content/uploads/2026/01/CIEP-Nelson-Rodrigues.png",
+  "destaque": true
+ }
+]

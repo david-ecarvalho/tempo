@@ -1,0 +1,365 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tempo Continuum — Dossiês</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500&amp;display=swap">
+<style>
+body{margin:0;font-family:"Montserrat","Helvetica Neue",Arial,sans-serif;font-weight:500}
+h1,h2,h3,h4,p,dt,dd{font-weight:500}
+a{color:inherit}a:hover{text-decoration-thickness:2px}
+a:focus-visible,button:focus-visible,input:focus-visible{outline:2px solid currentColor;outline-offset:3px}
+@media (max-width: 760px){
+.tc-header-row{flex-wrap:nowrap !important;gap:8px !important;padding:10px 16px !important}
+.tc-nav,.tc-buscar{display:none !important}
+.tc-logo{margin-right:auto;min-width:0}
+.tc-tema-txt{display:none}
+.tc-tema{padding:8px 12px !important}
+.tc-chips{flex-wrap:nowrap !important;overflow-x:auto;padding-bottom:8px;margin-right:-16px;padding-right:16px;-webkit-overflow-scrolling:touch;scrollbar-width:thin}
+.tc-chips>*{flex:none}
+main{padding-left:16px !important;padding-right:16px !important;gap:32px !important}
+footer>div{padding-left:16px !important;padding-right:16px !important}
+}
+
+/* Cabeçalho fixo e menu lateral */
+.tc-topo{position:sticky;top:0;z-index:50}
+.tc-menu-btn{display:flex !important}
+.tc-painel{display:block !important;position:fixed;top:0;left:0;bottom:0;width:min(340px,86vw);overflow-y:auto;z-index:70;box-shadow:8px 0 32px rgba(16,16,16,.35);padding:12px 16px 24px !important;border-top:0 !important;box-sizing:border-box}
+.tc-fundo{position:fixed;inset:0;z-index:60;background:rgba(16,16,16,.45);border:0;padding:0;cursor:pointer}
+.tc-painel-topo{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:6px 4px 14px;font-size:12px;letter-spacing:.1em;text-transform:uppercase}
+.tc-painel-topo button{font:inherit;font-size:14px;letter-spacing:0;text-transform:none;background:none;border:2px solid currentColor;color:inherit;border-radius:999px;padding:6px 14px;cursor:pointer}
+/* Cabeçalho em uma linha só: ocupa a largura toda da janela */
+.tc-header-row{max-width:none !important;flex-wrap:nowrap !important;gap:12px 20px !important}
+.tc-nav{flex-wrap:nowrap !important;flex:1 1 auto !important;min-width:0}
+.tc-nav a{white-space:nowrap}
+@media (max-width: 1320px){.tc-nav{gap:2px !important}.tc-nav a{padding:8px 10px !important}.tc-buscar,.tc-menu-btn{font-size:0 !important;gap:0 !important;padding:8px 13px !important}.tc-tema-txt{display:none}.tc-tema{padding:8px 13px !important}}
+@media (max-width: 1100px){.tc-nav,.tc-buscar{display:none !important}.tc-logo{margin-right:auto;min-width:0}}
+</style>
+<style>html,body{margin:0} #app > div{min-height:100vh}</style>
+</head>
+<body>
+<div id="app"></div>
+<template id="tpl">
+
+<div style="background: {{c.bg}}; color: {{c.ink}}; min-height: 100%; font-family: &quot;Montserrat&quot;, Arial, sans-serif; font-weight: 500;">
+
+  <header class="tc-topo" style="background: {{c.bg}}; color: {{c.ink}}; border-bottom: 2px solid {{c.ink}};">
+    <div class="tc-header-row" style="max-width: 1240px; margin: 0 auto; padding: 14px 24px; display: flex; flex-wrap: wrap; align-items: center; gap: 12px 40px;">
+      <button type="button" class="tc-menu-btn" onClick="{{alternarMenu}}" aria-expanded="{{menuAbertoTxt}}" aria-controls="tc-painel" style="align-items: center; gap: 8px; font: inherit; font-size: 14px; border: 2px solid {{c.ink}}; background: transparent; color: {{c.ink}}; border-radius: 999px; padding: 8px 14px; min-height: 44px; box-sizing: border-box; cursor: pointer;">
+        <sc-if value="{{menuFechado}}" hint-placeholder-val="{{true}}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"></path></svg></sc-if>
+        <sc-if value="{{menuAberto}}" hint-placeholder-val="{{false}}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></sc-if>
+        Menu
+      </button>
+      <a class="tc-logo" href="index.html" style="display: flex; align-items: center; gap: 12px; text-decoration: none; color: inherit;" aria-label="Tempo Continuum, início">
+        <sc-if value="{{claro}}" hint-placeholder-val="{{true}}"><img src="logos/logo-claro.svg" alt="" width="48" height="48" style="display: block; width: 48px; height: 48px; border-radius: 50%; object-fit: cover; flex: none;"></sc-if><sc-if value="{{escuro}}" hint-placeholder-val="{{false}}"><img src="logos/logo-escuro.svg" alt="" width="48" height="48" style="display: block; width: 48px; height: 48px; border-radius: 50%; object-fit: cover; flex: none;"></sc-if>
+        <span style="font-size: 13px; line-height: 1.05; letter-spacing: 0.08em; text-transform: uppercase;">Tempo<br>Continuum</span>
+      </a>
+      <nav class="tc-nav" aria-label="Seções" style="display: flex; flex-wrap: wrap; gap: 6px 8px; flex: 1 1 560px; font-size: 15px;">
+        <a href="noticias.html" style="text-decoration: none; padding: 8px 14px; border-radius: 999px;">Notícias</a>
+        <a href="streaming.html" style="text-decoration: none; padding: 8px 14px; border-radius: 999px;">Streaming</a>
+        <a href="ferramentas.html" style="text-decoration: none; padding: 8px 14px; border-radius: 999px;">Recursos</a>
+        <a href="cursos.html" style="text-decoration: none; padding: 8px 14px; border-radius: 999px;">Academia</a>
+        <a href="politicos.html" style="text-decoration: none; padding: 8px 14px; border-radius: 999px;">Wiki</a>
+        <a href="dossies.html" aria-current="page" style="text-decoration: none; padding: 8px 14px; border-radius: 999px; background: #556A2F; color: #FFFAF0;">Dossiês</a>
+        <a href="publicacoes.html" style="text-decoration: none; padding: 8px 14px; border-radius: 999px;">Publicações</a>
+      </nav>
+      <a class="tc-buscar" href="noticias.html" style="display: flex; align-items: center; gap: 8px; text-decoration: none; border: 2px solid {{c.ink}}; border-radius: 999px; padding: 8px 16px; font-size: 14px; min-height: 44px; box-sizing: border-box;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-4-4"></path></svg>Buscar</a>
+      <button type="button" class="tc-tema" onClick="{{alternarTema}}" aria-label="{{temaLabel}}" style="display: flex; align-items: center; gap: 8px; font: inherit; font-size: 14px; border: 2px solid {{c.ink}}; background: {{c.ink}}; color: {{c.bg}}; border-radius: 999px; padding: 8px 16px; min-height: 44px; box-sizing: border-box; cursor: pointer;">
+        <sc-if value="{{claro}}" hint-placeholder-val="{{true}}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"></path></svg></sc-if>
+        <sc-if value="{{escuro}}" hint-placeholder-val="{{false}}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg></sc-if>
+        <span class="tc-tema-txt">{{temaTexto}}</span>
+      </button>
+    </div>
+    <sc-if value="{{menuAberto}}" hint-placeholder-val="{{false}}">
+      <button type="button" class="tc-fundo" onClick="{{fecharMenu}}" aria-label="Fechar o menu" tabindex="-1"></button>
+      <nav id="tc-painel" class="tc-painel" aria-label="Menu" style="background: {{c.bg}}; color: {{c.ink}}; border-right: 2px solid {{c.ink}};">
+        <div class="tc-painel-topo"><span>Tempo Continuum</span><button type="button" onClick="{{fecharMenu}}">Fechar</button></div>
+        <a href="index.html" style="text-decoration: none; display: block; padding: 14px 12px; font-size: 18px; border-bottom: 1px solid {{c.line}};">Início</a>
+        <a href="noticias.html" style="text-decoration: none; display: block; padding: 14px 12px; font-size: 18px; border-bottom: 1px solid {{c.line}};">Notícias</a>
+        <a href="streaming.html" style="text-decoration: none; display: block; padding: 14px 12px; font-size: 18px; border-bottom: 1px solid {{c.line}};">Streaming</a>
+        <a href="ferramentas.html" style="text-decoration: none; display: block; padding: 14px 12px; font-size: 18px; border-bottom: 1px solid {{c.line}};">Recursos</a>
+        <a href="cursos.html" style="text-decoration: none; display: block; padding: 14px 12px; font-size: 18px; border-bottom: 1px solid {{c.line}};">Academia</a>
+        <a href="politicos.html" style="text-decoration: none; display: block; padding: 14px 12px; font-size: 18px; border-bottom: 1px solid {{c.line}};">Wiki</a>
+        <a href="dossies.html" aria-current="page" style="text-decoration: none; display: block; padding: 14px 12px; font-size: 18px; border-bottom: 1px solid {{c.line}}; background: #556A2F; color: #FFFAF0;">Dossiês</a>
+        <a href="publicacoes.html" style="text-decoration: none; display: block; padding: 14px 12px; font-size: 18px; border-bottom: 1px solid {{c.line}};">Publicações</a>
+        <a href="noticias.html" onClick="{{fecharMenu}}" style="text-decoration: none; display: flex; align-items: center; gap: 10px; padding: 14px 12px; font-size: 18px;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-4-4"></path></svg>Buscar</a>
+      </nav>
+    </sc-if>
+  </header>
+
+  <main style="max-width: 1240px; margin: 0 auto; padding: 32px 24px 80px; display: flex; flex-direction: column; gap: 32px;">
+    <div style="display: flex; flex-direction: column; gap: 14px;">
+      <p style="margin: 0; font-size: 13px; color: {{c.muted}};"><a href="index.html" style="text-underline-offset: 3px;">Início</a> / Dossiês</p>
+      <h1 style="margin: 0; font-size: clamp(2.4rem, 5vw, 3.6rem); line-height: 1; letter-spacing: -0.02em;"><span style="background: #556A2F; color: #FFFAF0; padding: 0 10px;">Dossiês</span></h1>
+      <p style="margin: 0; font-size: 1.1rem; line-height: 1.55; color: {{c.muted}}; max-width: 60ch;">Reportagens longas, divididas em capítulos, e os casos que acompanhamos do início ao fim, com a situação atual, os envolvidos e os documentos reunidos.</p>
+    </div>
+
+    <sc-if value="{{semDossies}}" hint-placeholder-val="{{false}}">
+      <div style="border: 1.5px dashed {{c.line}}; padding: 28px 24px; display: flex; flex-direction: column; gap: 6px;">
+        <strong style="font-size: 1.2rem; font-weight: 500;">Nenhum dossiê publicado ainda</strong>
+        <span style="color: {{c.muted}};">Os dossiês da redação aparecem aqui assim que forem publicados.</span>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{temDestaque}}" hint-placeholder-val="{{true}}">
+      <article style="background: #556A2F; color: #FFFAF0; display: flex; flex-wrap: wrap; align-items: stretch;">
+        <sc-if value="{{destaque.temCapa}}" hint-placeholder-val="{{false}}">
+          <a href="{{destaque.href}}" tabindex="-1" aria-hidden="true" style="flex: 1 1 360px; min-height: 240px; background: #101010 url('{{destaque.capa}}') center / cover no-repeat;"></a>
+        </sc-if>
+        <div style="flex: 999 1 420px; min-width: 0; padding: clamp(24px, 4vw, 48px); display: flex; flex-direction: column; gap: 14px; justify-content: flex-end;">
+          <span style="font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase;">Dossiê em destaque · {{destaque.capitulosTexto}}</span>
+          <h2 style="margin: 0; font-size: clamp(1.8rem, 3.6vw, 2.8rem); line-height: 1.08; letter-spacing: -0.01em; text-wrap: balance;"><a href="{{destaque.href}}" style="text-decoration: none;">{{destaque.titulo}}</a></h2>
+          <sc-if value="{{destaque.temLinha}}" hint-placeholder-val="{{true}}"><p style="margin: 0; font-size: 1.05rem; line-height: 1.55; max-width: 58ch;">{{destaque.linha}}</p></sc-if>
+          <div style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 6px;">
+            <a href="{{destaque.href}}" style="text-decoration: none; background: #101010; color: #FFFAF0; padding: 14px 22px; font-size: 14px;">Ler o dossiê</a>
+            <sc-if value="{{destaque.temPdf}}" hint-placeholder-val="{{false}}"><a href="{{destaque.pdf}}" download="{{destaque.pdfNome}}" style="text-decoration: none; border: 2px solid #FFFAF0; color: #FFFAF0; padding: 12px 20px; font-size: 14px;">Baixar PDF</a></sc-if>
+          </div>
+        </div>
+      </article>
+    </sc-if>
+
+    <sc-if value="{{temOutros}}" hint-placeholder-val="{{true}}">
+      <div style="display: flex; flex-direction: column; border-bottom: 1px solid {{c.line}};">
+        <sc-for list="{{outros}}" as="o" hint-placeholder-count="4">
+          <article style="display: flex; flex-wrap: wrap; gap: 12px 32px; align-items: baseline; padding: 24px 0; border-top: 1px solid {{c.line}};">
+            <span style="flex: none; width: 120px; font-size: 13px; color: {{c.muted}};">{{o.capitulosTexto}}</span>
+            <div style="flex: 1 1 420px; min-width: 0; display: flex; flex-direction: column; gap: 6px;">
+              <h3 style="margin: 0; font-size: 1.4rem; line-height: 1.2;"><a href="{{o.href}}" style="text-decoration: none;">{{o.titulo}}</a></h3>
+              <sc-if value="{{o.temLinha}}" hint-placeholder-val="{{true}}"><p style="margin: 0; font-size: 0.95rem; line-height: 1.5; color: {{c.muted}};">{{o.linha}}</p></sc-if>
+              <sc-if value="{{o.temPdf}}" hint-placeholder-val="{{false}}"><a href="{{o.pdf}}" download="{{o.pdfNome}}" style="align-self: flex-start; font-size: 13px; text-underline-offset: 3px;">Baixar PDF</a></sc-if>
+            </div>
+            <span style="font-size: 13px; color: {{c.muted}};">{{o.dataTexto}}</span>
+          </article>
+        </sc-for>
+      </div>
+    </sc-if>
+
+    <div id="casos" style="display: flex; flex-direction: column; gap: 10px; scroll-margin-top: 110px;">
+      <h2 style="margin: 0; font-size: clamp(1.6rem, 3vw, 2.2rem); line-height: 1.1; letter-spacing: -0.01em;">Casos acompanhados</h2>
+      <p style="margin: 0; font-size: 1rem; line-height: 1.55; color: {{c.muted}}; max-width: 60ch;">Investigações acompanhadas do início ao fim, com a situação atual, os envolvidos, a última etapa e os documentos reunidos.</p>
+    </div>
+
+    <section aria-label="Filtros" style="display: flex; flex-direction: column; gap: 16px; border-top: 2px solid {{c.ink}}; border-bottom: 1px solid {{c.line}}; padding: 20px 0;">
+      <div style="display: flex; flex-direction: column; gap: 6px; max-width: 640px;">
+        <label for="cq" style="font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: {{c.muted}};">Buscar</label>
+        <input id="cq" type="search" value="{{q}}" onChange="{{onQ}}" placeholder="Palavra no título, no resumo, nos envolvidos ou nas tags" autocomplete="off" style="font: inherit; font-size: 16px; padding: 12px 14px; border: 2px solid {{c.ink}}; background: {{c.bg}}; color: {{c.ink}}; border-radius: 0; min-width: 0;">
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 8px;">
+        <span style="font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: {{c.muted}};">Situação</span>
+        <div class="tc-chips" style="display: flex; flex-wrap: wrap; gap: 8px;">
+          <sc-for list="{{situacoes}}" as="s" hint-placeholder-count="4">
+            <sc-if value="{{s.ativa}}" hint-placeholder-val="{{false}}">
+              <button type="button" onClick="{{s.escolher}}" aria-pressed="true" style="font: inherit; font-size: 13px; padding: 6px 12px; border-radius: 999px; background: #556A2F; color: #FFFAF0; border: 1.5px solid #556A2F; cursor: pointer;">{{s.nome}} · {{s.n}}</button>
+            </sc-if>
+            <sc-if value="{{s.inativa}}" hint-placeholder-val="{{true}}">
+              <button type="button" onClick="{{s.escolher}}" aria-pressed="false" style="font: inherit; font-size: 13px; padding: 6px 12px; border-radius: 999px; background: transparent; color: {{c.ink}}; border: 1.5px solid {{c.line}}; cursor: pointer;">{{s.nome}} · {{s.n}}</button>
+            </sc-if>
+          </sc-for>
+        </div>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 8px;">
+        <span style="font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: {{c.muted}};">Tags</span>
+        <div class="tc-chips" style="display: flex; flex-wrap: wrap; gap: 8px;">
+          <sc-for list="{{todasTags}}" as="t" hint-placeholder-count="12">
+            <sc-if value="{{t.ativa}}" hint-placeholder-val="{{false}}">
+              <button type="button" onClick="{{t.toggle}}" aria-pressed="true" style="font: inherit; font-size: 13px; padding: 6px 12px; border-radius: 999px; background: #556A2F; color: #FFFAF0; border: 1.5px solid #556A2F; cursor: pointer;">{{t.nome}} · {{t.n}} ✕</button>
+            </sc-if>
+            <sc-if value="{{t.inativa}}" hint-placeholder-val="{{true}}">
+              <button type="button" onClick="{{t.toggle}}" aria-pressed="false" style="font: inherit; font-size: 13px; padding: 6px 12px; border-radius: 999px; background: transparent; color: {{c.ink}}; border: 1.5px solid {{c.line}}; cursor: pointer;">{{t.nome}} · {{t.n}}</button>
+            </sc-if>
+          </sc-for>
+        </div>
+      </div>
+      <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px 16px; font-size: 13px; color: {{c.muted}};">
+        <span role="status">{{contagem}}</span>
+        <sc-if value="{{temFiltros}}" hint-placeholder-val="{{false}}">
+          <button type="button" onClick="{{limpar}}" style="font: inherit; font-size: 13px; background: none; border: 0; padding: 4px 0; color: {{c.ink}}; text-decoration: underline; text-underline-offset: 3px; cursor: pointer;">Limpar filtros</button>
+        </sc-if>
+      </div>
+    </section>
+
+    <sc-if value="{{semCasos}}" hint-placeholder-val="{{false}}">
+      <div style="border: 1.5px dashed {{c.line}}; padding: 28px 24px; display: flex; flex-direction: column; gap: 6px;">
+        <strong style="font-size: 1.2rem; font-weight: 500;">Nenhum caso publicado ainda</strong>
+        <span style="color: {{c.muted}};">Os casos acompanhados pela redação aparecem aqui assim que forem publicados.</span>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{vazio}}" hint-placeholder-val="{{false}}">
+      <div style="border: 1.5px dashed {{c.line}}; padding: 28px 24px; display: flex; flex-direction: column; gap: 6px;">
+        <strong style="font-size: 1.2rem; font-weight: 500;">Nenhum caso com esses filtros</strong>
+        <span style="color: {{c.muted}};">Escolha outra situação, desmarque uma tag ou use menos palavras na busca.</span>
+      </div>
+    </sc-if>
+
+    <div style="display: flex; flex-direction: column;">
+      <sc-for list="{{itens}}" as="k" hint-placeholder-count="5">
+        <article style="display: flex; flex-wrap: wrap; gap: 16px 28px; padding: 26px 0; border-bottom: 1px solid {{c.line}};">
+          <div style="flex: none; width: 150px; display: flex; flex-direction: column; gap: 8px;">
+            <sc-if value="{{k.andamento}}" hint-placeholder-val="{{true}}"><span style="display: block; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; border: 1.5px solid {{c.ink}}; padding: 5px 10px; text-align: center;">Em andamento</span></sc-if>
+            <sc-if value="{{k.julgamento}}" hint-placeholder-val="{{false}}"><span style="display: block; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; background: #556A2F; color: #FFFAF0; border: 1.5px solid #556A2F; padding: 5px 10px; text-align: center;">Em julgamento</span></sc-if>
+            <sc-if value="{{k.encerrado}}" hint-placeholder-val="{{false}}"><span style="display: block; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; border: 1.5px dashed {{c.muted}}; color: {{c.muted}}; padding: 5px 10px; text-align: center;">Encerrado</span></sc-if>
+            <span style="font-size: 12px; color: {{c.muted}};">Aberto em {{k.abertoTexto}}</span>
+          </div>
+          <div style="flex: 1 1 420px; min-width: 0; display: flex; flex-direction: column; gap: 10px;">
+            <h2 style="margin: 0; font-size: 1.35rem; line-height: 1.2;">{{k.titulo}}</h2>
+            <p style="margin: 0; font-size: 0.95rem; line-height: 1.55; color: {{c.muted}}; max-width: 66ch;">{{k.resumo}}</p>
+            <dl style="margin: 0; display: flex; flex-wrap: wrap; gap: 8px 28px; font-size: 0.85rem;">
+              <div><dt style="font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: {{c.muted}};">Envolvidos</dt><dd style="margin: 2px 0 0;">{{k.envolvidosTexto}}</dd></div>
+              <div><dt style="font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: {{c.muted}};">Última etapa</dt><dd style="margin: 2px 0 0;">{{k.etapa}} · {{k.atualizadoTexto}}</dd></div>
+              <div><dt style="font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: {{c.muted}};">Documentos</dt><dd style="margin: 2px 0 0;">{{k.docs}}</dd></div>
+            </dl>
+            <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+              <sc-for list="{{k.tags}}" as="t" hint-placeholder-count="3">
+                <sc-if value="{{t.ativa}}" hint-placeholder-val="{{false}}">
+                  <button type="button" onClick="{{t.toggle}}" aria-pressed="true" style="font: inherit; font-size: 12px; padding: 3px 9px; border-radius: 999px; background: #556A2F; color: #FFFAF0; border: 1.5px solid #556A2F; cursor: pointer;">{{t.nome}}</button>
+                </sc-if>
+                <sc-if value="{{t.inativa}}" hint-placeholder-val="{{true}}">
+                  <button type="button" onClick="{{t.toggle}}" aria-pressed="false" style="font: inherit; font-size: 12px; padding: 3px 9px; border-radius: 999px; background: transparent; color: {{c.ink}}; border: 1.5px solid {{c.line}}; cursor: pointer;">{{t.nome}}</button>
+                </sc-if>
+              </sc-for>
+            </div>
+          </div>
+        </article>
+      </sc-for>
+    </div>
+  </main>
+
+  <footer style="background: #101010; color: #FFFAF0; border-top: 1px solid {{c.line}};">
+    <div style="max-width: 1240px; margin: 0 auto; padding: 48px 24px 40px; display: flex; flex-wrap: wrap; gap: 40px; justify-content: space-between;">
+      <div style="flex: 1 1 360px; min-width: 0; display: flex; flex-direction: column; gap: 12px;">
+        <p style="margin: 0; font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase;">Tempo Continuum</p>
+        <p style="margin: 0; font-size: 1.4rem; line-height: 1.25; max-width: 24ch;"><span style="background: #556A2F; color: #FFFAF0; padding: 0 6px; box-decoration-break: clone; -webkit-box-decoration-break: clone;">Conhecer o passado. Organizar o presente. Construir o futuro.</span></p>
+      </div>
+      <nav aria-label="Rodapé" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 40px; font-size: 14px; align-content: start;">
+        <a href="noticias.html" style="text-decoration: none;">Notícias</a>
+        <a href="streaming.html" style="text-decoration: none;">Streaming</a>
+        <a href="ferramentas.html" style="text-decoration: none;">Recursos</a>
+        <a href="cursos.html" style="text-decoration: none;">Academia</a>
+        <a href="politicos.html" style="text-decoration: none;">Wiki</a>
+        <a href="dossies.html" style="text-decoration: none;">Dossiês</a>
+        <a href="publicacoes.html" style="text-decoration: none;">Publicações</a>
+        <a href="index.html" style="text-decoration: none;">Início</a>
+      </nav>
+    </div>
+  </footer>
+</div>
+</template>
+<script src="js/runtime.js"></script>
+<script src="js/tags.js"></script>
+<script>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { escuro: null, q: '', tags: [], situacao: 'Todos', dossies: [] };
+  }
+  componentDidMount() {
+    var self = this;
+    // Dossiês publicados (índice gerado de conteudo/dossies/)
+    fetch('dados/dossies.json', { cache: 'no-cache' })
+      .then(function (r) { return r.ok ? r.json() : []; })
+      .then(function (lista) { self.setState({ dossies: Array.isArray(lista) ? lista : [] }); })
+      .catch(function () {});
+    try {
+      var v = window.localStorage.getItem('tc-tema');
+      if (v === 'escuro' || v === 'claro') this.setState({ escuro: v === 'escuro' });
+    } catch (e) {}
+  }
+  dados() {
+    // Cada caso: { id, status ('Em andamento' | 'Em julgamento' | 'Encerrado'), titulo, resumo, aberto: 'AAAA-MM-DD',
+    //   atualizado: 'AAAA-MM-DD', etapa, envolvidos: [..], docs: número, tags: [..] }. Subtag com barra: 'violência/contra indígenas'.
+    return [];
+  }
+  renderVals() {
+    var self = this;
+    var st = this.state || {};
+    var escuro = (st.escuro !== null && st.escuro !== undefined) ? st.escuro : (this.props.tema ?? 'claro') === 'escuro';
+    var c = escuro
+      ? { bg: '#101010', surface: '#2F2E25', ink: '#FFFAF0', muted: '#DDD5CA', line: 'rgba(221, 213, 202, 0.3)' }
+      : { bg: '#FFFAF0', surface: '#DDD5CA', ink: '#101010', muted: '#2F2E25', line: 'rgba(47, 46, 37, 0.28)' };
+    var norm = function (s) { return String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim(); };
+    var meses = ['jan.', 'fev.', 'mar.', 'abr.', 'maio', 'jun.', 'jul.', 'ago.', 'set.', 'out.', 'nov.', 'dez.'];
+    var fmt = function (iso) { var p = iso.split('-'); return Number(p[2]) + ' ' + meses[Number(p[1]) - 1] + ' ' + p[0]; };
+    var sel = st.tags || [];
+    var selN = sel.map(TCTags.norm);
+    var situacao = st.situacao || 'Todos';
+    var toggle = function (nome) {
+      return function () {
+        var k = TCTags.norm(nome);
+        var atual = (self.state.tags || []).slice();
+        var i = atual.map(TCTags.norm).indexOf(k);
+        if (i >= 0) atual.splice(i, 1); else atual.push(nome);
+        self.setState({ tags: atual });
+      };
+    };
+    var dados = this.dados().slice().sort(function (a, b) { return a.atualizado < b.atualizado ? 1 : -1; });
+    var palavras = norm(st.q).split(/\s+/).filter(Boolean);
+    var passaTextoETags = function (k) {
+      if (!TCTags.atendeTodos(k.tags, sel)) return false;
+      var texto = norm([k.titulo, k.resumo, k.etapa, k.envolvidos.join(' '), k.tags.join(' ')].join(' '));
+      return palavras.every(function (w) { return texto.indexOf(w) >= 0; });
+    };
+    var base = dados.filter(passaTextoETags);
+    var filtrados = base.filter(function (k) { return situacao === 'Todos' || k.status === situacao; });
+    var situacoes = ['Todos', 'Em andamento', 'Em julgamento', 'Encerrado'].map(function (s) {
+      var n = s === 'Todos' ? base.length : base.filter(function (k) { return k.status === s; }).length;
+      var ativa = s === situacao;
+      return { nome: s, n: n, ativa: ativa, inativa: !ativa, escolher: function () { self.setState({ situacao: s }); } };
+    });
+    var todasTags = TCTags.contar(dados.map(function (k) { return k.tags; })).map(function (t) {
+      var ativa = selN.indexOf(TCTags.norm(t.tag)) >= 0;
+      return { nome: t.rotulo, n: t.n, ativa: ativa, inativa: !ativa, toggle: toggle(t.tag) };
+    });
+    var itens = filtrados.map(function (k) {
+      return {
+        id: k.id, titulo: k.titulo, resumo: k.resumo, etapa: k.etapa, docs: k.docs,
+        andamento: k.status === 'Em andamento', julgamento: k.status === 'Em julgamento', encerrado: k.status === 'Encerrado',
+        abertoTexto: fmt(k.aberto), atualizadoTexto: fmt(k.atualizado), envolvidosTexto: k.envolvidos.join(' · '),
+        tags: k.tags.map(function (t) { var a = selN.indexOf(TCTags.norm(t)) >= 0; return { nome: TCTags.rotulo(t), ativa: a, inativa: !a, toggle: toggle(TCTags.limpa(t)) }; })
+      };
+    });
+    // Dossiês: o destaque é o mais recente marcado como destaque (ou o mais recente de todos)
+    var listaD = (st.dossies || []).slice().sort(function (a, b) { return String(a.data) < String(b.data) ? 1 : -1; });
+    var principal = listaD.filter(function (x) { return x.destaque; })[0] || listaD[0] || null;
+    var cartao = function (x) {
+      var n = (x.capitulos || []).length;
+      return {
+        titulo: x.titulo, linha: x.linha || '', temLinha: !!x.linha, href: 'dossie.html?id=' + encodeURIComponent(x.id),
+        capa: String(x.capa || '').replace(/'/g, '%27'), temCapa: !!x.capa, dataTexto: x.data ? fmt(String(x.data).slice(0, 10)) : '',
+        capitulosTexto: n + (n === 1 ? ' capítulo' : ' capítulos'), pdf: x.pdf || '', temPdf: !!x.pdf, pdfNome: x.id + '.pdf'
+      };
+    };
+    var outros = listaD.filter(function (x) { return x !== principal; }).map(cartao);
+    var temFiltros = !!(palavras.length || sel.length || situacao !== 'Todos');
+    var contagem = temFiltros
+      ? itens.length + ' de ' + dados.length + (dados.length === 1 ? ' caso' : ' casos') + (sel.length ? ' com ' + (sel.length === 1 ? 'a tag ' : 'as tags ') + sel.map(TCTags.rotulo).join(' + ') : '')
+      : dados.length + (dados.length === 1 ? ' caso' : ' casos');
+    return {
+      menuAberto: !!(this.state && this.state.menuAberto),
+      menuFechado: !(this.state && this.state.menuAberto),
+      menuAbertoTxt: (this.state && this.state.menuAberto) ? 'true' : 'false',
+      alternarMenu: (function (eu) { return function () { eu.setState({ menuAberto: !(eu.state && eu.state.menuAberto) }); }; })(this),
+      fecharMenu: (function (eu) { return function () { eu.setState({ menuAberto: false }); }; })(this),
+      c: c, escuro: escuro, claro: !escuro,
+      temaTexto: escuro ? 'Claro' : 'Escuro',
+      temaLabel: escuro ? 'Mudar para o tema claro' : 'Mudar para o tema escuro',
+      alternarTema: function () {
+        var novo = !escuro;
+        self.setState({ escuro: novo });
+        try { window.localStorage.setItem('tc-tema', novo ? 'escuro' : 'claro'); } catch (e) {}
+      },
+      q: st.q || '',
+      onQ: function (e) { self.setState({ q: e.target.value }); },
+      limpar: function () { self.setState({ q: '', tags: [], situacao: 'Todos' }); },
+      situacoes: situacoes, todasTags: todasTags, itens: itens,
+      semDossies: listaD.length === 0, temDestaque: !!principal, destaque: principal ? cartao(principal) : {},
+      outros: outros, temOutros: outros.length > 0,
+      semCasos: dados.length === 0, vazio: dados.length > 0 && itens.length === 0, temFiltros: temFiltros, contagem: contagem
+    };
+  }
+}
+iniciarPagina(Component, {"tema": "claro"});
+</script>
+</body>
+</html>

@@ -1,0 +1,12 @@
+# Gerados
+site/_site/
+motor-imagens/target/
+
+# Python
+__pycache__/
+*.pyc
+
+# Sistema
+.DS_Store
+Thumbs.db
+desktop.ini

@@ -1,0 +1,434 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tempo Continuum — Curso: Musculação gastando o mínimo</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500&amp;display=swap">
+<style>
+body{margin:0;font-family:"Montserrat","Helvetica Neue",Arial,sans-serif;font-weight:500}
+h1,h2,h3,h4,p,th,dt,dd{font-weight:500}
+a{color:inherit}a:hover{text-decoration-thickness:2px}
+a:focus-visible,button:focus-visible,input:focus-visible{outline:2px solid currentColor;outline-offset:3px}
+@media (max-width: 760px){
+.tc-header-row{flex-wrap:nowrap !important;gap:8px !important;padding:10px 16px !important}
+.tc-nav,.tc-buscar{display:none !important}
+.tc-logo{margin-right:auto;min-width:0}
+.tc-tema-txt{display:none}
+.tc-tema{padding:8px 12px !important}
+.tc-chips{flex-wrap:nowrap !important;overflow-x:auto;padding-bottom:8px;margin-right:-16px;padding-right:16px;-webkit-overflow-scrolling:touch;scrollbar-width:thin}
+.tc-chips>*{flex:none}
+main{padding-left:16px !important;padding-right:16px !important;gap:32px !important}
+footer>div{padding-left:16px !important;padding-right:16px !important}
+}
+
+/* Cabeçalho fixo e menu lateral */
+.tc-topo{position:sticky;top:0;z-index:50}
+.tc-menu-btn{display:flex !important}
+.tc-painel{display:block !important;position:fixed;top:0;left:0;bottom:0;width:min(340px,86vw);overflow-y:auto;z-index:70;box-shadow:8px 0 32px rgba(16,16,16,.35);padding:12px 16px 24px !important;border-top:0 !important;box-sizing:border-box}
+.tc-fundo{position:fixed;inset:0;z-index:60;background:rgba(16,16,16,.45);border:0;padding:0;cursor:pointer}
+.tc-painel-topo{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:6px 4px 14px;font-size:12px;letter-spacing:.1em;text-transform:uppercase}
+.tc-painel-topo button{font:inherit;font-size:14px;letter-spacing:0;text-transform:none;background:none;border:2px solid currentColor;color:inherit;border-radius:999px;padding:6px 14px;cursor:pointer}
+/* Cabeçalho em uma linha só: ocupa a largura toda da janela */
+.tc-header-row{max-width:none !important;flex-wrap:nowrap !important;gap:12px 20px !important}
+.tc-nav{flex-wrap:nowrap !important;flex:1 1 auto !important;min-width:0}
+.tc-nav a{white-space:nowrap}
+@media (max-width: 1320px){.tc-nav{gap:2px !important}.tc-nav a{padding:8px 10px !important}.tc-buscar,.tc-menu-btn{font-size:0 !important;gap:0 !important;padding:8px 13px !important}.tc-tema-txt{display:none}.tc-tema{padding:8px 13px !important}}
+@media (max-width: 1100px){.tc-nav,.tc-buscar{display:none !important}.tc-logo{margin-right:auto;min-width:0}}
+</style>
+<style>html,body{margin:0} #app > div{min-height:100vh}</style>
+</head>
+<body>
+<div id="app"></div>
+<template id="tpl">
+
+<div style="background: {{c.bg}}; color: {{c.ink}}; min-height: 100%; font-family: &quot;Montserrat&quot;, Arial, sans-serif; font-weight: 500;">
+
+  <header class="tc-topo" style="background: {{c.bg}}; color: {{c.ink}}; border-bottom: 2px solid {{c.ink}};">
+    <div class="tc-header-row" style="max-width: 1240px; margin: 0 auto; padding: 14px 24px; display: flex; flex-wrap: wrap; align-items: center; gap: 12px 40px;">
+      <button type="button" class="tc-menu-btn" onClick="{{alternarMenu}}" aria-expanded="{{menuAbertoTxt}}" aria-controls="tc-painel" style="align-items: center; gap: 8px; font: inherit; font-size: 14px; border: 2px solid {{c.ink}}; background: transparent; color: {{c.ink}}; border-radius: 999px; padding: 8px 14px; min-height: 44px; box-sizing: border-box; cursor: pointer;">
+        <sc-if value="{{menuFechado}}" hint-placeholder-val="{{true}}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"></path></svg></sc-if>
+        <sc-if value="{{menuAberto}}" hint-placeholder-val="{{false}}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></sc-if>
+        Menu
+      </button>
+      <a class="tc-logo" href="index.html" style="display: flex; align-items: center; gap: 12px; text-decoration: none; color: inherit;" aria-label="Tempo Continuum, início">
+        <sc-if value="{{claro}}" hint-placeholder-val="{{true}}"><img src="logos/logo-claro.svg" alt="" width="48" height="48" style="display: block; width: 48px; height: 48px; border-radius: 50%; object-fit: cover; flex: none;"></sc-if><sc-if value="{{escuro}}" hint-placeholder-val="{{false}}"><img src="logos/logo-escuro.svg" alt="" width="48" height="48" style="display: block; width: 48px; height: 48px; border-radius: 50%; object-fit: cover; flex: none;"></sc-if>
+        <span style="font-size: 13px; line-height: 1.05; letter-spacing: 0.08em; text-transform: uppercase;">Tempo<br>Continuum</span>
+      </a>
+      <nav class="tc-nav" aria-label="Seções" style="display: flex; flex-wrap: wrap; gap: 6px 8px; flex: 1 1 560px; font-size: 15px;">
+        <a href="noticias.html" style="text-decoration: none; padding: 8px 14px; border-radius: 999px;">Notícias</a>
+        <a href="streaming.html" style="text-decoration: none; padding: 8px 14px; border-radius: 999px;">Streaming</a>
+        <a href="ferramentas.html" style="text-decoration: none; padding: 8px 14px; border-radius: 999px;">Recursos</a>
+        <a href="cursos.html" aria-current="page" style="text-decoration: none; padding: 8px 14px; border-radius: 999px; background: #556A2F; color: #FFFAF0;">Academia</a>
+        <a href="politicos.html" style="text-decoration: none; padding: 8px 14px; border-radius: 999px;">Wiki</a>
+        <a href="dossies.html" style="text-decoration: none; padding: 8px 14px; border-radius: 999px;">Dossiês</a>
+        <a href="publicacoes.html" style="text-decoration: none; padding: 8px 14px; border-radius: 999px;">Publicações</a>
+      </nav>
+      <a class="tc-buscar" href="noticias.html" style="display: flex; align-items: center; gap: 8px; text-decoration: none; border: 2px solid {{c.ink}}; border-radius: 999px; padding: 8px 16px; font-size: 14px; min-height: 44px; box-sizing: border-box;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-4-4"></path></svg>Buscar</a>
+      <button type="button" class="tc-tema" onClick="{{alternarTema}}" aria-label="{{temaLabel}}" style="display: flex; align-items: center; gap: 8px; font: inherit; font-size: 14px; border: 2px solid {{c.ink}}; background: {{c.ink}}; color: {{c.bg}}; border-radius: 999px; padding: 8px 16px; min-height: 44px; box-sizing: border-box; cursor: pointer;">
+        <sc-if value="{{claro}}" hint-placeholder-val="{{true}}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"></path></svg></sc-if>
+        <sc-if value="{{escuro}}" hint-placeholder-val="{{false}}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg></sc-if>
+        <span class="tc-tema-txt">{{temaTexto}}</span>
+      </button>
+    </div>
+    <sc-if value="{{menuAberto}}" hint-placeholder-val="{{false}}">
+      <button type="button" class="tc-fundo" onClick="{{fecharMenu}}" aria-label="Fechar o menu" tabindex="-1"></button>
+      <nav id="tc-painel" class="tc-painel" aria-label="Menu" style="background: {{c.bg}}; color: {{c.ink}}; border-right: 2px solid {{c.ink}};">
+        <div class="tc-painel-topo"><span>Tempo Continuum</span><button type="button" onClick="{{fecharMenu}}">Fechar</button></div>
+        <a href="index.html" style="text-decoration: none; display: block; padding: 14px 12px; font-size: 18px; border-bottom: 1px solid {{c.line}};">Início</a>
+        <a href="noticias.html" style="text-decoration: none; display: block; padding: 14px 12px; font-size: 18px; border-bottom: 1px solid {{c.line}};">Notícias</a>
+        <a href="streaming.html" style="text-decoration: none; display: block; padding: 14px 12px; font-size: 18px; border-bottom: 1px solid {{c.line}};">Streaming</a>
+        <a href="ferramentas.html" style="text-decoration: none; display: block; padding: 14px 12px; font-size: 18px; border-bottom: 1px solid {{c.line}};">Recursos</a>
+        <a href="cursos.html" aria-current="page" style="text-decoration: none; display: block; padding: 14px 12px; font-size: 18px; border-bottom: 1px solid {{c.line}}; background: #556A2F; color: #FFFAF0;">Academia</a>
+        <a href="politicos.html" style="text-decoration: none; display: block; padding: 14px 12px; font-size: 18px; border-bottom: 1px solid {{c.line}};">Wiki</a>
+        <a href="dossies.html" style="text-decoration: none; display: block; padding: 14px 12px; font-size: 18px; border-bottom: 1px solid {{c.line}};">Dossiês</a>
+        <a href="publicacoes.html" style="text-decoration: none; display: block; padding: 14px 12px; font-size: 18px; border-bottom: 1px solid {{c.line}};">Publicações</a>
+        <a href="noticias.html" onClick="{{fecharMenu}}" style="text-decoration: none; display: flex; align-items: center; gap: 10px; padding: 14px 12px; font-size: 18px;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-4-4"></path></svg>Buscar</a>
+      </nav>
+    </sc-if>
+  </header>
+
+  <main style="max-width: 1240px; margin: 0 auto; padding: 32px 24px 80px; display: flex; flex-direction: column; gap: 36px;">
+    <p style="margin: 0; font-size: 13px; color: {{c.muted}};"><a href="index.html" style="text-underline-offset: 3px;">Início</a> / <a href="cursos.html" style="text-underline-offset: 3px;">Academia</a> / Musculação gastando o mínimo</p>
+
+    <div style="display: flex; flex-direction: column; gap: 14px;">
+      <p style="margin: 0; font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: {{c.muted}};">Curso · Saúde</p>
+      <h1 style="margin: 0; font-size: clamp(2.2rem, 5vw, 3.4rem); line-height: 1.02; letter-spacing: -0.02em; max-width: 20ch;"><span style="background: #556A2F; color: #FFFAF0; padding: 0 10px; box-decoration-break: clone; -webkit-box-decoration-break: clone;">Musculação gastando o mínimo</span></h1>
+      <p style="margin: 0; font-size: 1.1rem; line-height: 1.55; color: {{c.muted}}; max-width: 62ch;">Como ganhar força e massa muscular com o peso do corpo, uma mochila e no máximo R$ 150 em equipamento: princípios do treino, exercícios com progressões, programas prontos e alimentação barata.</p>
+      <div style="display: flex; flex-wrap: wrap; gap: 8px; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase;">
+        <span style="background: #556A2F; color: #FFFAF0; padding: 4px 10px;">8 módulos</span>
+        <span style="border: 1.5px solid {{c.ink}}; padding: 3px 10px;">Para iniciantes e intermediários</span>
+        <span style="border: 1.5px solid {{c.ink}}; padding: 3px 10px;">Preços de nov. 2026</span>
+      </div>
+    </div>
+
+    <div style="display: flex; flex-wrap: wrap; gap: 40px; align-items: flex-start; border-top: 2px solid {{c.ink}}; padding-top: 28px;">
+      <aside style="flex: 1 1 280px; min-width: 0; display: flex; flex-direction: column; gap: 20px;">
+        <nav aria-labelledby="h-sumario" style="background: {{c.surface}}; border: 1px solid {{c.line}}; padding: 22px;">
+          <h2 id="h-sumario" style="margin: 0 0 14px; font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: {{c.muted}};">Módulos</h2>
+          <ol style="margin: 0; padding: 0 0 0 1.4em; display: flex; flex-direction: column; gap: 10px; font-size: 0.95rem; line-height: 1.35;">
+            <li><a href="#m1" style="text-underline-offset: 3px;">Princípios do treino</a></li>
+            <li><a href="#m2" style="text-underline-offset: 3px;">Equipamento: do custo zero ao kit de R$ 150</a></li>
+            <li><a href="#m3" style="text-underline-offset: 3px;">Exercícios e progressões</a></li>
+            <li><a href="#m4" style="text-underline-offset: 3px;">Programas prontos</a></li>
+            <li><a href="#m5" style="text-underline-offset: 3px;">Alimentação barata para ganhar músculo</a></li>
+            <li><a href="#m6" style="text-underline-offset: 3px;">Recuperação e prevenção de lesões</a></li>
+            <li><a href="#m7" style="text-underline-offset: 3px;">Acompanhar o progresso e o que não comprar</a></li>
+            <li><a href="#m8" style="text-underline-offset: 3px;">Plano de 12 semanas</a></li>
+          </ol>
+        </nav>
+        <div style="border: 1px solid {{c.line}}; padding: 22px; display: flex; flex-direction: column; gap: 10px;">
+          <h2 style="margin: 0; font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: {{c.muted}};">A ideia central</h2>
+          <p style="margin: 0; font-size: 0.98rem; line-height: 1.55;">O músculo responde a esforço perto da falha e a progresso constante, não à marca do aparelho. Peso do corpo, uma mochila e uma barra de porta cobrem quase tudo o que uma academia oferece no começo.</p>
+        </div>
+      </aside>
+
+      <div style="flex: 999 1 560px; min-width: 0; display: flex; flex-direction: column; gap: 48px;">
+
+        <section id="m1" style="display: flex; flex-direction: column; gap: 14px; scroll-margin-top: 16px;">
+          <p style="margin: 0; font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: {{c.muted}};">Módulo 1</p>
+          <h2 style="margin: 0; font-size: 1.6rem; line-height: 1.15;">Princípios do treino</h2>
+          <p style="margin: 0; font-size: 1.02rem; line-height: 1.65; max-width: 66ch;">Cinco regras explicam quase todo o resultado, e nenhuma custa dinheiro.</p>
+          <div style="overflow-x: auto;">
+            <table style="border-collapse: collapse; width: 100%; min-width: 560px; font-size: 0.92rem; line-height: 1.45;">
+              <thead><tr><th style="text-align: left; padding: 10px 12px 10px 0; border-bottom: 2px solid {{c.ink}}; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: {{c.muted}};">Princípio</th><th style="text-align: left; padding: 10px 12px; border-bottom: 2px solid {{c.ink}}; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: {{c.muted}};">O que significa</th><th style="text-align: left; padding: 10px 0 10px 12px; border-bottom: 2px solid {{c.ink}}; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: {{c.muted}};">Meta prática</th></tr></thead>
+              <tbody>
+                <tr><td style="padding: 12px 12px 12px 0; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Sobrecarga progressiva</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Fazer o exercício ficar mais difícil com o tempo</td><td style="padding: 12px 0 12px 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Mais repetições, mais peso na mochila ou uma variação mais difícil a cada 1 ou 2 semanas</td></tr>
+                <tr><td style="padding: 12px 12px 12px 0; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Volume</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Total de séries difíceis por músculo</td><td style="padding: 12px 0 12px 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">10 a 20 séries por grupo muscular por semana</td></tr>
+                <tr><td style="padding: 12px 12px 12px 0; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Proximidade da falha</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Quão perto você chega de não conseguir mais uma repetição</td><td style="padding: 12px 0 12px 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Terminar cada série com 0 a 3 repetições sobrando</td></tr>
+                <tr><td style="padding: 12px 12px 12px 0; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Frequência</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Quantas vezes treina cada músculo</td><td style="padding: 12px 0 12px 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">2 a 3 vezes por semana</td></tr>
+                <tr><td style="padding: 12px 12px 12px 0; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Faixa de repetições</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Repetições por série</td><td style="padding: 12px 0 12px 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">De 6 a 30 repetições, desde que a série seja difícil</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p style="margin: 0; font-size: 1.02rem; line-height: 1.65; max-width: 66ch;">A última linha é a chave do treino barato: <strong style="font-weight: 500;">séries de 15 a 30 repetições perto da falha geram hipertrofia parecida com a de séries pesadas</strong>. Por isso você não precisa de anilhas.</p>
+          <p style="margin: 0; font-size: 1.02rem; line-height: 1.65; max-width: 66ch;">Descanse de 1 a 3 minutos entre séries. Desça devagar (2 a 3 segundos) e use a amplitude completa: isso deixa exercícios leves muito mais difíceis, de graça.</p>
+        </section>
+
+        <section id="m2" style="display: flex; flex-direction: column; gap: 14px; scroll-margin-top: 16px;">
+          <p style="margin: 0; font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: {{c.muted}};">Módulo 2</p>
+          <h2 style="margin: 0; font-size: 1.6rem; line-height: 1.15;">Equipamento: do custo zero ao kit de R$ 150</h2>
+          <p style="margin: 0; font-size: 1.02rem; line-height: 1.65; max-width: 66ch;">Comece pelo nível 0 e só compre algo quando um exercício ficar fácil demais. Ordem de compra: primeiro a barra de porta, que é o único jeito barato de treinar costas na vertical; depois os elásticos.</p>
+          <div style="overflow-x: auto;">
+            <table style="border-collapse: collapse; width: 100%; min-width: 620px; font-size: 0.92rem; line-height: 1.45;">
+              <thead><tr><th style="text-align: left; padding: 10px 12px 10px 0; border-bottom: 2px solid {{c.ink}}; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: {{c.muted}};">Nível</th><th style="text-align: left; padding: 10px 12px; border-bottom: 2px solid {{c.ink}}; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: {{c.muted}};">Item</th><th style="text-align: left; padding: 10px 12px; border-bottom: 2px solid {{c.ink}}; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: {{c.muted}};">Custo aprox.</th><th style="text-align: left; padding: 10px 0 10px 12px; border-bottom: 2px solid {{c.ink}}; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: {{c.muted}};">Para que serve</th></tr></thead>
+              <tbody>
+                <tr><td style="padding: 12px 12px 12px 0; border-bottom: 1px solid {{c.line}}; vertical-align: top;">0</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Peso do corpo, chão e parede</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">R$ 0</td><td style="padding: 12px 0 12px 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Flexões, agachamentos, afundos, pranchas</td></tr>
+                <tr><td style="padding: 12px 12px 12px 0; border-bottom: 1px solid {{c.line}}; vertical-align: top;">0</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Mochila velha com livros, areia ou garrafas d'água</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">R$ 0</td><td style="padding: 12px 0 12px 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Carga extra em agachamento, flexão, remada e levantamento terra</td></tr>
+                <tr><td style="padding: 12px 12px 12px 0; border-bottom: 1px solid {{c.line}}; vertical-align: top;">0</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Mesa firme, ou cabo de vassoura apoiado em duas cadeiras</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">R$ 0</td><td style="padding: 12px 0 12px 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Remada invertida</td></tr>
+                <tr><td style="padding: 12px 12px 12px 0; border-bottom: 1px solid {{c.line}}; vertical-align: top;">0</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Toalha presa na porta (lado das dobradiças, porta fechada)</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">R$ 0</td><td style="padding: 12px 0 12px 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Remada com toalha</td></tr>
+                <tr><td style="padding: 12px 12px 12px 0; border-bottom: 1px solid {{c.line}}; vertical-align: top;">0</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Galões de 5 L com água ou areia (5 a 8 kg)</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">R$ 0</td><td style="padding: 12px 0 12px 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Halteres improvisados</td></tr>
+                <tr><td style="padding: 12px 12px 12px 0; border-bottom: 1px solid {{c.line}}; vertical-align: top;">0</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Academia ao ar livre da praça, barras de parque</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">R$ 0</td><td style="padding: 12px 0 12px 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Barra fixa, paralelas, abdominais</td></tr>
+                <tr><td style="padding: 12px 12px 12px 0; border-bottom: 1px solid {{c.line}}; vertical-align: top;">1</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Barra de porta sem parafuso</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">R$ 50 a 90</td><td style="padding: 12px 0 12px 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Barra fixa, chin-up, elevação de pernas</td></tr>
+                <tr><td style="padding: 12px 12px 12px 0; border-bottom: 1px solid {{c.line}}; vertical-align: top;">1</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Kit de elásticos tubulares ou mini bands</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">R$ 40 a 80</td><td style="padding: 12px 0 12px 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Ajuda na barra fixa, puxadas, rosca, ombros</td></tr>
+                <tr><td style="padding: 12px 12px 12px 0; border-bottom: 1px solid {{c.line}}; vertical-align: top;">2</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Saco de areia de construção (20 kg) dentro de mochila reforçada</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">R$ 10 a 20 por saco</td><td style="padding: 12px 0 12px 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Carga pesada para pernas</td></tr>
+                <tr><td style="padding: 12px 12px 12px 0; border-bottom: 1px solid {{c.line}}; vertical-align: top;">2</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Argolas de ginástica (opcional)</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">R$ 80 a 150</td><td style="padding: 12px 0 12px 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Paralelas, remadas e flexões instáveis</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div style="background: {{c.surface}}; border-left: 4px solid #556A2F; padding: 16px 20px; display: flex; flex-direction: column; gap: 8px;">
+            <h3 style="margin: 0; font-size: 1rem;">Segurança</h3>
+            <p style="margin: 0; font-size: 0.98rem; line-height: 1.6;">Confira a costura da mochila antes de passar de 15 kg, embale a areia em sacos duplos e teste a barra de porta com metade do seu peso antes de se pendurar.</p>
+          </div>
+          <p style="margin: 0; font-size: 1.02rem; line-height: 1.65; max-width: 66ch;">Alternativa: uma academia de bairro por R$ 60 a 90 por mês pode valer a pena para pernas pesadas. Muitas cidades também têm academias públicas e centros esportivos gratuitos.</p>
+        </section>
+
+        <section id="m3" style="display: flex; flex-direction: column; gap: 14px; scroll-margin-top: 16px;">
+          <p style="margin: 0; font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: {{c.muted}};">Módulo 3</p>
+          <h2 style="margin: 0; font-size: 1.6rem; line-height: 1.15;">Exercícios e progressões</h2>
+          <p style="margin: 0; font-size: 1.02rem; line-height: 1.65; max-width: 66ch;">Cada padrão de movimento tem uma escada. Quando fizer 3 séries de 15 a 20 repetições limpas, suba um degrau ou ponha mais peso na mochila. Leia cada linha da esquerda (mais fácil) para a direita (mais difícil).</p>
+          <div style="overflow-x: auto;">
+            <table style="border-collapse: collapse; width: 100%; min-width: 860px; font-size: 0.92rem; line-height: 1.45;">
+              <thead><tr><th style="text-align: left; padding: 10px 12px 10px 0; border-bottom: 2px solid {{c.ink}}; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: {{c.muted}};">Padrão</th><th style="text-align: left; padding: 10px 12px; border-bottom: 2px solid {{c.ink}}; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: {{c.muted}};">Degrau 1</th><th style="text-align: left; padding: 10px 12px; border-bottom: 2px solid {{c.ink}}; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: {{c.muted}};">Degrau 2</th><th style="text-align: left; padding: 10px 12px; border-bottom: 2px solid {{c.ink}}; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: {{c.muted}};">Degrau 3</th><th style="text-align: left; padding: 10px 12px; border-bottom: 2px solid {{c.ink}}; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: {{c.muted}};">Degrau 4</th><th style="text-align: left; padding: 10px 0 10px 12px; border-bottom: 2px solid {{c.ink}}; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: {{c.muted}};">Degrau 5</th></tr></thead>
+              <tbody>
+                <tr><td style="padding: 12px 12px 12px 0; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Empurrar horizontal<br><span style="font-size: 0.82rem; color: {{c.muted}};">peito, tríceps</span></td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Flexão na parede</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Flexão inclinada, mãos na mesa</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Flexão no chão</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Flexão com pés elevados ou mochila</td><td style="padding: 12px 0 12px 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Flexão archer ou com pausa</td></tr>
+                <tr><td style="padding: 12px 12px 12px 0; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Empurrar vertical<br><span style="font-size: 0.82rem; color: {{c.muted}};">ombros</span></td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Pike push-up com mãos elevadas</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Pike push-up no chão</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Pike com pés elevados</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Parada de mãos na parede, parcial</td><td style="padding: 12px 0 12px 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Flexão em parada de mãos na parede</td></tr>
+                <tr><td style="padding: 12px 12px 12px 0; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Paralelas<br><span style="font-size: 0.82rem; color: {{c.muted}};">peito, tríceps</span></td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Mergulho no banco, joelhos dobrados</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Mergulho no banco, pernas estendidas</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Paralelas com elástico</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Paralelas na praça ou entre cadeiras firmes</td><td style="padding: 12px 0 12px 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Paralelas com mochila</td></tr>
+                <tr><td style="padding: 12px 12px 12px 0; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Puxar horizontal<br><span style="font-size: 0.82rem; color: {{c.muted}};">costas, bíceps</span></td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Remada com toalha na porta</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Remada invertida na mesa, joelhos dobrados</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Remada invertida, pernas estendidas</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Remada invertida, pés elevados</td><td style="padding: 12px 0 12px 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Remada com mochila pesada ou argolas</td></tr>
+                <tr><td style="padding: 12px 12px 12px 0; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Puxar vertical<br><span style="font-size: 0.82rem; color: {{c.muted}};">costas, bíceps</span></td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Pendurar na barra, 30 a 60 s</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Negativas: sobe com cadeira, desce em 5 s</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Barra fixa com elástico</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Barra fixa ou chin-up</td><td style="padding: 12px 0 12px 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Barra com mochila</td></tr>
+                <tr><td style="padding: 12px 12px 12px 0; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Agachar<br><span style="font-size: 0.82rem; color: {{c.muted}};">quadríceps, glúteos</span></td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Agachamento na cadeira</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Agachamento livre</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Búlgaro, pé de trás no sofá</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Búlgaro com mochila</td><td style="padding: 12px 0 12px 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Pistol assistido ou shrimp squat</td></tr>
+                <tr><td style="padding: 12px 12px 12px 0; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Dobradiça de quadril<br><span style="font-size: 0.82rem; color: {{c.muted}};">posterior, glúteos</span></td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Ponte de glúteo</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Ponte unilateral</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Stiff unilateral com galão ou mochila</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Hip thrust com mochila no sofá</td><td style="padding: 12px 0 12px 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Nordic curl assistido, pés presos no sofá</td></tr>
+                <tr><td style="padding: 12px 12px 12px 0; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Panturrilha</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Elevação no chão</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Elevação no degrau, amplitude total</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Unilateral no degrau</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Unilateral com mochila</td><td style="padding: 12px 0 12px 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Unilateral com pausa de 2 s embaixo</td></tr>
+                <tr><td style="padding: 12px 12px 12px 0; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Core</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Prancha de 30 s</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Dead bug</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Prancha lateral</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Elevação de joelhos na barra</td><td style="padding: 12px 0 12px 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Elevação de pernas estendidas na barra</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p style="margin: 0; font-size: 1.02rem; line-height: 1.65; max-width: 66ch;">Bíceps e tríceps já trabalham em remadas, barras e flexões. Para isolar: rosca com galão ou elástico, e tríceps testa com mochila ou flexão diamante.</p>
+          <h3 style="margin: 6px 0 0; font-size: 1.1rem;">Três truques para dificultar sem comprar nada</h3>
+          <ul style="margin: 0; padding-left: 1.2em; display: flex; flex-direction: column; gap: 10px; font-size: 1.02rem; line-height: 1.6; max-width: 66ch;">
+            <li><strong style="font-weight: 500;">Descida lenta</strong> de 3 a 4 segundos.</li>
+            <li><strong style="font-weight: 500;">Pausa</strong> de 2 segundos na posição mais difícil.</li>
+            <li><strong style="font-weight: 500;">Uma e meia:</strong> desce tudo, sobe metade, desce de novo e sobe tudo; isso conta como 1 repetição.</li>
+          </ul>
+        </section>
+
+        <section id="m4" style="display: flex; flex-direction: column; gap: 14px; scroll-margin-top: 16px;">
+          <p style="margin: 0; font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: {{c.muted}};">Módulo 4</p>
+          <h2 style="margin: 0; font-size: 1.6rem; line-height: 1.15;">Programas prontos</h2>
+          <p style="margin: 0; font-size: 1.02rem; line-height: 1.65; max-width: 66ch;">Quem treina há menos de 6 meses usa o Programa A. Quem já faz barra fixa e flexões com facilidade usa o Programa B. Em cada exercício, escolha o degrau do Módulo 3 que te leve perto da falha na faixa indicada.</p>
+          <h3 style="margin: 6px 0 0; font-size: 1.1rem;">Programa A: corpo inteiro, 3 vezes por semana, cerca de 45 min</h3>
+          <p style="margin: 0; font-size: 1.02rem; line-height: 1.65; max-width: 66ch;">Segunda, quarta e sexta, alternando o Treino 1 e o Treino 2.</p>
+          <div style="overflow-x: auto;">
+            <table style="border-collapse: collapse; width: 100%; min-width: 560px; font-size: 0.92rem; line-height: 1.45;">
+              <thead><tr><th style="text-align: left; padding: 10px 12px 10px 0; border-bottom: 2px solid {{c.ink}}; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: {{c.muted}};">Grupo</th><th style="text-align: left; padding: 10px 12px; border-bottom: 2px solid {{c.ink}}; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: {{c.muted}};">Treino 1</th><th style="text-align: left; padding: 10px 12px; border-bottom: 2px solid {{c.ink}}; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: {{c.muted}};">Treino 2</th><th style="text-align: left; padding: 10px 0 10px 12px; border-bottom: 2px solid {{c.ink}}; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: {{c.muted}};">Séries × repetições</th></tr></thead>
+              <tbody>
+                <tr><td style="padding: 12px 12px 12px 0; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Pernas</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Agachamento</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Búlgaro</td><td style="padding: 12px 0 12px 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">3 × 8 a 20</td></tr>
+                <tr><td style="padding: 12px 12px 12px 0; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Empurrar</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Flexão</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Pike push-up</td><td style="padding: 12px 0 12px 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">3 × 6 a 20</td></tr>
+                <tr><td style="padding: 12px 12px 12px 0; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Puxar</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Remada invertida</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Barra fixa ou negativas</td><td style="padding: 12px 0 12px 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">3 × 5 a 15</td></tr>
+                <tr><td style="padding: 12px 12px 12px 0; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Quadril</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Ponte ou hip thrust</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Stiff unilateral</td><td style="padding: 12px 0 12px 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">3 × 10 a 20</td></tr>
+                <tr><td style="padding: 12px 12px 12px 0; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Acessório</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Panturrilha</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Rosca com galão ou elástico</td><td style="padding: 12px 0 12px 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">2 × 12 a 25</td></tr>
+                <tr><td style="padding: 12px 12px 12px 0; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Core</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Prancha</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Dead bug</td><td style="padding: 12px 0 12px 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">2 séries</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <h3 style="margin: 6px 0 0; font-size: 1.1rem;">Programa B: superior e inferior, 4 vezes por semana, cerca de 50 min</h3>
+          <p style="margin: 0; font-size: 1.02rem; line-height: 1.65; max-width: 66ch;">Superior A na segunda, Inferior A na terça, Superior B na quinta, Inferior B na sexta.</p>
+          <div style="overflow-x: auto;">
+            <table style="border-collapse: collapse; width: 100%; min-width: 560px; font-size: 0.92rem; line-height: 1.45;">
+              <thead><tr><th style="text-align: left; padding: 10px 12px 10px 0; border-bottom: 2px solid {{c.ink}}; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: {{c.muted}};">Treino</th><th style="text-align: left; padding: 10px 12px; border-bottom: 2px solid {{c.ink}}; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: {{c.muted}};">Exercícios</th><th style="text-align: left; padding: 10px 0 10px 12px; border-bottom: 2px solid {{c.ink}}; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: {{c.muted}};">Séries × repetições</th></tr></thead>
+              <tbody>
+                <tr><td style="padding: 12px 12px 12px 0; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Superior A</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Barra fixa (com mochila se possível), flexão com pés elevados, remada invertida, paralelas, rosca com elástico</td><td style="padding: 12px 0 12px 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">3 a 4 × 6 a 15</td></tr>
+                <tr><td style="padding: 12px 12px 12px 0; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Inferior A</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Búlgaro com mochila, stiff unilateral, panturrilha unilateral, elevação de pernas na barra</td><td style="padding: 12px 0 12px 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">3 a 4 × 8 a 20</td></tr>
+                <tr><td style="padding: 12px 12px 12px 0; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Superior B</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Pike ou parada de mãos na parede, chin-up, flexão archer, remada com mochila, tríceps testa com mochila</td><td style="padding: 12px 0 12px 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">3 a 4 × 6 a 15</td></tr>
+                <tr><td style="padding: 12px 12px 12px 0; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Inferior B</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Agachamento com mochila pesada, hip thrust com mochila, nordic curl assistido, prancha lateral</td><td style="padding: 12px 0 12px 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">3 a 4 × 8 a 20</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div style="background: {{c.surface}}; border-left: 4px solid #556A2F; padding: 16px 20px; display: flex; flex-direction: column; gap: 8px;">
+            <h3 style="margin: 0; font-size: 1rem;">Como progredir</h3>
+            <p style="margin: 0; font-size: 0.98rem; line-height: 1.6;">Mantenha o mesmo degrau e a mesma carga até chegar ao topo da faixa em todas as séries. Aí acrescente 1 a 2 kg na mochila, ou suba um degrau, e volte ao início da faixa. A cada 6 a 8 semanas, faça uma semana leve com metade das séries.</p>
+          </div>
+        </section>
+
+        <section id="m5" style="display: flex; flex-direction: column; gap: 14px; scroll-margin-top: 16px;">
+          <p style="margin: 0; font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: {{c.muted}};">Módulo 5</p>
+          <h2 style="margin: 0; font-size: 1.6rem; line-height: 1.15;">Alimentação barata para ganhar músculo</h2>
+          <p style="margin: 0; font-size: 1.02rem; line-height: 1.65; max-width: 66ch;">A meta é <strong style="font-weight: 500;">1,6 g de proteína por kg de peso por dia</strong> e um leve excesso de 250 a 500 kcal. Uma pessoa de 75 kg precisa de cerca de 120 g de proteína. Feijão, soja texturizada, ovos e frango entregam isso por bem menos do que suplementos.</p>
+          <div style="overflow-x: auto;">
+            <table style="border-collapse: collapse; width: 100%; min-width: 620px; font-size: 0.92rem; line-height: 1.45;">
+              <thead><tr><th style="text-align: left; padding: 10px 12px 10px 0; border-bottom: 2px solid {{c.ink}}; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: {{c.muted}};">Alimento</th><th style="text-align: left; padding: 10px 12px; border-bottom: 2px solid {{c.ink}}; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: {{c.muted}};">Preço aprox.</th><th style="text-align: left; padding: 10px 12px; border-bottom: 2px solid {{c.ink}}; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: {{c.muted}};">Proteína</th><th style="text-align: left; padding: 10px 0 10px 12px; border-bottom: 2px solid {{c.ink}}; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: {{c.muted}};">Custo por 20 g de proteína</th></tr></thead>
+              <tbody>
+                <tr><td style="padding: 12px 12px 12px 0; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Proteína texturizada de soja (PTS)</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">R$ 18/kg</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">~50 g/100 g</td><td style="padding: 12px 0 12px 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">~R$ 0,70</td></tr>
+                <tr><td style="padding: 12px 12px 12px 0; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Feijão seco</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">R$ 8/kg</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">~21 g/100 g</td><td style="padding: 12px 0 12px 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">~R$ 0,80</td></tr>
+                <tr><td style="padding: 12px 12px 12px 0; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Lentilha ou grão-de-bico seco</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">R$ 12/kg</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">~20 a 23 g/100 g</td><td style="padding: 12px 0 12px 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">~R$ 1,10</td></tr>
+                <tr><td style="padding: 12px 12px 12px 0; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Fígado bovino</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">R$ 18/kg</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">~20 g/100 g</td><td style="padding: 12px 0 12px 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">~R$ 1,80</td></tr>
+                <tr><td style="padding: 12px 12px 12px 0; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Peito de frango</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">R$ 22/kg</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">~23 g/100 g</td><td style="padding: 12px 0 12px 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">~R$ 1,90</td></tr>
+                <tr><td style="padding: 12px 12px 12px 0; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Coxa e sobrecoxa</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">R$ 13/kg</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">~13 g/100 g com osso</td><td style="padding: 12px 0 12px 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">~R$ 2,00</td></tr>
+                <tr><td style="padding: 12px 12px 12px 0; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Leite em pó integral</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">R$ 40/kg</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">~26 g/100 g</td><td style="padding: 12px 0 12px 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">~R$ 3,00</td></tr>
+                <tr><td style="padding: 12px 12px 12px 0; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Whey concentrado</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">R$ 120/kg</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">~75 g/100 g</td><td style="padding: 12px 0 12px 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">~R$ 3,20</td></tr>
+                <tr><td style="padding: 12px 12px 12px 0; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Ovos</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">R$ 12/dúzia</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">~6 g/ovo</td><td style="padding: 12px 0 12px 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">~R$ 3,30</td></tr>
+                <tr><td style="padding: 12px 12px 12px 0; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Carne moída (patinho)</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">R$ 45/kg</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">~21 g/100 g</td><td style="padding: 12px 0 12px 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">~R$ 4,30</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p style="margin: 0; font-size: 1.02rem; line-height: 1.65; max-width: 66ch;">Preços aproximados. Confira no seu mercado e refaça a conta: preço por kg ÷ gramas de proteína por kg × 20. Leguminosas com arroz formam proteína completa; ovos e frango continuam valendo pela praticidade.</p>
+          <h3 style="margin: 6px 0 0; font-size: 1.1rem;">Cardápio exemplo: 75 kg, cerca de 120 g de proteína, R$ 15 a 18 por dia</h3>
+          <div style="overflow-x: auto;">
+            <table style="border-collapse: collapse; width: 100%; min-width: 560px; font-size: 0.92rem; line-height: 1.45;">
+              <thead><tr><th style="text-align: left; padding: 10px 12px 10px 0; border-bottom: 2px solid {{c.ink}}; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: {{c.muted}};">Refeição</th><th style="text-align: left; padding: 10px 12px; border-bottom: 2px solid {{c.ink}}; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: {{c.muted}};">O que comer</th><th style="text-align: left; padding: 10px 0 10px 12px; border-bottom: 2px solid {{c.ink}}; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: {{c.muted}};">Proteína aprox.</th></tr></thead>
+              <tbody>
+                <tr><td style="padding: 12px 12px 12px 0; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Café da manhã</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">3 ovos mexidos, 2 pães, banana</td><td style="padding: 12px 0 12px 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">25 g</td></tr>
+                <tr><td style="padding: 12px 12px 12px 0; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Almoço</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Arroz, 1 concha grande de feijão, 150 g de frango, salada</td><td style="padding: 12px 0 12px 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">45 g</td></tr>
+                <tr><td style="padding: 12px 12px 12px 0; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Lanche</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Copo de leite com 2 colheres de leite em pó, aveia</td><td style="padding: 12px 0 12px 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">15 g</td></tr>
+                <tr><td style="padding: 12px 12px 12px 0; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Jantar</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Arroz, feijão, 40 g (seco) de PTS refogada como carne moída, legumes</td><td style="padding: 12px 0 12px 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">35 g</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <h3 style="margin: 6px 0 0; font-size: 1.1rem;">Lista de compras da semana, para uma pessoa</h3>
+          <ul style="margin: 0; padding-left: 1.2em; display: flex; flex-direction: column; gap: 10px; font-size: 1.02rem; line-height: 1.6; max-width: 66ch;">
+            <li>2 dúzias de ovos</li>
+            <li>1 kg de feijão e 2 kg de arroz</li>
+            <li>1 kg de peito ou 1,5 kg de coxa e sobrecoxa</li>
+            <li>500 g de PTS</li>
+            <li>400 g de leite em pó e 1 kg de aveia</li>
+            <li>Bananas, legumes e verduras da época (a feira no fim do dia sai mais barata)</li>
+          </ul>
+          <p style="margin: 0; font-size: 1.02rem; line-height: 1.65; max-width: 66ch;">Para economizar tempo e gás, cozinhe feijão e frango em grande quantidade uma vez por semana e congele em porções.</p>
+        </section>
+
+        <section id="m6" style="display: flex; flex-direction: column; gap: 14px; scroll-margin-top: 16px;">
+          <p style="margin: 0; font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: {{c.muted}};">Módulo 6</p>
+          <h2 style="margin: 0; font-size: 1.6rem; line-height: 1.15;">Recuperação e prevenção de lesões</h2>
+          <p style="margin: 0; font-size: 1.02rem; line-height: 1.65; max-width: 66ch;">O músculo cresce no descanso, e as ferramentas de recuperação mais eficazes são gratuitas: sono, dias de folga e boa técnica.</p>
+          <ul style="margin: 0; padding-left: 1.2em; display: flex; flex-direction: column; gap: 10px; font-size: 1.02rem; line-height: 1.6; max-width: 66ch;">
+            <li><strong style="font-weight: 500;">Sono:</strong> 7 a 9 horas por noite. Quarto escuro, celular longe 30 minutos antes de dormir, horário fixo.</li>
+            <li><strong style="font-weight: 500;">Folga:</strong> pelo menos 1 dia entre treinos do mesmo músculo. Caminhada leve nos dias livres ajuda.</li>
+            <li><strong style="font-weight: 500;">Aquecimento de 5 minutos:</strong> polichinelos, rotação de ombros e quadril, e uma série fácil do primeiro exercício.</li>
+            <li><strong style="font-weight: 500;">Técnica antes de carga:</strong> só suba de degrau com a execução controlada. Grave-se com o celular para conferir.</li>
+            <li><strong style="font-weight: 500;">Dor ou desconforto?</strong> Ardência no músculo e dor tardia (24 a 72 horas) são normais. Dor aguda, pontada na articulação ou formigamento: pare e troque o exercício.</li>
+            <li><strong style="font-weight: 500;">Água:</strong> cerca de 35 ml por kg por dia, uns 2,6 L para 75 kg.</li>
+          </ul>
+          <div style="background: {{c.surface}}; border-left: 4px solid #556A2F; padding: 16px 20px; display: flex; flex-direction: column; gap: 8px;">
+            <h3 style="margin: 0; font-size: 1rem;">Antes de começar</h3>
+            <p style="margin: 0; font-size: 0.98rem; line-height: 1.6;">Quem tem doença cardíaca, pressão alta sem controle ou lesão anterior deve passar por avaliação médica. Isso pode ser feito de graça na UBS, pelo SUS.</p>
+          </div>
+        </section>
+
+        <section id="m7" style="display: flex; flex-direction: column; gap: 14px; scroll-margin-top: 16px;">
+          <p style="margin: 0; font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: {{c.muted}};">Módulo 7</p>
+          <h2 style="margin: 0; font-size: 1.6rem; line-height: 1.15;">Acompanhar o progresso e o que não comprar</h2>
+          <p style="margin: 0; font-size: 1.02rem; line-height: 1.65; max-width: 66ch;">Sem registro, você não sabe se está progredindo. Um caderno ou o bloco de notas do celular basta.</p>
+          <p style="margin: 0; font-size: 1.02rem; line-height: 1.65; max-width: 66ch;">Anote em cada treino: data, exercício, degrau, carga da mochila e repetições de cada série. Exemplo: <code>08/11, flexão com pés elevados, mochila 5 kg: 12, 10, 9</code>.</p>
+          <h3 style="margin: 6px 0 0; font-size: 1.1rem;">A cada 2 a 4 semanas, meça de graça</h3>
+          <ul style="margin: 0; padding-left: 1.2em; display: flex; flex-direction: column; gap: 10px; font-size: 1.02rem; line-height: 1.6; max-width: 66ch;">
+            <li>Peso em jejum (use a média da semana). Para iniciantes, ganhar de 0,25 a 0,5 kg por mês é um bom ritmo.</li>
+            <li>Fita métrica de costura (R$ 5): braço, peito, cintura e coxa.</li>
+            <li>Fotos de frente, de lado e de costas, sempre com a mesma luz.</li>
+          </ul>
+          <h3 style="margin: 6px 0 0; font-size: 1.1rem;">Não gaste com isto</h3>
+          <div style="overflow-x: auto;">
+            <table style="border-collapse: collapse; width: 100%; min-width: 560px; font-size: 0.92rem; line-height: 1.45;">
+              <thead><tr><th style="text-align: left; padding: 10px 12px 10px 0; border-bottom: 2px solid {{c.ink}}; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: {{c.muted}};">Item</th><th style="text-align: left; padding: 10px 0 10px 12px; border-bottom: 2px solid {{c.ink}}; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: {{c.muted}};">Por que é dispensável</th></tr></thead>
+              <tbody>
+                <tr><td style="padding: 12px 12px 12px 0; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Pré-treino, BCAA, glutamina, "queimadores"</td><td style="padding: 12px 0 12px 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Pouco ou nenhum efeito para quem come proteína suficiente; café coado faz o papel do pré-treino</td></tr>
+                <tr><td style="padding: 12px 12px 12px 0; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Whey</td><td style="padding: 12px 0 12px 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">É só proteína. Vale pela praticidade, mas custa mais por grama do que feijão, PTS e frango</td></tr>
+                <tr><td style="padding: 12px 12px 12px 0; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Luvas, cinturão e munhequeira para treino em casa</td><td style="padding: 12px 0 12px 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Desnecessários com as cargas deste curso</td></tr>
+                <tr><td style="padding: 12px 12px 12px 0; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Aparelhos "milagrosos" de abdômen e eletroestimuladores</td><td style="padding: 12px 0 12px 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Não substituem treino nem alimentação</td></tr>
+                <tr><td style="padding: 12px 12px 12px 0; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Roupa e tênis específicos</td><td style="padding: 12px 0 12px 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Qualquer roupa confortável serve; treine descalço ou de tênis comum</td></tr>
+                <tr><td style="padding: 12px 12px 12px 0; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Planos e aplicativos pagos</td><td style="padding: 12px 0 12px 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Este curso e um caderno cobrem o necessário</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p style="margin: 0; font-size: 1.02rem; line-height: 1.65; max-width: 66ch;">O único suplemento com bom custo-benefício comprovado é a <strong style="font-weight: 500;">creatina monohidratada</strong>: 3 a 5 g por dia, cerca de R$ 60 a 100 por 300 g, que duram 2 a 3 meses. É opcional.</p>
+        </section>
+
+        <section id="m8" style="display: flex; flex-direction: column; gap: 14px; scroll-margin-top: 16px;">
+          <p style="margin: 0; font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: {{c.muted}};">Módulo 8</p>
+          <h2 style="margin: 0; font-size: 1.6rem; line-height: 1.15;">Plano de 12 semanas</h2>
+          <p style="margin: 0; font-size: 1.02rem; line-height: 1.65; max-width: 66ch;">Em 12 semanas o objetivo é sair do zero para uma rotina estável, com progresso registrado, gastando no máximo R$ 150 em equipamento.</p>
+          <div style="overflow-x: auto;">
+            <table style="border-collapse: collapse; width: 100%; min-width: 620px; font-size: 0.92rem; line-height: 1.45;">
+              <thead><tr><th style="text-align: left; padding: 10px 12px 10px 0; border-bottom: 2px solid {{c.ink}}; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: {{c.muted}};">Semanas</th><th style="text-align: left; padding: 10px 12px; border-bottom: 2px solid {{c.ink}}; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: {{c.muted}};">Foco</th><th style="text-align: left; padding: 10px 12px; border-bottom: 2px solid {{c.ink}}; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: {{c.muted}};">Treino</th><th style="text-align: left; padding: 10px 0 10px 12px; border-bottom: 2px solid {{c.ink}}; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: {{c.muted}};">Gasto previsto</th></tr></thead>
+              <tbody>
+                <tr><td style="padding: 12px 12px 12px 0; border-bottom: 1px solid {{c.line}}; vertical-align: top;">1 e 2</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Aprender a técnica e achar o degrau certo em cada padrão</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Programa A com 2 séries por exercício</td><td style="padding: 12px 0 12px 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">R$ 0</td></tr>
+                <tr><td style="padding: 12px 12px 12px 0; border-bottom: 1px solid {{c.line}}; vertical-align: top;">3 a 6</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Subir para 3 séries e aplicar a progressão</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Programa A completo</td><td style="padding: 12px 0 12px 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Barra de porta, R$ 50 a 90</td></tr>
+                <tr><td style="padding: 12px 12px 12px 0; border-bottom: 1px solid {{c.line}}; vertical-align: top;">7</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Semana leve</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Metade das séries</td><td style="padding: 12px 0 12px 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">R$ 0</td></tr>
+                <tr><td style="padding: 12px 12px 12px 0; border-bottom: 1px solid {{c.line}}; vertical-align: top;">8 a 11</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Pôr carga com a mochila e buscar a primeira barra fixa</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Programa A, ou B se já fizer 5 barras</td><td style="padding: 12px 0 12px 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Elásticos, R$ 40 a 80, se precisar</td></tr>
+                <tr><td style="padding: 12px 12px 12px 0; border-bottom: 1px solid {{c.line}}; vertical-align: top;">12</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Reavaliar: medidas, fotos e caderno comparado à semana 1</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Semana leve, depois novo ciclo</td><td style="padding: 12px 0 12px 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">R$ 0</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <h3 style="margin: 6px 0 0; font-size: 1.1rem;">Checklist semanal</h3>
+          <ul style="margin: 0; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 0 24px; font-size: 0.95rem; line-height: 1.45;">
+            <li style="display: flex; gap: 10px; padding: 9px 0; border-top: 1px solid {{c.line}};"><span aria-hidden="true">☐</span>Treinei 3 (ou 4) vezes</li>
+            <li style="display: flex; gap: 10px; padding: 9px 0; border-top: 1px solid {{c.line}};"><span aria-hidden="true">☐</span>Registrei todas as séries no caderno</li>
+            <li style="display: flex; gap: 10px; padding: 9px 0; border-top: 1px solid {{c.line}};"><span aria-hidden="true">☐</span>Fiz mais repetições, mais carga ou subi de degrau em pelo menos um exercício</li>
+            <li style="display: flex; gap: 10px; padding: 9px 0; border-top: 1px solid {{c.line}};"><span aria-hidden="true">☐</span>Comi cerca de 1,6 g de proteína por kg na maioria dos dias</li>
+            <li style="display: flex; gap: 10px; padding: 9px 0; border-top: 1px solid {{c.line}};"><span aria-hidden="true">☐</span>Dormi 7 horas ou mais na maioria das noites</li>
+            <li style="display: flex; gap: 10px; padding: 9px 0; border-top: 1px solid {{c.line}};"><span aria-hidden="true">☐</span>Cozinhei e congelei as proteínas da semana</li>
+          </ul>
+        </section>
+
+        <section style="display: flex; flex-direction: column; gap: 12px; border-top: 2px solid {{c.ink}}; padding-top: 24px;">
+          <p style="margin: 0; font-size: 12px; color: {{c.muted}};">Preços aproximados, de novembro de 2026; variam por região e loja. Este curso é material educativo e não substitui orientação de profissional de saúde ou de educação física.</p>
+          <p style="margin: 8px 0 0;"><a href="cursos.html" style="text-decoration: none; border: 2px solid {{c.ink}}; padding: 10px 18px; font-size: 14px; display: inline-block;">← Todos os cursos</a></p>
+        </section>
+
+      </div>
+    </div>
+  </main>
+
+  <footer style="background: #101010; color: #FFFAF0; border-top: 1px solid {{c.line}};">
+    <div style="max-width: 1240px; margin: 0 auto; padding: 48px 24px 40px; display: flex; flex-wrap: wrap; gap: 40px; justify-content: space-between;">
+      <div style="flex: 1 1 360px; min-width: 0; display: flex; flex-direction: column; gap: 12px;">
+        <p style="margin: 0; font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase;">Tempo Continuum</p>
+        <p style="margin: 0; font-size: 1.4rem; line-height: 1.25; max-width: 24ch;"><span style="background: #556A2F; color: #FFFAF0; padding: 0 6px; box-decoration-break: clone; -webkit-box-decoration-break: clone;">Conhecer o passado. Organizar o presente. Construir o futuro.</span></p>
+      </div>
+      <nav aria-label="Rodapé" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 40px; font-size: 14px; align-content: start;">
+        <a href="noticias.html" style="text-decoration: none;">Notícias</a>
+        <a href="streaming.html" style="text-decoration: none;">Streaming</a>
+        <a href="ferramentas.html" style="text-decoration: none;">Recursos</a>
+        <a href="cursos.html" style="text-decoration: none;">Academia</a>
+        <a href="politicos.html" style="text-decoration: none;">Wiki</a>
+        <a href="dossies.html" style="text-decoration: none;">Dossiês</a>
+        <a href="publicacoes.html" style="text-decoration: none;">Publicações</a>
+        <a href="index.html" style="text-decoration: none;">Início</a>
+      </nav>
+    </div>
+  </footer>
+</div>
+</template>
+<script src="js/runtime.js"></script>
+<script>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { escuro: null };
+  }
+  componentDidMount() {
+    try {
+      var v = window.localStorage.getItem('tc-tema');
+      if (v === 'escuro' || v === 'claro') this.setState({ escuro: v === 'escuro' });
+    } catch (e) {}
+  }
+  renderVals() {
+    var escuro = (this.state && this.state.escuro !== null && this.state.escuro !== undefined)
+      ? this.state.escuro
+      : (this.props.tema ?? 'claro') === 'escuro';
+    var self = this;
+    var c = escuro
+      ? { bg: '#101010', surface: '#2F2E25', ink: '#FFFAF0', muted: '#DDD5CA', line: 'rgba(221, 213, 202, 0.3)' }
+      : { bg: '#FFFAF0', surface: '#DDD5CA', ink: '#101010', muted: '#2F2E25', line: 'rgba(47, 46, 37, 0.28)' };
+    return {
+      menuAberto: !!(this.state && this.state.menuAberto),
+      menuFechado: !(this.state && this.state.menuAberto),
+      menuAbertoTxt: (this.state && this.state.menuAberto) ? 'true' : 'false',
+      alternarMenu: (function (eu) { return function () { eu.setState({ menuAberto: !(eu.state && eu.state.menuAberto) }); }; })(this),
+      fecharMenu: (function (eu) { return function () { eu.setState({ menuAberto: false }); }; })(this),
+      c: c,
+      escuro: escuro,
+      claro: !escuro,
+      temaTexto: escuro ? 'Claro' : 'Escuro',
+      temaLabel: escuro ? 'Mudar para o tema claro' : 'Mudar para o tema escuro',
+      alternarTema: function () {
+        var novo = !escuro;
+        self.setState({ escuro: novo });
+        try { window.localStorage.setItem('tc-tema', novo ? 'escuro' : 'claro'); } catch (e) {}
+      }
+    };
+  }
+}
+iniciarPagina(Component, {"tema": "claro"});
+</script>
+</body>
+</html>

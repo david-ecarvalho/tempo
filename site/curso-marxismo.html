@@ -1,0 +1,524 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tempo Continuum — Curso: Marxismo</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500&amp;display=swap">
+<style>
+body{margin:0;font-family:"Montserrat","Helvetica Neue",Arial,sans-serif;font-weight:500}
+h1,h2,h3,h4,p,th,dt,dd{font-weight:500}
+a{color:inherit}a:hover{text-decoration-thickness:2px}
+a:focus-visible,button:focus-visible,input:focus-visible{outline:2px solid currentColor;outline-offset:3px}
+@media (max-width: 760px){
+.tc-header-row{flex-wrap:nowrap !important;gap:8px !important;padding:10px 16px !important}
+.tc-nav,.tc-buscar{display:none !important}
+.tc-logo{margin-right:auto;min-width:0}
+.tc-tema-txt{display:none}
+.tc-tema{padding:8px 12px !important}
+.tc-chips{flex-wrap:nowrap !important;overflow-x:auto;padding-bottom:8px;margin-right:-16px;padding-right:16px;-webkit-overflow-scrolling:touch;scrollbar-width:thin}
+.tc-chips>*{flex:none}
+main{padding-left:16px !important;padding-right:16px !important;gap:32px !important}
+footer>div{padding-left:16px !important;padding-right:16px !important}
+}
+
+/* Cabeçalho fixo e menu lateral */
+.tc-topo{position:sticky;top:0;z-index:50}
+.tc-menu-btn{display:flex !important}
+.tc-painel{display:block !important;position:fixed;top:0;left:0;bottom:0;width:min(340px,86vw);overflow-y:auto;z-index:70;box-shadow:8px 0 32px rgba(16,16,16,.35);padding:12px 16px 24px !important;border-top:0 !important;box-sizing:border-box}
+.tc-fundo{position:fixed;inset:0;z-index:60;background:rgba(16,16,16,.45);border:0;padding:0;cursor:pointer}
+.tc-painel-topo{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:6px 4px 14px;font-size:12px;letter-spacing:.1em;text-transform:uppercase}
+.tc-painel-topo button{font:inherit;font-size:14px;letter-spacing:0;text-transform:none;background:none;border:2px solid currentColor;color:inherit;border-radius:999px;padding:6px 14px;cursor:pointer}
+/* Cabeçalho em uma linha só: ocupa a largura toda da janela */
+.tc-header-row{max-width:none !important;flex-wrap:nowrap !important;gap:12px 20px !important}
+.tc-nav{flex-wrap:nowrap !important;flex:1 1 auto !important;min-width:0}
+.tc-nav a{white-space:nowrap}
+@media (max-width: 1320px){.tc-nav{gap:2px !important}.tc-nav a{padding:8px 10px !important}.tc-buscar,.tc-menu-btn{font-size:0 !important;gap:0 !important;padding:8px 13px !important}.tc-tema-txt{display:none}.tc-tema{padding:8px 13px !important}}
+@media (max-width: 1100px){.tc-nav,.tc-buscar{display:none !important}.tc-logo{margin-right:auto;min-width:0}}
+</style>
+<style>html,body{margin:0} #app > div{min-height:100vh}</style>
+</head>
+<body>
+<div id="app"></div>
+<template id="tpl">
+
+<div style="background: {{c.bg}}; color: {{c.ink}}; min-height: 100%; font-family: &quot;Montserrat&quot;, Arial, sans-serif; font-weight: 500;">
+
+  <header class="tc-topo" style="background: {{c.bg}}; color: {{c.ink}}; border-bottom: 2px solid {{c.ink}};">
+    <div class="tc-header-row" style="max-width: 1240px; margin: 0 auto; padding: 14px 24px; display: flex; flex-wrap: wrap; align-items: center; gap: 12px 40px;">
+      <button type="button" class="tc-menu-btn" onClick="{{alternarMenu}}" aria-expanded="{{menuAbertoTxt}}" aria-controls="tc-painel" style="align-items: center; gap: 8px; font: inherit; font-size: 14px; border: 2px solid {{c.ink}}; background: transparent; color: {{c.ink}}; border-radius: 999px; padding: 8px 14px; min-height: 44px; box-sizing: border-box; cursor: pointer;">
+        <sc-if value="{{menuFechado}}" hint-placeholder-val="{{true}}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"></path></svg></sc-if>
+        <sc-if value="{{menuAberto}}" hint-placeholder-val="{{false}}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></sc-if>
+        Menu
+      </button>
+      <a class="tc-logo" href="index.html" style="display: flex; align-items: center; gap: 12px; text-decoration: none; color: inherit;" aria-label="Tempo Continuum, início">
+        <sc-if value="{{claro}}" hint-placeholder-val="{{true}}"><img src="logos/logo-claro.svg" alt="" width="48" height="48" style="display: block; width: 48px; height: 48px; border-radius: 50%; object-fit: cover; flex: none;"></sc-if><sc-if value="{{escuro}}" hint-placeholder-val="{{false}}"><img src="logos/logo-escuro.svg" alt="" width="48" height="48" style="display: block; width: 48px; height: 48px; border-radius: 50%; object-fit: cover; flex: none;"></sc-if>
+        <span style="font-size: 13px; line-height: 1.05; letter-spacing: 0.08em; text-transform: uppercase;">Tempo<br>Continuum</span>
+      </a>
+      <nav class="tc-nav" aria-label="Seções" style="display: flex; flex-wrap: wrap; gap: 6px 8px; flex: 1 1 560px; font-size: 15px;">
+        <a href="noticias.html" style="text-decoration: none; padding: 8px 14px; border-radius: 999px;">Notícias</a>
+        <a href="streaming.html" style="text-decoration: none; padding: 8px 14px; border-radius: 999px;">Streaming</a>
+        <a href="ferramentas.html" style="text-decoration: none; padding: 8px 14px; border-radius: 999px;">Recursos</a>
+        <a href="cursos.html" aria-current="page" style="text-decoration: none; padding: 8px 14px; border-radius: 999px; background: #556A2F; color: #FFFAF0;">Academia</a>
+        <a href="politicos.html" style="text-decoration: none; padding: 8px 14px; border-radius: 999px;">Wiki</a>
+        <a href="dossies.html" style="text-decoration: none; padding: 8px 14px; border-radius: 999px;">Dossiês</a>
+        <a href="publicacoes.html" style="text-decoration: none; padding: 8px 14px; border-radius: 999px;">Publicações</a>
+      </nav>
+      <a class="tc-buscar" href="noticias.html" style="display: flex; align-items: center; gap: 8px; text-decoration: none; border: 2px solid {{c.ink}}; border-radius: 999px; padding: 8px 16px; font-size: 14px; min-height: 44px; box-sizing: border-box;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-4-4"></path></svg>Buscar</a>
+      <button type="button" class="tc-tema" onClick="{{alternarTema}}" aria-label="{{temaLabel}}" style="display: flex; align-items: center; gap: 8px; font: inherit; font-size: 14px; border: 2px solid {{c.ink}}; background: {{c.ink}}; color: {{c.bg}}; border-radius: 999px; padding: 8px 16px; min-height: 44px; box-sizing: border-box; cursor: pointer;">
+        <sc-if value="{{claro}}" hint-placeholder-val="{{true}}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"></path></svg></sc-if>
+        <sc-if value="{{escuro}}" hint-placeholder-val="{{false}}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg></sc-if>
+        <span class="tc-tema-txt">{{temaTexto}}</span>
+      </button>
+    </div>
+    <sc-if value="{{menuAberto}}" hint-placeholder-val="{{false}}">
+      <button type="button" class="tc-fundo" onClick="{{fecharMenu}}" aria-label="Fechar o menu" tabindex="-1"></button>
+      <nav id="tc-painel" class="tc-painel" aria-label="Menu" style="background: {{c.bg}}; color: {{c.ink}}; border-right: 2px solid {{c.ink}};">
+        <div class="tc-painel-topo"><span>Tempo Continuum</span><button type="button" onClick="{{fecharMenu}}">Fechar</button></div>
+        <a href="index.html" style="text-decoration: none; display: block; padding: 14px 12px; font-size: 18px; border-bottom: 1px solid {{c.line}};">Início</a>
+        <a href="noticias.html" style="text-decoration: none; display: block; padding: 14px 12px; font-size: 18px; border-bottom: 1px solid {{c.line}};">Notícias</a>
+        <a href="streaming.html" style="text-decoration: none; display: block; padding: 14px 12px; font-size: 18px; border-bottom: 1px solid {{c.line}};">Streaming</a>
+        <a href="ferramentas.html" style="text-decoration: none; display: block; padding: 14px 12px; font-size: 18px; border-bottom: 1px solid {{c.line}};">Recursos</a>
+        <a href="cursos.html" aria-current="page" style="text-decoration: none; display: block; padding: 14px 12px; font-size: 18px; border-bottom: 1px solid {{c.line}}; background: #556A2F; color: #FFFAF0;">Academia</a>
+        <a href="politicos.html" style="text-decoration: none; display: block; padding: 14px 12px; font-size: 18px; border-bottom: 1px solid {{c.line}};">Wiki</a>
+        <a href="dossies.html" style="text-decoration: none; display: block; padding: 14px 12px; font-size: 18px; border-bottom: 1px solid {{c.line}};">Dossiês</a>
+        <a href="publicacoes.html" style="text-decoration: none; display: block; padding: 14px 12px; font-size: 18px; border-bottom: 1px solid {{c.line}};">Publicações</a>
+        <a href="noticias.html" onClick="{{fecharMenu}}" style="text-decoration: none; display: flex; align-items: center; gap: 10px; padding: 14px 12px; font-size: 18px;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-4-4"></path></svg>Buscar</a>
+      </nav>
+    </sc-if>
+  </header>
+
+  <main style="max-width: 1240px; margin: 0 auto; padding: 32px 24px 80px; display: flex; flex-direction: column; gap: 36px;">
+    <p style="margin: 0; font-size: 13px; color: {{c.muted}};"><a href="index.html" style="text-underline-offset: 3px;">Início</a> / <a href="cursos.html" style="text-underline-offset: 3px;">Academia</a> / Marxismo</p>
+
+    <div style="display: flex; flex-direction: column; gap: 14px;">
+      <p style="margin: 0; font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: {{c.muted}};">Curso · Formação política</p>
+      <h1 style="margin: 0; font-size: clamp(2.2rem, 5vw, 3.4rem); line-height: 1.02; letter-spacing: -0.02em; max-width: 20ch;"><span style="background: #556A2F; color: #FFFAF0; padding: 0 10px; box-decoration-break: clone; -webkit-box-decoration-break: clone;">Marxismo</span></h1>
+      <p style="margin: 0; font-size: 1.1rem; line-height: 1.55; color: {{c.muted}}; max-width: 62ch;">Uma introdução às ideias de Marx e Engels: o método materialista, as classes sociais, como o capitalismo gera lucro e crises, o Estado e a revolução, e como o marxismo pensou o Brasil. Com leituras gratuitas e um plano de estudos de 12 semanas.</p>
+      <div style="display: flex; flex-wrap: wrap; gap: 8px; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase;">
+        <span style="background: #556A2F; color: #FFFAF0; padding: 4px 10px;">9 módulos</span>
+        <span style="border: 1.5px solid {{c.ink}}; padding: 3px 10px;">Para iniciantes</span>
+        <span style="border: 1.5px solid {{c.ink}}; padding: 3px 10px;">Leituras gratuitas</span>
+      </div>
+    </div>
+
+    <div style="display: flex; flex-wrap: wrap; gap: 40px; align-items: flex-start; border-top: 2px solid {{c.ink}}; padding-top: 28px;">
+      <aside style="flex: 1 1 280px; min-width: 0; display: flex; flex-direction: column; gap: 20px;">
+        <nav aria-labelledby="h-sumario" style="background: {{c.surface}}; border: 1px solid {{c.line}}; padding: 22px;">
+          <h2 id="h-sumario" style="margin: 0 0 14px; font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: {{c.muted}};">Módulos</h2>
+          <ol style="margin: 0; padding: 0 0 0 1.4em; display: flex; flex-direction: column; gap: 10px; font-size: 0.95rem; line-height: 1.35;">
+            <li><a href="#m1" style="text-underline-offset: 3px;">O que é o marxismo</a></li>
+            <li><a href="#m2" style="text-underline-offset: 3px;">Materialismo histórico e dialético</a></li>
+            <li><a href="#m3" style="text-underline-offset: 3px;">Classes sociais e luta de classes</a></li>
+            <li><a href="#m4" style="text-underline-offset: 3px;">Mercadoria, valor e dinheiro</a></li>
+            <li><a href="#m5" style="text-underline-offset: 3px;">Mais-valia e exploração</a></li>
+            <li><a href="#m6" style="text-underline-offset: 3px;">Acumulação, crises e imperialismo</a></li>
+            <li><a href="#m7" style="text-underline-offset: 3px;">Estado, ideologia e revolução</a></li>
+            <li><a href="#m8" style="text-underline-offset: 3px;">Marxismo no Brasil</a></li>
+            <li><a href="#m9" style="text-underline-offset: 3px;">Plano de estudos de 12 semanas</a></li>
+          </ol>
+        </nav>
+        <div style="border: 1px solid {{c.line}}; padding: 22px; display: flex; flex-direction: column; gap: 10px;">
+          <h2 style="margin: 0; font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: {{c.muted}};">A ideia central</h2>
+          <p style="margin: 0; font-size: 0.98rem; line-height: 1.55;">A forma como uma sociedade produz a sua vida explica muito do resto. No capitalismo, o lucro vem do trabalho não pago, e a classe que produz a riqueza é a que pode transformar a sociedade.</p>
+        </div>
+      </aside>
+
+      <div style="flex: 999 1 560px; min-width: 0; display: flex; flex-direction: column; gap: 48px;">
+
+        <section id="m1" style="display: flex; flex-direction: column; gap: 14px; scroll-margin-top: 16px;">
+          <p style="margin: 0; font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: {{c.muted}};">Módulo 1</p>
+          <h2 style="margin: 0; font-size: 1.6rem; line-height: 1.15;">O que é o marxismo</h2>
+          <p style="margin: 0; font-size: 1.02rem; line-height: 1.65; max-width: 66ch;">O marxismo é o conjunto de ideias iniciado por Karl Marx (1818–1883) e Friedrich Engels (1820–1895) para explicar como as sociedades se organizam, por que mudam e como o capitalismo funciona. Ele não é só uma opinião sobre o mundo: é um <strong style="font-weight: 500;">método de análise</strong> (olhar para como os seres humanos produzem a vida) e, ao mesmo tempo, um <strong style="font-weight: 500;">projeto político</strong> (a superação do capitalismo pela classe trabalhadora).</p>
+          <p style="margin: 0; font-size: 1.02rem; line-height: 1.65; max-width: 66ch;">Lênin resumiu a origem do marxismo em três fontes, que Marx e Engels criticaram e transformaram:</p>
+          <div style="overflow-x: auto;">
+            <table style="border-collapse: collapse; width: 100%; min-width: 640px; font-size: 0.92rem; line-height: 1.45;">
+              <thead><tr><th style="text-align: left; padding: 10px 12px 10px 0; border-bottom: 2px solid {{c.ink}}; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: {{c.muted}};">Fonte</th><th style="text-align: left; padding: 10px 12px; border-bottom: 2px solid {{c.ink}}; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: {{c.muted}};">O que Marx e Engels tomaram</th><th style="text-align: left; padding: 10px 0 10px 12px; border-bottom: 2px solid {{c.ink}}; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: {{c.muted}};">O que mudaram</th></tr></thead>
+              <tbody>
+                <tr><td style="padding: 12px 12px 12px 0; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Filosofia alemã (Hegel, Feuerbach)</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">A dialética: tudo está em movimento e se transforma por contradições internas</td><td style="padding: 12px 0 12px 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Trocaram o ponto de partida: não são as ideias que movem a história, e sim as condições materiais</td></tr>
+                <tr><td style="padding: 12px 12px 12px 0; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Economia política inglesa (Smith, Ricardo)</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">A teoria de que o trabalho é a fonte do valor</td><td style="padding: 12px 0 12px 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Explicaram de onde vem o lucro: do trabalho não pago (a mais-valia)</td></tr>
+                <tr><td style="padding: 12px 12px 12px 0; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Socialismo francês (Saint-Simon, Fourier, Proudhon)</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">A crítica moral à miséria e o sonho de uma sociedade igualitária</td><td style="padding: 12px 0 12px 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Trocaram o plano ideal pela análise das forças reais: a classe trabalhadora organizada</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p style="margin: 0; font-size: 1.02rem; line-height: 1.65; max-width: 66ch;">Por isso Engels chamou o marxismo de <strong style="font-weight: 500;">socialismo científico</strong>, em oposição ao socialismo utópico: em vez de desenhar uma sociedade perfeita e esperar que os ricos a aceitem, ele estuda as tendências do próprio capitalismo e quem tem interesse e força para transformá-lo.</p>
+          <div style="background: {{c.surface}}; border-left: 4px solid #556A2F; padding: 16px 20px; display: flex; flex-direction: column; gap: 8px;">
+            <h3 style="margin: 0; font-size: 1rem;">A frase-chave</h3>
+            <p style="margin: 0; font-size: 0.98rem; line-height: 1.6;">“Os filósofos têm apenas interpretado o mundo de diferentes maneiras; a questão, porém, é transformá-lo.” É a 11ª das Teses sobre Feuerbach (Marx, 1845). Estudar marxismo sempre foi, para Marx, uma ferramenta de ação.</p>
+          </div>
+          <h3 style="margin: 6px 0 0; font-size: 1.1rem;">Três ideias erradas comuns</h3>
+          <ul style="margin: 0; padding-left: 1.2em; display: flex; flex-direction: column; gap: 10px; font-size: 1.02rem; line-height: 1.6; max-width: 66ch;">
+            <li><strong style="font-weight: 500;">“Marxismo é só economia.”</strong> A economia é central, mas o marxismo também trata de Estado, cultura, família, opressão de gênero e raça, ciência e filosofia.</li>
+            <li><strong style="font-weight: 500;">“Marx queria que todos ganhassem igual e ninguém tivesse nada.”</strong> O alvo é a propriedade privada dos <strong style="font-weight: 500;">meios de produção</strong> (fábricas, terras, bancos), não a sua escova de dentes ou sua casa.</li>
+            <li><strong style="font-weight: 500;">“É uma doutrina fechada.”</strong> Marx revisou suas ideias a vida toda, e o marxismo se desenvolveu com Lênin, Rosa Luxemburgo, Gramsci, Mariátegui, Caio Prado Jr., Clóvis Moura e muitos outros.</li>
+          </ul>
+          <h3 style="margin: 6px 0 0; font-size: 1.1rem;">Para ler</h3>
+          <ul style="margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; font-size: 0.95rem; line-height: 1.45; max-width: 66ch;">
+            <li style="display: flex; gap: 10px; padding: 9px 0; border-top: 1px solid {{c.line}};"><span aria-hidden="true">→</span><span><a href="https://www.marxists.org/portugues/marx/1880/socialismo/index.htm" target="_blank" rel="noopener" style="text-underline-offset: 3px;">Do Socialismo Utópico ao Socialismo Científico</a> <span style="font-size: 0.85rem; color: {{c.muted}};">Friedrich Engels, 1880</span><br><span style="font-size: 0.9rem; line-height: 1.5;">A melhor introdução escrita pelos próprios fundadores. Curta, cerca de 60 páginas.</span></span></li>
+            <li style="display: flex; gap: 10px; padding: 9px 0; border-top: 1px solid {{c.line}};"><span aria-hidden="true">→</span><span><a href="https://www.marxists.org/portugues/marx/1845/tesfeuer.htm" target="_blank" rel="noopener" style="text-underline-offset: 3px;">Teses sobre Feuerbach</a> <span style="font-size: 0.85rem; color: {{c.muted}};">Karl Marx, 1845</span><br><span style="font-size: 0.9rem; line-height: 1.5;">Onze parágrafos. Leia em 10 minutos e volte a eles depois do módulo 2.</span></span></li>
+          </ul>
+        </section>
+
+        <section id="m2" style="display: flex; flex-direction: column; gap: 14px; scroll-margin-top: 16px;">
+          <p style="margin: 0; font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: {{c.muted}};">Módulo 2</p>
+          <h2 style="margin: 0; font-size: 1.6rem; line-height: 1.15;">Materialismo histórico e dialético</h2>
+          <p style="margin: 0; font-size: 1.02rem; line-height: 1.65; max-width: 66ch;">O ponto de partida é simples: antes de fazer política, arte, religião ou filosofia, as pessoas precisam comer, morar e se vestir. <strong style="font-weight: 500;">A forma como uma sociedade produz a sua vida material</strong> condiciona o resto. Isso é o materialismo histórico.</p>
+          <div style="background: {{c.surface}}; border-left: 4px solid #556A2F; padding: 16px 20px; display: flex; flex-direction: column; gap: 8px;">
+            <h3 style="margin: 0; font-size: 1rem;">Prefácio de 1859</h3>
+            <p style="margin: 0; font-size: 0.98rem; line-height: 1.6;">“Não é a consciência dos homens que determina o seu ser; ao contrário, é o seu ser social que determina a sua consciência.” (Marx, Contribuição à Crítica da Economia Política)</p>
+          </div>
+          <h3 style="margin: 6px 0 0; font-size: 1.1rem;">Os conceitos básicos</h3>
+          <div style="overflow-x: auto;">
+            <table style="border-collapse: collapse; width: 100%; min-width: 640px; font-size: 0.92rem; line-height: 1.45;">
+              <thead><tr><th style="text-align: left; padding: 10px 12px 10px 0; border-bottom: 2px solid {{c.ink}}; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: {{c.muted}};">Conceito</th><th style="text-align: left; padding: 10px 12px; border-bottom: 2px solid {{c.ink}}; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: {{c.muted}};">O que é</th><th style="text-align: left; padding: 10px 0 10px 12px; border-bottom: 2px solid {{c.ink}}; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: {{c.muted}};">Exemplo</th></tr></thead>
+              <tbody>
+                <tr><td style="padding: 12px 12px 12px 0; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Forças produtivas</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Os meios de trabalho (ferramentas, máquinas, terra) mais a força de trabalho humana e o conhecimento técnico</td><td style="padding: 12px 0 12px 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Enxada, trator, computador, a habilidade de um soldador</td></tr>
+                <tr><td style="padding: 12px 12px 12px 0; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Relações de produção</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">As relações entre as pessoas na produção, a começar por quem é dono dos meios de produção</td><td style="padding: 12px 0 12px 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Senhor e escravo; senhor feudal e servo; patrão e assalariado</td></tr>
+                <tr><td style="padding: 12px 12px 12px 0; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Modo de produção</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">A combinação das duas coisas acima numa época</td><td style="padding: 12px 0 12px 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Escravismo, feudalismo, capitalismo</td></tr>
+                <tr><td style="padding: 12px 12px 12px 0; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Base (infraestrutura)</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">A estrutura econômica: o modo de produção</td><td style="padding: 12px 0 12px 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">A economia de exportação de açúcar no Brasil colônia</td></tr>
+                <tr><td style="padding: 12px 12px 12px 0; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Superestrutura</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Leis, Estado, religião, ideias e cultura que se erguem sobre a base e ajudam a mantê-la</td><td style="padding: 12px 0 12px 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Leis que tratavam o escravizado como propriedade</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p style="margin: 0; font-size: 1.02rem; line-height: 1.65; max-width: 66ch;">A base condiciona a superestrutura, mas não a determina de forma mecânica: Engels insistiu que ideias, leis e lutas políticas também agem de volta sobre a economia. O que move a história são as <strong style="font-weight: 500;">contradições</strong>: quando as forças produtivas crescem e as relações de produção passam a travá-las, abre-se uma época de revolução social.</p>
+          <h3 style="margin: 6px 0 0; font-size: 1.1rem;">A dialética em três ideias</h3>
+          <ul style="margin: 0; padding-left: 1.2em; display: flex; flex-direction: column; gap: 10px; font-size: 1.02rem; line-height: 1.6; max-width: 66ch;">
+            <li><strong style="font-weight: 500;">Tudo está em movimento.</strong> Nada é eterno: o capitalismo nasceu num momento da história e pode acabar.</li>
+            <li><strong style="font-weight: 500;">A mudança vem de dentro, por contradição.</strong> O capitalismo junta milhões de trabalhadores na produção e, ao fazer isso, cria a força social capaz de superá-lo.</li>
+            <li><strong style="font-weight: 500;">Mudanças de quantidade viram mudanças de qualidade.</strong> Pequenas greves e lutas acumuladas podem, num ponto, mudar a natureza de uma situação política.</li>
+          </ul>
+          <p style="margin: 0; font-size: 1.02rem; line-height: 1.65; max-width: 66ch;"><strong style="font-weight: 500;">Por que “materialismo”?</strong> Porque parte da realidade material, não de ideias abstratas. Não tem nada a ver com “ser apegado a dinheiro”.</p>
+          <h3 style="margin: 6px 0 0; font-size: 1.1rem;">Para ler</h3>
+          <ul style="margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; font-size: 0.95rem; line-height: 1.45; max-width: 66ch;">
+            <li style="display: flex; gap: 10px; padding: 9px 0; border-top: 1px solid {{c.line}};"><span aria-hidden="true">→</span><span><a href="https://www.marxists.org/portugues/marx/1845/ideologia-alema-oe/index.htm" target="_blank" rel="noopener" style="text-underline-offset: 3px;">A Ideologia Alemã (capítulo I)</a> <span style="font-size: 0.85rem; color: {{c.muted}};">Marx e Engels, 1846</span><br><span style="font-size: 0.9rem; line-height: 1.5;">Onde a concepção materialista da história aparece pela primeira vez de forma organizada.</span></span></li>
+            <li style="display: flex; gap: 10px; padding: 9px 0; border-top: 1px solid {{c.line}};"><span aria-hidden="true">→</span><span><a href="https://www.marxists.org/portugues/marx/1876/mes/macaco.htm" target="_blank" rel="noopener" style="text-underline-offset: 3px;">Sobre o Papel do Trabalho na Transformação do Macaco em Homem</a> <span style="font-size: 0.85rem; color: {{c.muted}};">Friedrich Engels, 1876</span><br><span style="font-size: 0.9rem; line-height: 1.5;">Texto curto sobre como o trabalho formou o próprio ser humano.</span></span></li>
+            <li style="display: flex; gap: 10px; padding: 9px 0; border-top: 1px solid {{c.line}};"><span aria-hidden="true">→</span><span><a href="https://www.marxists.org/portugues/marx/1886/mes/fim.htm" target="_blank" rel="noopener" style="text-underline-offset: 3px;">Ludwig Feuerbach e o Fim da Filosofia Clássica Alemã</a> <span style="font-size: 0.85rem; color: {{c.muted}};">Friedrich Engels, 1886</span><br><span style="font-size: 0.9rem; line-height: 1.5;">Para quem quiser entender a relação com Hegel. Mais difícil.</span></span></li>
+          </ul>
+        </section>
+
+        <section id="m3" style="display: flex; flex-direction: column; gap: 14px; scroll-margin-top: 16px;">
+          <p style="margin: 0; font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: {{c.muted}};">Módulo 3</p>
+          <h2 style="margin: 0; font-size: 1.6rem; line-height: 1.15;">Classes sociais e luta de classes</h2>
+          <div style="background: {{c.surface}}; border-left: 4px solid #556A2F; padding: 16px 20px; display: flex; flex-direction: column; gap: 8px;">
+            <h3 style="margin: 0; font-size: 1rem;">Manifesto do Partido Comunista, 1848</h3>
+            <p style="margin: 0; font-size: 0.98rem; line-height: 1.6;">“A história de todas as sociedades até hoje existentes é a história das lutas de classes.”</p>
+          </div>
+          <p style="margin: 0; font-size: 1.02rem; line-height: 1.65; max-width: 66ch;">Para o marxismo, classe não é faixa de renda (“classe A, B, C”). Classe é definida pelo <strong style="font-weight: 500;">lugar que o grupo ocupa na produção</strong>, antes de tudo pela relação com os meios de produção.</p>
+          <div style="overflow-x: auto;">
+            <table style="border-collapse: collapse; width: 100%; min-width: 640px; font-size: 0.92rem; line-height: 1.45;">
+              <thead><tr><th style="text-align: left; padding: 10px 12px 10px 0; border-bottom: 2px solid {{c.ink}}; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: {{c.muted}};">Classe</th><th style="text-align: left; padding: 10px 12px; border-bottom: 2px solid {{c.ink}}; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: {{c.muted}};">Relação com os meios de produção</th><th style="text-align: left; padding: 10px 0 10px 12px; border-bottom: 2px solid {{c.ink}}; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: {{c.muted}};">Como vive</th></tr></thead>
+              <tbody>
+                <tr><td style="padding: 12px 12px 12px 0; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Burguesia (capitalistas)</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">É dona dos meios de produção</td><td style="padding: 12px 0 12px 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Do lucro, dos juros e da renda que vêm do trabalho alheio</td></tr>
+                <tr><td style="padding: 12px 12px 12px 0; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Proletariado (classe trabalhadora)</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Não possui meios de produção</td><td style="padding: 12px 0 12px 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Vendendo sua força de trabalho em troca de salário</td></tr>
+                <tr><td style="padding: 12px 12px 12px 0; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Pequena burguesia</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Possui pequenos meios de produção e trabalha neles</td><td style="padding: 12px 0 12px 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Do próprio trabalho, sem explorar ou explorando pouco trabalho alheio (pequeno comerciante, artesão, sitiante)</td></tr>
+                <tr><td style="padding: 12px 12px 12px 0; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Campesinato</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Trabalha a terra, própria ou não</td><td style="padding: 12px 0 12px 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Da produção agrícola familiar; no Brasil, a luta pela terra é central</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p style="margin: 0; font-size: 1.02rem; line-height: 1.65; max-width: 66ch;">Um motorista de aplicativo que ganha bem e um gerente de banco podem ter renda parecida com a de um pequeno empresário, mas a posição deles é diferente. E um entregador “empreendedor” que só tem a moto e depende de uma plataforma para trabalhar está, na prática, vendendo sua força de trabalho.</p>
+          <h3 style="margin: 6px 0 0; font-size: 1.1rem;">Classe em si e classe para si</h3>
+          <p style="margin: 0; font-size: 1.02rem; line-height: 1.65; max-width: 66ch;">Marx distinguiu a classe que existe objetivamente (<strong style="font-weight: 500;">classe em si</strong>) da classe que se reconhece, se organiza e age pelos seus interesses (<strong style="font-weight: 500;">classe para si</strong>). A passagem de uma para a outra não é automática: depende de experiência de luta, organização em sindicatos, movimentos e partidos, e de consciência política.</p>
+          <h3 style="margin: 6px 0 0; font-size: 1.1rem;">Classe, raça e gênero</h3>
+          <p style="margin: 0; font-size: 1.02rem; line-height: 1.65; max-width: 66ch;">No Brasil, a classe trabalhadora foi formada a partir da escravidão. Por isso marxistas como Clóvis Moura insistiram que não dá para entender a luta de classes aqui sem o racismo. Do mesmo modo, o trabalho doméstico não pago, feito sobretudo por mulheres, ajuda a reproduzir a força de trabalho que o capital explora. O marxismo trata essas opressões como parte da mesma estrutura, não como assuntos separados.</p>
+          <h3 style="margin: 6px 0 0; font-size: 1.1rem;">Para ler</h3>
+          <ul style="margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; font-size: 0.95rem; line-height: 1.45; max-width: 66ch;">
+            <li style="display: flex; gap: 10px; padding: 9px 0; border-top: 1px solid {{c.line}};"><span aria-hidden="true">→</span><span><a href="https://www.marxists.org/portugues/marx/1848/ManifestoDoPartidoComunista/index.htm" target="_blank" rel="noopener" style="text-underline-offset: 3px;">Manifesto do Partido Comunista</a> <span style="font-size: 0.85rem; color: {{c.muted}};">Marx e Engels, 1848</span><br><span style="font-size: 0.9rem; line-height: 1.5;">Leitura obrigatória. Leia a parte I (Burgueses e proletários) e a II antes de seguir.</span></span></li>
+            <li style="display: flex; gap: 10px; padding: 9px 0; border-top: 1px solid {{c.line}};"><span aria-hidden="true">→</span><span><a href="https://www.marxists.org/portugues/marx/1884/origem/index.htm" target="_blank" rel="noopener" style="text-underline-offset: 3px;">A Origem da Família, da Propriedade Privada e do Estado</a> <span style="font-size: 0.85rem; color: {{c.muted}};">Friedrich Engels, 1884</span><br><span style="font-size: 0.9rem; line-height: 1.5;">Como a propriedade privada, a opressão da mulher e o Estado surgiram juntos.</span></span></li>
+            <li style="display: flex; gap: 10px; padding: 9px 0; border-top: 1px solid {{c.line}};"><span aria-hidden="true">→</span><span><a href="https://www.marxists.org/portugues/marx/1852/brumario/index.htm" target="_blank" rel="noopener" style="text-underline-offset: 3px;">O 18 de Brumário de Luís Bonaparte</a> <span style="font-size: 0.85rem; color: {{c.muted}};">Karl Marx, 1852</span><br><span style="font-size: 0.9rem; line-height: 1.5;">A análise de classes aplicada a um golpe de Estado. Exemplo do método em ação.</span></span></li>
+          </ul>
+        </section>
+
+        <section id="m4" style="display: flex; flex-direction: column; gap: 14px; scroll-margin-top: 16px;">
+          <p style="margin: 0; font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: {{c.muted}};">Módulo 4</p>
+          <h2 style="margin: 0; font-size: 1.6rem; line-height: 1.15;">Mercadoria, valor e dinheiro</h2>
+          <p style="margin: 0; font-size: 1.02rem; line-height: 1.65; max-width: 66ch;">O Capital começa pela mercadoria porque, no capitalismo, quase tudo que consumimos é produzido para ser vendido. Entender a mercadoria é a chave para entender o resto.</p>
+          <div style="overflow-x: auto;">
+            <table style="border-collapse: collapse; width: 100%; min-width: 560px; font-size: 0.92rem; line-height: 1.45;">
+              <thead><tr><th style="text-align: left; padding: 10px 12px 10px 0; border-bottom: 2px solid {{c.ink}}; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: {{c.muted}};">Conceito</th><th style="text-align: left; padding: 10px 0 10px 12px; border-bottom: 2px solid {{c.ink}}; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: {{c.muted}};">O que significa</th></tr></thead>
+              <tbody>
+                <tr><td style="padding: 12px 12px 12px 0; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Valor de uso</td><td style="padding: 12px 0 12px 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">A utilidade concreta de uma coisa: o pão mata a fome, o casaco esquenta</td></tr>
+                <tr><td style="padding: 12px 12px 12px 0; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Valor de troca</td><td style="padding: 12px 0 12px 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">A proporção em que uma mercadoria se troca por outras (1 casaco = 20 kg de arroz = R$ 200)</td></tr>
+                <tr><td style="padding: 12px 12px 12px 0; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Valor</td><td style="padding: 12px 0 12px 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">O que todas as mercadorias têm em comum e permite compará-las: são produto de trabalho humano</td></tr>
+                <tr><td style="padding: 12px 12px 12px 0; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Trabalho socialmente necessário</td><td style="padding: 12px 0 12px 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">O valor não se mede pelo tempo de um trabalhador lento, e sim pelo tempo médio exigido com a técnica e a habilidade normais da época</td></tr>
+                <tr><td style="padding: 12px 12px 12px 0; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Dinheiro</td><td style="padding: 12px 0 12px 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Uma mercadoria especial que expressa o valor de todas as outras e serve de equivalente geral</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p style="margin: 0; font-size: 1.02rem; line-height: 1.65; max-width: 66ch;">Se a técnica melhora e passa a levar metade do tempo para fazer um par de sapatos, cada par passa a valer menos, mesmo que o sapateiro que não modernizou continue levando o dobro do tempo.</p>
+          <h3 style="margin: 6px 0 0; font-size: 1.1rem;">O fetichismo da mercadoria</h3>
+          <p style="margin: 0; font-size: 1.02rem; line-height: 1.65; max-width: 66ch;">No mercado, os produtos parecem ter valor por si mesmos, como se o preço fosse uma propriedade natural do celular ou do café. Marx chamou isso de <strong style="font-weight: 500;">fetichismo da mercadoria</strong>: uma relação entre pessoas (o trabalho de milhares de trabalhadores, em vários países) aparece como uma relação entre coisas. Quando você compra um café, não vê o trabalhador da colheita em Minas Gerais nem o do porto de Santos, só o preço na etiqueta.</p>
+          <h3 style="margin: 6px 0 0; font-size: 1.1rem;">Duas fórmulas de circulação</h3>
+          <div style="overflow-x: auto;">
+            <table style="border-collapse: collapse; width: 100%; min-width: 560px; font-size: 0.92rem; line-height: 1.45;">
+              <thead><tr><th style="text-align: left; padding: 10px 12px 10px 0; border-bottom: 2px solid {{c.ink}}; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: {{c.muted}};">Fórmula</th><th style="text-align: left; padding: 10px 12px; border-bottom: 2px solid {{c.ink}}; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: {{c.muted}};">Quem faz</th><th style="text-align: left; padding: 10px 0 10px 12px; border-bottom: 2px solid {{c.ink}}; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: {{c.muted}};">Objetivo</th></tr></thead>
+              <tbody>
+                <tr><td style="padding: 12px 12px 12px 0; border-bottom: 1px solid {{c.line}}; vertical-align: top;">M – D – M</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">O trabalhador: vende uma mercadoria (sua força de trabalho) para comprar outras</td><td style="padding: 12px 0 12px 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Satisfazer necessidades</td></tr>
+                <tr><td style="padding: 12px 12px 12px 0; border-bottom: 1px solid {{c.line}}; vertical-align: top;">D – M – D′</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">O capitalista: investe dinheiro para ter mais dinheiro no fim (D′ é maior que D)</td><td style="padding: 12px 0 12px 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Acumular sem limite</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p style="margin: 0; font-size: 1.02rem; line-height: 1.65; max-width: 66ch;">A pergunta que move todo o Capital é: <strong style="font-weight: 500;">de onde vem esse dinheiro a mais?</strong> Se todos trocam equivalentes, ninguém deveria sair com mais do que entrou. A resposta está no módulo 5.</p>
+          <h3 style="margin: 6px 0 0; font-size: 1.1rem;">Para ler</h3>
+          <ul style="margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; font-size: 0.95rem; line-height: 1.45; max-width: 66ch;">
+            <li style="display: flex; gap: 10px; padding: 9px 0; border-top: 1px solid {{c.line}};"><span aria-hidden="true">→</span><span><a href="https://www.marxists.org/portugues/marx/1849/04/05.htm" target="_blank" rel="noopener" style="text-underline-offset: 3px;">Trabalho Assalariado e Capital</a> <span style="font-size: 0.85rem; color: {{c.muted}};">Karl Marx, 1849</span><br><span style="font-size: 0.9rem; line-height: 1.5;">Escrito para operários. A forma mais fácil de começar a economia marxista.</span></span></li>
+            <li style="display: flex; gap: 10px; padding: 9px 0; border-top: 1px solid {{c.line}};"><span aria-hidden="true">→</span><span><a href="https://www.marxists.org/portugues/marx/1867/capital/index.htm" target="_blank" rel="noopener" style="text-underline-offset: 3px;">O Capital, Livro I, capítulo 1</a> <span style="font-size: 0.85rem; color: {{c.muted}};">Karl Marx, 1867</span><br><span style="font-size: 0.9rem; line-height: 1.5;">O capítulo mais difícil do livro. Leia devagar, de preferência em grupo, e siga adiante mesmo sem entender tudo.</span></span></li>
+          </ul>
+        </section>
+
+        <section id="m5" style="display: flex; flex-direction: column; gap: 14px; scroll-margin-top: 16px;">
+          <p style="margin: 0; font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: {{c.muted}};">Módulo 5</p>
+          <h2 style="margin: 0; font-size: 1.6rem; line-height: 1.15;">Mais-valia e exploração</h2>
+          <p style="margin: 0; font-size: 1.02rem; line-height: 1.65; max-width: 66ch;">O segredo está numa mercadoria especial: a <strong style="font-weight: 500;">força de trabalho</strong>, ou seja, a capacidade de trabalhar. O trabalhador não vende “o trabalho” já feito; vende ao patrão o uso da sua capacidade de trabalhar por um tempo (uma jornada, um mês).</p>
+          <p style="margin: 0; font-size: 1.02rem; line-height: 1.65; max-width: 66ch;">Como toda mercadoria, a força de trabalho tem um valor: o necessário para o trabalhador viver e se reproduzir (comida, moradia, transporte, criar os filhos). Esse é o salário. Mas, uma vez comprada, ela é capaz de produzir <strong style="font-weight: 500;">mais valor do que custa</strong>. Essa diferença é a <strong style="font-weight: 500;">mais-valia</strong>.</p>
+          <h3 style="margin: 6px 0 0; font-size: 1.1rem;">Exemplo de uma jornada de 8 horas</h3>
+          <div style="overflow-x: auto;">
+            <table style="border-collapse: collapse; width: 100%; min-width: 620px; font-size: 0.92rem; line-height: 1.45;">
+              <thead><tr><th style="text-align: left; padding: 10px 12px 10px 0; border-bottom: 2px solid {{c.ink}}; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: {{c.muted}};">Parte da jornada</th><th style="text-align: left; padding: 10px 12px; border-bottom: 2px solid {{c.ink}}; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: {{c.muted}};">O que acontece</th><th style="text-align: left; padding: 10px 0 10px 12px; border-bottom: 2px solid {{c.ink}}; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: {{c.muted}};">Para quem vai</th></tr></thead>
+              <tbody>
+                <tr><td style="padding: 12px 12px 12px 0; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Primeiras 4 horas</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">O trabalhador produz um valor igual ao do seu salário (trabalho necessário)</td><td style="padding: 12px 0 12px 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Para o trabalhador, na forma de salário</td></tr>
+                <tr><td style="padding: 12px 12px 12px 0; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Últimas 4 horas</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">O trabalhador continua produzindo, mas esse valor já não é pago (trabalho excedente)</td><td style="padding: 12px 0 12px 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Para o capitalista: é a mais-valia</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p style="margin: 0; font-size: 1.02rem; line-height: 1.65; max-width: 66ch;">Nesse exemplo a taxa de mais-valia é de 100%: para cada hora paga, uma hora não paga. Ninguém roubou ninguém no sentido legal: o salário pode ter sido pago certinho. A <strong style="font-weight: 500;">exploração está na própria relação</strong>, não em um patrão “malvado”. É por isso que o marxismo não propõe só patrões melhores, e sim acabar com a relação.</p>
+          <h3 style="margin: 6px 0 0; font-size: 1.1rem;">Como o capital aumenta a mais-valia</h3>
+          <div style="overflow-x: auto;">
+            <table style="border-collapse: collapse; width: 100%; min-width: 640px; font-size: 0.92rem; line-height: 1.45;">
+              <thead><tr><th style="text-align: left; padding: 10px 12px 10px 0; border-bottom: 2px solid {{c.ink}}; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: {{c.muted}};">Forma</th><th style="text-align: left; padding: 10px 12px; border-bottom: 2px solid {{c.ink}}; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: {{c.muted}};">Como funciona</th><th style="text-align: left; padding: 10px 0 10px 12px; border-bottom: 2px solid {{c.ink}}; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: {{c.muted}};">Exemplos de hoje</th></tr></thead>
+              <tbody>
+                <tr><td style="padding: 12px 12px 12px 0; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Mais-valia absoluta</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Aumentar a jornada ou a intensidade sem aumentar o salário</td><td style="padding: 12px 0 12px 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Horas extras, banco de horas, jornadas de 12 horas, metas de entregas por hora</td></tr>
+                <tr><td style="padding: 12px 12px 12px 0; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Mais-valia relativa</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Reduzir o tempo de trabalho necessário barateando o que o trabalhador consome ou aumentando a produtividade</td><td style="padding: 12px 0 12px 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Novas máquinas, automação, importação de alimentos e roupas mais baratos</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <h3 style="margin: 6px 0 0; font-size: 1.1rem;">Capital constante e capital variável</h3>
+          <p style="margin: 0; font-size: 1.02rem; line-height: 1.65; max-width: 66ch;">Marx divide o capital investido em duas partes. <strong style="font-weight: 500;">Capital constante (c)</strong>: máquinas, prédios e matéria-prima, que só transferem seu valor ao produto. <strong style="font-weight: 500;">Capital variável (v)</strong>: o dinheiro gasto em salários, a única parte que cria valor novo e mais-valia (m). O valor de uma mercadoria é c + v + m.</p>
+          <div style="background: {{c.surface}}; border-left: 4px solid #556A2F; padding: 16px 20px; display: flex; flex-direction: column; gap: 8px;">
+            <h3 style="margin: 0; font-size: 1rem;">Exercício</h3>
+            <p style="margin: 0; font-size: 0.98rem; line-height: 1.6;">Uma fábrica gasta R$ 60 mil em matéria-prima e desgaste de máquinas, R$ 20 mil em salários, e os trabalhadores produzem R$ 20 mil de mais-valia. Qual o valor total produzido e qual a taxa de mais-valia? (Resposta: R$ 100 mil; m/v = 20/20 = 100%. A taxa de lucro, m/(c+v), é 20/80 = 25%.)</p>
+          </div>
+          <h3 style="margin: 6px 0 0; font-size: 1.1rem;">Para ler</h3>
+          <ul style="margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; font-size: 0.95rem; line-height: 1.45; max-width: 66ch;">
+            <li style="display: flex; gap: 10px; padding: 9px 0; border-top: 1px solid {{c.line}};"><span aria-hidden="true">→</span><span><a href="https://www.marxists.org/portugues/marx/1865/salario/index.htm" target="_blank" rel="noopener" style="text-underline-offset: 3px;">Salário, Preço e Lucro</a> <span style="font-size: 0.85rem; color: {{c.muted}};">Karl Marx, 1865</span><br><span style="font-size: 0.9rem; line-height: 1.5;">Palestra de Marx para operários. Explica a mais-valia em linguagem simples e por que a luta por salário importa.</span></span></li>
+            <li style="display: flex; gap: 10px; padding: 9px 0; border-top: 1px solid {{c.line}};"><span aria-hidden="true">→</span><span><a href="https://www.marxists.org/portugues/marx/1844/manuscritos/index.htm" target="_blank" rel="noopener" style="text-underline-offset: 3px;">Manuscritos Econômico-Filosóficos (o trabalho alienado)</a> <span style="font-size: 0.85rem; color: {{c.muted}};">Karl Marx, 1844</span><br><span style="font-size: 0.9rem; line-height: 1.5;">O jovem Marx sobre como o trabalhador perde o controle do que produz e de si mesmo.</span></span></li>
+          </ul>
+        </section>
+
+        <section id="m6" style="display: flex; flex-direction: column; gap: 14px; scroll-margin-top: 16px;">
+          <p style="margin: 0; font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: {{c.muted}};">Módulo 6</p>
+          <h2 style="margin: 0; font-size: 1.6rem; line-height: 1.15;">Acumulação, crises e imperialismo</h2>
+          <h3 style="margin: 6px 0 0; font-size: 1.1rem;">A acumulação primitiva</h3>
+          <p style="margin: 0; font-size: 1.02rem; line-height: 1.65; max-width: 66ch;">Para existir capitalismo, foi preciso que de um lado houvesse dinheiro concentrado e, de outro, massas sem nada além da força de trabalho. Marx mostra que isso não veio da poupança dos “empreendedores”: veio da expulsão de camponeses das terras, do saque colonial e da escravidão. O Brasil colonial, com açúcar, ouro e trabalho escravizado, fez parte desse processo. A <strong style="font-weight: 500;">Lei de Terras de 1850</strong>, que só permitia acesso à terra pela compra, ajudou a garantir que ex-escravizados e imigrantes pobres não virassem proprietários.</p>
+          <h3 style="margin: 6px 0 0; font-size: 1.1rem;">A lei da acumulação</h3>
+          <ul style="margin: 0; padding-left: 1.2em; display: flex; flex-direction: column; gap: 10px; font-size: 1.02rem; line-height: 1.6; max-width: 66ch;">
+            <li><strong style="font-weight: 500;">Concorrência obriga a investir.</strong> O capitalista que não moderniza é engolido pelo que moderniza. Acumular não é escolha, é condição de sobrevivência.</li>
+            <li><strong style="font-weight: 500;">Concentração e centralização.</strong> O capital se concentra em empresas cada vez maiores, que compram as menores.</li>
+            <li><strong style="font-weight: 500;">Exército industrial de reserva.</strong> A máquina substitui trabalhadores e mantém um contingente de desempregados e subempregados que pressiona os salários para baixo.</li>
+          </ul>
+          <h3 style="margin: 6px 0 0; font-size: 1.1rem;">Por que há crises</h3>
+          <div style="overflow-x: auto;">
+            <table style="border-collapse: collapse; width: 100%; min-width: 560px; font-size: 0.92rem; line-height: 1.45;">
+              <thead><tr><th style="text-align: left; padding: 10px 12px 10px 0; border-bottom: 2px solid {{c.ink}}; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: {{c.muted}};">Tendência</th><th style="text-align: left; padding: 10px 0 10px 12px; border-bottom: 2px solid {{c.ink}}; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: {{c.muted}};">Explicação resumida</th></tr></thead>
+              <tbody>
+                <tr><td style="padding: 12px 12px 12px 0; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Superprodução</td><td style="padding: 12px 0 12px 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Cada empresa tenta produzir o máximo e pagar o mínimo; no conjunto, a sociedade produz mais do que os trabalhadores conseguem comprar</td></tr>
+                <tr><td style="padding: 12px 12px 12px 0; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Queda tendencial da taxa de lucro</td><td style="padding: 12px 0 12px 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Como só o trabalho vivo cria mais-valia e a parte gasta em máquinas cresce mais que a gasta em salários, a taxa de lucro tende a cair no longo prazo</td></tr>
+                <tr><td style="padding: 12px 12px 12px 0; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Anarquia da produção</td><td style="padding: 12px 0 12px 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Ninguém planeja o conjunto; cada capitalista decide sozinho, e o ajuste vem pela crise: falências, desemprego, destruição de capital</td></tr>
+                <tr><td style="padding: 12px 12px 12px 0; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Capital financeiro e fictício</td><td style="padding: 12px 0 12px 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Crédito e especulação adiam a crise e a tornam maior quando estoura, como em 2008</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <h3 style="margin: 6px 0 0; font-size: 1.1rem;">Imperialismo</h3>
+          <p style="margin: 0; font-size: 1.02rem; line-height: 1.65; max-width: 66ch;">Lênin, em 1916, mostrou que o capitalismo tinha entrado numa nova fase: monopólios no lugar da livre concorrência, fusão do capital bancário com o industrial (o <strong style="font-weight: 500;">capital financeiro</strong>), exportação de capitais, e a divisão do mundo entre grandes potências e grupos econômicos. Países como o Brasil entram nesse sistema numa posição dependente: exportam matérias-primas e pagam juros e lucros às potências.</p>
+          <h3 style="margin: 6px 0 0; font-size: 1.1rem;">Para ler</h3>
+          <ul style="margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; font-size: 0.95rem; line-height: 1.45; max-width: 66ch;">
+            <li style="display: flex; gap: 10px; padding: 9px 0; border-top: 1px solid {{c.line}};"><span aria-hidden="true">→</span><span><a href="https://www.marxists.org/portugues/marx/1867/capital/index.htm" target="_blank" rel="noopener" style="text-underline-offset: 3px;">O Capital, Livro I, capítulos 23 e 24</a> <span style="font-size: 0.85rem; color: {{c.muted}};">Karl Marx, 1867</span><br><span style="font-size: 0.9rem; line-height: 1.5;">A lei geral da acumulação e a “assim chamada acumulação primitiva”. São os capítulos mais diretos do livro.</span></span></li>
+            <li style="display: flex; gap: 10px; padding: 9px 0; border-top: 1px solid {{c.line}};"><span aria-hidden="true">→</span><span><a href="https://www.marxists.org/portugues/lenin/1916/imperialismo/index.htm" target="_blank" rel="noopener" style="text-underline-offset: 3px;">O Imperialismo, Fase Superior do Capitalismo</a> <span style="font-size: 0.85rem; color: {{c.muted}};">Vladimir Lênin, 1916</span><br><span style="font-size: 0.9rem; line-height: 1.5;">Curto e cheio de dados. Leia os capítulos 1, 3, 4 e 7.</span></span></li>
+            <li style="display: flex; gap: 10px; padding: 9px 0; border-top: 1px solid {{c.line}};"><span aria-hidden="true">→</span><span><a href="https://www.marxists.org/portugues/marx/1873/habita/index.htm" target="_blank" rel="noopener" style="text-underline-offset: 3px;">Para a Questão da Habitação</a> <span style="font-size: 0.85rem; color: {{c.muted}};">Friedrich Engels, 1873</span><br><span style="font-size: 0.9rem; line-height: 1.5;">Por que o capitalismo não resolve a falta de moradia. Atual para qualquer cidade brasileira.</span></span></li>
+          </ul>
+        </section>
+
+        <section id="m7" style="display: flex; flex-direction: column; gap: 14px; scroll-margin-top: 16px;">
+          <p style="margin: 0; font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: {{c.muted}};">Módulo 7</p>
+          <h2 style="margin: 0; font-size: 1.6rem; line-height: 1.15;">Estado, ideologia e revolução</h2>
+          <h3 style="margin: 6px 0 0; font-size: 1.1rem;">O Estado</h3>
+          <p style="margin: 0; font-size: 1.02rem; line-height: 1.65; max-width: 66ch;">Para o marxismo, o Estado não é um árbitro neutro acima da sociedade. Ele surgiu quando a sociedade se dividiu em classes e serve, no fundamental, para manter a ordem que interessa à classe dominante. O Manifesto o chama de “comitê para gerir os negócios comuns de toda a classe burguesa”. Isso não quer dizer que direitos conquistados (CLT, SUS, voto) não valham: são resultado de luta e importam, mas têm limites dentro do capitalismo.</p>
+          <h3 style="margin: 6px 0 0; font-size: 1.1rem;">A ideologia</h3>
+          <p style="margin: 0; font-size: 1.02rem; line-height: 1.65; max-width: 66ch;">“As ideias da classe dominante são, em cada época, as ideias dominantes” (A Ideologia Alemã). Quem controla os meios de produção materiais controla também boa parte dos meios de produção de ideias: escolas, igrejas, imprensa, hoje as plataformas digitais. Gramsci desenvolveu isso com o conceito de <strong style="font-weight: 500;">hegemonia</strong>: a classe dominante governa não só pela força, mas pelo consenso, fazendo seus interesses parecerem senso comum (“o mercado é natural”, “quem se esforça vence”).</p>
+          <h3 style="margin: 6px 0 0; font-size: 1.1rem;">Reforma ou revolução</h3>
+          <p style="margin: 0; font-size: 1.02rem; line-height: 1.65; max-width: 66ch;">Rosa Luxemburgo respondeu em 1899 a quem achava que o capitalismo viraria socialismo aos poucos, por reformas: as reformas são parte da luta, mas não mudam quem é dono dos meios de produção. A luta por reformas serve para acumular forças e consciência; o objetivo continua sendo a transformação da sociedade.</p>
+          <h3 style="margin: 6px 0 0; font-size: 1.1rem;">Socialismo e comunismo</h3>
+          <div style="overflow-x: auto;">
+            <table style="border-collapse: collapse; width: 100%; min-width: 660px; font-size: 0.92rem; line-height: 1.45;">
+              <thead><tr><th style="text-align: left; padding: 10px 12px 10px 0; border-bottom: 2px solid {{c.ink}}; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: {{c.muted}};">Fase</th><th style="text-align: left; padding: 10px 12px; border-bottom: 2px solid {{c.ink}}; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: {{c.muted}};">Como Marx descreveu</th><th style="text-align: left; padding: 10px 0 10px 12px; border-bottom: 2px solid {{c.ink}}; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: {{c.muted}};">Princípio</th></tr></thead>
+              <tbody>
+                <tr><td style="padding: 12px 12px 12px 0; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Transição (ditadura do proletariado)</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">A classe trabalhadora assume o poder político e substitui o Estado burguês por um Estado seu, como na Comuna de Paris (1871): cargos eletivos e revogáveis, salários de funcionários iguais aos de operários</td><td style="padding: 12px 0 12px 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Quebrar o poder da burguesia</td></tr>
+                <tr><td style="padding: 12px 12px 12px 0; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Socialismo (primeira fase do comunismo)</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Meios de produção sociais, produção planejada; ainda carrega marcas da sociedade antiga</td><td style="padding: 12px 0 12px 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">“De cada um segundo sua capacidade, a cada um segundo seu trabalho”</td></tr>
+                <tr><td style="padding: 12px 12px 12px 0; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Comunismo (fase superior)</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Sem classes, e por isso sem Estado como aparelho de repressão de uma classe sobre outra; abundância e fim da divisão entre trabalho manual e intelectual</td><td style="padding: 12px 0 12px 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">“De cada um segundo suas capacidades, a cada um segundo suas necessidades”</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p style="margin: 0; font-size: 1.02rem; line-height: 1.65; max-width: 66ch;">“Ditadura do proletariado” é um termo do século XIX que assusta hoje. Para Marx, toda forma de Estado é a dominação de uma classe; a república burguesa é, nesse sentido, a ditadura da burguesia, mesmo com eleições. A expressão quer dizer o poder político da maioria trabalhadora, não necessariamente um governo de uma pessoa só.</p>
+          <h3 style="margin: 6px 0 0; font-size: 1.1rem;">Organização</h3>
+          <p style="margin: 0; font-size: 1.02rem; line-height: 1.65; max-width: 66ch;">Lênin, em Que Fazer? (1902), defendeu que a consciência socialista não brota sozinha da luta econômica do dia a dia e que é preciso uma organização política dos trabalhadores, disciplinada e ligada às massas. Debates sobre como organizar (partido, sindicato, movimento) atravessam toda a história do marxismo.</p>
+          <h3 style="margin: 6px 0 0; font-size: 1.1rem;">Para ler</h3>
+          <ul style="margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; font-size: 0.95rem; line-height: 1.45; max-width: 66ch;">
+            <li style="display: flex; gap: 10px; padding: 9px 0; border-top: 1px solid {{c.line}};"><span aria-hidden="true">→</span><span><a href="https://www.marxists.org/portugues/lenin/1917/08/estadoerevolucao/index.htm" target="_blank" rel="noopener" style="text-underline-offset: 3px;">O Estado e a Revolução</a> <span style="font-size: 0.85rem; color: {{c.muted}};">Vladimir Lênin, 1917</span><br><span style="font-size: 0.9rem; line-height: 1.5;">A síntese do que Marx e Engels escreveram sobre o Estado. Comece pelos capítulos 1 e 3.</span></span></li>
+            <li style="display: flex; gap: 10px; padding: 9px 0; border-top: 1px solid {{c.line}};"><span aria-hidden="true">→</span><span><a href="https://www.marxists.org/portugues/marx/1871/guerra_civil/index.htm" target="_blank" rel="noopener" style="text-underline-offset: 3px;">A Guerra Civil em França</a> <span style="font-size: 0.85rem; color: {{c.muted}};">Karl Marx, 1871</span><br><span style="font-size: 0.9rem; line-height: 1.5;">A Comuna de Paris como primeiro governo operário, analisada no calor dos fatos.</span></span></li>
+            <li style="display: flex; gap: 10px; padding: 9px 0; border-top: 1px solid {{c.line}};"><span aria-hidden="true">→</span><span><a href="https://www.marxists.org/portugues/marx/1875/gotha/index.htm" target="_blank" rel="noopener" style="text-underline-offset: 3px;">Crítica do Programa de Gotha</a> <span style="font-size: 0.85rem; color: {{c.muted}};">Karl Marx, 1875</span><br><span style="font-size: 0.9rem; line-height: 1.5;">Onde estão as fases do socialismo e do comunismo. A parte I é a mais importante.</span></span></li>
+            <li style="display: flex; gap: 10px; padding: 9px 0; border-top: 1px solid {{c.line}};"><span aria-hidden="true">→</span><span><a href="https://www.marxists.org/portugues/luxemburgo/1900/ref_rev/index.htm" target="_blank" rel="noopener" style="text-underline-offset: 3px;">Reforma ou Revolução?</a> <span style="font-size: 0.85rem; color: {{c.muted}};">Rosa Luxemburgo, 1899</span><br><span style="font-size: 0.9rem; line-height: 1.5;">O debate com Bernstein, ainda atual.</span></span></li>
+          </ul>
+        </section>
+
+        <section id="m8" style="display: flex; flex-direction: column; gap: 14px; scroll-margin-top: 16px;">
+          <p style="margin: 0; font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: {{c.muted}};">Módulo 8</p>
+          <h2 style="margin: 0; font-size: 1.6rem; line-height: 1.15;">Marxismo no Brasil</h2>
+          <p style="margin: 0; font-size: 1.02rem; line-height: 1.65; max-width: 66ch;">O marxismo chegou ao Brasil com imigrantes, operários e intelectuais e ganhou organização com a fundação do <strong style="font-weight: 500;">Partido Comunista do Brasil (PCB) em 1922</strong>. Desde então, uma pergunta atravessa o debate: <strong style="font-weight: 500;">que tipo de país é o Brasil</strong>, e o que isso diz sobre a transformação de que ele precisa?</p>
+          <div style="overflow-x: auto;">
+            <table style="border-collapse: collapse; width: 100%; min-width: 680px; font-size: 0.92rem; line-height: 1.45;">
+              <thead><tr><th style="text-align: left; padding: 10px 12px 10px 0; border-bottom: 2px solid {{c.ink}}; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: {{c.muted}};">Autor</th><th style="text-align: left; padding: 10px 12px; border-bottom: 2px solid {{c.ink}}; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: {{c.muted}};">Obra principal</th><th style="text-align: left; padding: 10px 0 10px 12px; border-bottom: 2px solid {{c.ink}}; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: {{c.muted}};">Contribuição</th></tr></thead>
+              <tbody>
+                <tr><td style="padding: 12px 12px 12px 0; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Caio Prado Jr.</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Formação do Brasil Contemporâneo (1942); A Revolução Brasileira (1966)</td><td style="padding: 12px 0 12px 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">O Brasil nasceu como empresa colonial voltada para fora, não como sociedade feudal; criticou a ideia de que faltava uma revolução “antifeudal”</td></tr>
+                <tr><td style="padding: 12px 12px 12px 0; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Nelson Werneck Sodré</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Formação Histórica do Brasil (1962)</td><td style="padding: 12px 0 12px 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Leitura das etapas da formação brasileira e da questão nacional</td></tr>
+                <tr><td style="padding: 12px 12px 12px 0; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Clóvis Moura</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Rebeliões da Senzala (1959)</td><td style="padding: 12px 0 12px 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">O escravizado como sujeito da luta de classes: quilombos, insurreições e o racismo na formação do capitalismo brasileiro</td></tr>
+                <tr><td style="padding: 12px 12px 12px 0; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Florestan Fernandes</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">A Revolução Burguesa no Brasil (1975)</td><td style="padding: 12px 0 12px 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Uma burguesia associada ao capital estrangeiro e ao latifúndio, que se modernizou sem democratizar</td></tr>
+                <tr><td style="padding: 12px 12px 12px 0; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Ruy Mauro Marini</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Dialética da Dependência (1973)</td><td style="padding: 12px 0 12px 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Teoria marxista da dependência e da superexploração do trabalho na América Latina</td></tr>
+                <tr><td style="padding: 12px 12px 12px 0; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Lélia Gonzalez</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Lugar de Negro (1982, com Carlos Hasenbalg)</td><td style="padding: 12px 0 12px 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Raça, gênero e classe na sociedade brasileira</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <h3 style="margin: 6px 0 0; font-size: 1.1rem;">Questões brasileiras que o método ajuda a entender</h3>
+          <ul style="margin: 0; padding-left: 1.2em; display: flex; flex-direction: column; gap: 10px; font-size: 1.02rem; line-height: 1.6; max-width: 66ch;">
+            <li><strong style="font-weight: 500;">A concentração da terra</strong> desde as sesmarias e a Lei de Terras de 1850 até o agronegócio exportador e a luta dos movimentos sem-terra.</li>
+            <li><strong style="font-weight: 500;">A herança da escravidão</strong> na formação da classe trabalhadora, nos salários mais baixos da população negra e na violência policial.</li>
+            <li><strong style="font-weight: 500;">A dependência</strong>: exportar soja, minério e petróleo cru e importar tecnologia.</li>
+            <li><strong style="font-weight: 500;">A informalidade</strong>: uma parte enorme dos trabalhadores sem carteira, hoje somada ao trabalho por aplicativo.</li>
+          </ul>
+          <p style="margin: 0; font-size: 1.02rem; line-height: 1.65; max-width: 66ch;">Esses autores discordam entre si em pontos importantes, e isso é bom: o marxismo brasileiro é um debate vivo, não um manual. As obras desta tabela, por serem recentes, não estão na biblioteca do site, mas costumam ser encontradas em bibliotecas públicas e universitárias.</p>
+          <h3 style="margin: 6px 0 0; font-size: 1.1rem;">Para ler</h3>
+          <ul style="margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; font-size: 0.95rem; line-height: 1.45; max-width: 66ch;">
+            <li style="display: flex; gap: 10px; padding: 9px 0; border-top: 1px solid {{c.line}};"><span aria-hidden="true">→</span><span><a href="https://www.gutenberg.org/ebooks/70662" target="_blank" rel="noopener" style="text-underline-offset: 3px;">Cultura e Opulência do Brasil por suas Drogas e Minas</a> <span style="font-size: 0.85rem; color: {{c.muted}};">André João Antonil, 1711</span><br><span style="font-size: 0.9rem; line-height: 1.5;">Fonte de época sobre o engenho e a mineração coloniais. Leia o capítulo sobre o engenho com os conceitos do módulo 6 na cabeça.</span></span></li>
+            <li style="display: flex; gap: 10px; padding: 9px 0; border-top: 1px solid {{c.line}};"><span aria-hidden="true">→</span><span><a href="https://pt.wikisource.org/wiki/O_Abolicionismo" target="_blank" rel="noopener" style="text-underline-offset: 3px;">O Abolicionismo</a> <span style="font-size: 0.85rem; color: {{c.muted}};">Joaquim Nabuco, 1883</span><br><span style="font-size: 0.9rem; line-height: 1.5;">Não é marxista, mas mostra como a escravidão moldava toda a economia e a política do Império.</span></span></li>
+          </ul>
+        </section>
+
+        <section id="m9" style="display: flex; flex-direction: column; gap: 14px; scroll-margin-top: 16px;">
+          <p style="margin: 0; font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: {{c.muted}};">Módulo 9</p>
+          <h2 style="margin: 0; font-size: 1.6rem; line-height: 1.15;">Plano de estudos de 12 semanas</h2>
+          <p style="margin: 0; font-size: 1.02rem; line-height: 1.65; max-width: 66ch;">Um texto por semana, cerca de 2 a 4 horas de leitura. O ideal é estudar em grupo: marxismo se aprende discutindo, e o grupo ajuda a não desistir nos trechos difíceis.</p>
+          <div style="overflow-x: auto;">
+            <table style="border-collapse: collapse; width: 100%; min-width: 680px; font-size: 0.92rem; line-height: 1.45;">
+              <thead><tr><th style="text-align: left; padding: 10px 12px 10px 0; border-bottom: 2px solid {{c.ink}}; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: {{c.muted}};">Semana</th><th style="text-align: left; padding: 10px 12px; border-bottom: 2px solid {{c.ink}}; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: {{c.muted}};">Tema</th><th style="text-align: left; padding: 10px 12px; border-bottom: 2px solid {{c.ink}}; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: {{c.muted}};">Leitura</th><th style="text-align: left; padding: 10px 0 10px 12px; border-bottom: 2px solid {{c.ink}}; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: {{c.muted}};">Neste curso</th></tr></thead>
+              <tbody>
+                <tr><td style="padding: 12px 12px 12px 0; border-bottom: 1px solid {{c.line}}; vertical-align: top;">1</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Introdução e método</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Do Socialismo Utópico ao Socialismo Científico (partes I e II)</td><td style="padding: 12px 0 12px 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Módulos 1 e 2</td></tr>
+                <tr><td style="padding: 12px 12px 12px 0; border-bottom: 1px solid {{c.line}}; vertical-align: top;">2</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Materialismo histórico</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Teses sobre Feuerbach; Do Socialismo Utópico (parte III)</td><td style="padding: 12px 0 12px 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Módulo 2</td></tr>
+                <tr><td style="padding: 12px 12px 12px 0; border-bottom: 1px solid {{c.line}}; vertical-align: top;">3 e 4</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Classes e luta de classes</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Manifesto do Partido Comunista</td><td style="padding: 12px 0 12px 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Módulo 3</td></tr>
+                <tr><td style="padding: 12px 12px 12px 0; border-bottom: 1px solid {{c.line}}; vertical-align: top;">5</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Trabalho e salário</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Trabalho Assalariado e Capital</td><td style="padding: 12px 0 12px 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Módulo 4</td></tr>
+                <tr><td style="padding: 12px 12px 12px 0; border-bottom: 1px solid {{c.line}}; vertical-align: top;">6</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Mais-valia</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Salário, Preço e Lucro</td><td style="padding: 12px 0 12px 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Módulo 5</td></tr>
+                <tr><td style="padding: 12px 12px 12px 0; border-bottom: 1px solid {{c.line}}; vertical-align: top;">7</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Semana de revisão</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Releia suas anotações e escreva uma página explicando a mais-valia com um exemplo do seu trabalho ou da sua cidade</td><td style="padding: 12px 0 12px 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Módulos 1 a 5</td></tr>
+                <tr><td style="padding: 12px 12px 12px 0; border-bottom: 1px solid {{c.line}}; vertical-align: top;">8 e 9</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">O Capital</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">O Capital, Livro I: capítulo 1 (seções 1 e 4), capítulos 4 e 24</td><td style="padding: 12px 0 12px 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Módulos 4 a 6</td></tr>
+                <tr><td style="padding: 12px 12px 12px 0; border-bottom: 1px solid {{c.line}}; vertical-align: top;">10</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Imperialismo</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">O Imperialismo, Fase Superior do Capitalismo (capítulos 1, 3, 4 e 7)</td><td style="padding: 12px 0 12px 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Módulo 6</td></tr>
+                <tr><td style="padding: 12px 12px 12px 0; border-bottom: 1px solid {{c.line}}; vertical-align: top;">11</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Estado e revolução</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">O Estado e a Revolução (capítulos 1 e 3)</td><td style="padding: 12px 0 12px 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Módulo 7</td></tr>
+                <tr><td style="padding: 12px 12px 12px 0; border-bottom: 1px solid {{c.line}}; vertical-align: top;">12</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Brasil e balanço</td><td style="padding: 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Debate sobre o módulo 8; escolha o próximo livro (veja abaixo)</td><td style="padding: 12px 0 12px 12px; border-bottom: 1px solid {{c.line}}; vertical-align: top;">Módulo 8</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <h3 style="margin: 6px 0 0; font-size: 1.1rem;">Como montar um grupo de estudos</h3>
+          <ol style="margin: 0; padding-left: 1.4em; display: flex; flex-direction: column; gap: 10px; font-size: 1.02rem; line-height: 1.6; max-width: 66ch;">
+            <li><strong style="font-weight: 500;">Reúna de 4 a 12 pessoas.</strong> Menos que isso desanima; mais que isso, nem todo mundo fala.</li>
+            <li><strong style="font-weight: 500;">Fixe dia, hora e lugar.</strong> Uma vez por semana, 1h30. Pode ser no sindicato, no grêmio, na associação de moradores, numa sala da biblioteca ou por vídeo.</li>
+            <li><strong style="font-weight: 500;">Reveze quem apresenta.</strong> A cada semana, uma pessoa resume o texto em 10 minutos e traz duas ou três perguntas.</li>
+            <li><strong style="font-weight: 500;">Ligue o texto à realidade.</strong> Sempre termine com: o que isso explica do nosso trabalho, do nosso bairro, do noticiário da semana?</li>
+            <li><strong style="font-weight: 500;">Ninguém precisa entender tudo.</strong> Anote as dúvidas e volte a elas; muita coisa fica clara só nos textos seguintes.</li>
+          </ol>
+          <h3 style="margin: 6px 0 0; font-size: 1.1rem;">Checklist semanal</h3>
+          <ul style="margin: 0; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 0 24px; font-size: 0.95rem; line-height: 1.45;">
+            <li style="display: flex; gap: 10px; padding: 9px 0; border-top: 1px solid {{c.line}};"><span aria-hidden="true">☐</span>Li o texto da semana até o fim</li>
+            <li style="display: flex; gap: 10px; padding: 9px 0; border-top: 1px solid {{c.line}};"><span aria-hidden="true">☐</span>Anotei os conceitos novos com minhas palavras</li>
+            <li style="display: flex; gap: 10px; padding: 9px 0; border-top: 1px solid {{c.line}};"><span aria-hidden="true">☐</span>Escrevi pelo menos uma dúvida para o grupo</li>
+            <li style="display: flex; gap: 10px; padding: 9px 0; border-top: 1px solid {{c.line}};"><span aria-hidden="true">☐</span>Encontrei um exemplo atual do que o texto explica</li>
+            <li style="display: flex; gap: 10px; padding: 9px 0; border-top: 1px solid {{c.line}};"><span aria-hidden="true">☐</span>Participei do encontro ou li o resumo de quem foi</li>
+            <li style="display: flex; gap: 10px; padding: 9px 0; border-top: 1px solid {{c.line}};"><span aria-hidden="true">☐</span>Conversei sobre o tema com alguém de fora do grupo</li>
+          </ul>
+          <h3 style="margin: 6px 0 0; font-size: 1.1rem;">Depois das 12 semanas</h3>
+          <ul style="margin: 0; padding-left: 1.2em; display: flex; flex-direction: column; gap: 10px; font-size: 1.02rem; line-height: 1.6; max-width: 66ch;">
+            <li>Para aprofundar a economia: O Capital, Livro I inteiro, num ritmo de um capítulo por semana.</li>
+            <li>Para a filosofia: <a href="https://www.marxists.org/portugues/marx/1886/mes/fim.htm" target="_blank" rel="noopener" style="text-underline-offset: 3px;">Ludwig Feuerbach e o Fim da Filosofia Clássica Alemã</a> e <a href="https://www.marxists.org/portugues/marx/1845/ideologia-alema-oe/index.htm" target="_blank" rel="noopener" style="text-underline-offset: 3px;">A Ideologia Alemã</a>.</li>
+            <li>Para a organização política: <a href="https://www.marxists.org/portugues/lenin/1902/quefazer/index.htm" target="_blank" rel="noopener" style="text-underline-offset: 3px;">Que Fazer?</a>, de Lênin.</li>
+            <li>Para uma visão geral em linguagem de manual: <a href="https://www.marxists.org/portugues/bukharin/1920/abc/abc-do-comunismo.pdf" target="_blank" rel="noopener" style="text-underline-offset: 3px;">ABC do Comunismo</a>, de Bukharin e Preobrajenski.</li>
+            <li>Ou abra a <a href="cursos.html#biblioteca" style="text-underline-offset: 3px;">biblioteca do site</a> e filtre pela estante “Marxismo e economia”.</li>
+          </ul>
+        </section>
+
+        <section style="display: flex; flex-direction: column; gap: 12px; border-top: 2px solid {{c.ink}}; padding-top: 24px;">
+          <p style="margin: 0; font-size: 12px; color: {{c.muted}};">As leituras indicadas são de domínio público ou de acervos gratuitos (Arquivo Marxista na Internet, Projeto Gutenberg e Wikisource). As citações curtas vêm das traduções correntes em português.</p>
+          <p style="margin: 8px 0 0;"><a href="cursos.html" style="text-decoration: none; border: 2px solid {{c.ink}}; padding: 10px 18px; font-size: 14px; display: inline-block;">← Todos os cursos</a></p>
+        </section>
+
+      </div>
+    </div>
+  </main>
+
+  <footer style="background: #101010; color: #FFFAF0; border-top: 1px solid {{c.line}};">
+    <div style="max-width: 1240px; margin: 0 auto; padding: 48px 24px 40px; display: flex; flex-wrap: wrap; gap: 40px; justify-content: space-between;">
+      <div style="flex: 1 1 360px; min-width: 0; display: flex; flex-direction: column; gap: 12px;">
+        <p style="margin: 0; font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase;">Tempo Continuum</p>
+        <p style="margin: 0; font-size: 1.4rem; line-height: 1.25; max-width: 24ch;"><span style="background: #556A2F; color: #FFFAF0; padding: 0 6px; box-decoration-break: clone; -webkit-box-decoration-break: clone;">Conhecer o passado. Organizar o presente. Construir o futuro.</span></p>
+      </div>
+      <nav aria-label="Rodapé" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 40px; font-size: 14px; align-content: start;">
+        <a href="noticias.html" style="text-decoration: none;">Notícias</a>
+        <a href="streaming.html" style="text-decoration: none;">Streaming</a>
+        <a href="ferramentas.html" style="text-decoration: none;">Recursos</a>
+        <a href="cursos.html" style="text-decoration: none;">Academia</a>
+        <a href="politicos.html" style="text-decoration: none;">Wiki</a>
+        <a href="dossies.html" style="text-decoration: none;">Dossiês</a>
+        <a href="publicacoes.html" style="text-decoration: none;">Publicações</a>
+        <a href="index.html" style="text-decoration: none;">Início</a>
+      </nav>
+    </div>
+  </footer>
+</div>
+</template>
+<script src="js/runtime.js"></script>
+<script>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { escuro: null };
+  }
+  componentDidMount() {
+    try {
+      var v = window.localStorage.getItem('tc-tema');
+      if (v === 'escuro' || v === 'claro') this.setState({ escuro: v === 'escuro' });
+    } catch (e) {}
+  }
+  renderVals() {
+    var escuro = (this.state && this.state.escuro !== null && this.state.escuro !== undefined)
+      ? this.state.escuro
+      : (this.props.tema ?? 'claro') === 'escuro';
+    var self = this;
+    var c = escuro
+      ? { bg: '#101010', surface: '#2F2E25', ink: '#FFFAF0', muted: '#DDD5CA', line: 'rgba(221, 213, 202, 0.3)' }
+      : { bg: '#FFFAF0', surface: '#DDD5CA', ink: '#101010', muted: '#2F2E25', line: 'rgba(47, 46, 37, 0.28)' };
+    return {
+      menuAberto: !!(this.state && this.state.menuAberto),
+      menuFechado: !(this.state && this.state.menuAberto),
+      menuAbertoTxt: (this.state && this.state.menuAberto) ? 'true' : 'false',
+      alternarMenu: (function (eu) { return function () { eu.setState({ menuAberto: !(eu.state && eu.state.menuAberto) }); }; })(this),
+      fecharMenu: (function (eu) { return function () { eu.setState({ menuAberto: false }); }; })(this),
+      c: c,
+      escuro: escuro,
+      claro: !escuro,
+      temaTexto: escuro ? 'Claro' : 'Escuro',
+      temaLabel: escuro ? 'Mudar para o tema claro' : 'Mudar para o tema escuro',
+      alternarTema: function () {
+        var novo = !escuro;
+        self.setState({ escuro: novo });
+        try { window.localStorage.setItem('tc-tema', novo ? 'escuro' : 'claro'); } catch (e) {}
+      }
+    };
+  }
+}
+iniciarPagina(Component, {"tema": "claro"});
+</script>
+</body>
+</html>

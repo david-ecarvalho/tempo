@@ -1,0 +1,570 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tempo Continuum — Contatos de parlamentares</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500&amp;display=swap">
+<style>
+body{margin:0;font-family:"Montserrat","Helvetica Neue",Arial,sans-serif;font-weight:500}
+h1,h2,h3,h4,p{font-weight:500}
+a{color:inherit}a:hover{text-decoration-thickness:2px}
+a:focus-visible,button:focus-visible,input:focus-visible{outline:2px solid currentColor;outline-offset:3px}
+@media (max-width: 760px){
+.tc-header-row{flex-wrap:nowrap !important;gap:8px !important;padding:10px 16px !important}
+.tc-nav,.tc-buscar{display:none !important}
+.tc-logo{margin-right:auto;min-width:0}
+.tc-tema-txt{display:none}
+.tc-tema{padding:8px 12px !important}
+.tc-chips{flex-wrap:nowrap !important;overflow-x:auto;padding-bottom:8px;margin-right:-16px;padding-right:16px;-webkit-overflow-scrolling:touch;scrollbar-width:thin}
+.tc-chips>*{flex:none}
+main{padding-left:16px !important;padding-right:16px !important;gap:32px !important}
+.tc-nav-uf{display:none}
+.tc-estados{justify-content:flex-start !important}
+footer>div{padding-left:16px !important;padding-right:16px !important}
+}
+
+/* Cabeçalho fixo e menu lateral */
+.tc-topo{position:sticky;top:0;z-index:50}
+.tc-menu-btn{display:flex !important}
+.tc-painel{display:block !important;position:fixed;top:0;left:0;bottom:0;width:min(340px,86vw);overflow-y:auto;z-index:70;box-shadow:8px 0 32px rgba(16,16,16,.35);padding:12px 16px 24px !important;border-top:0 !important;box-sizing:border-box}
+.tc-fundo{position:fixed;inset:0;z-index:60;background:rgba(16,16,16,.45);border:0;padding:0;cursor:pointer}
+.tc-painel-topo{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:6px 4px 14px;font-size:12px;letter-spacing:.1em;text-transform:uppercase}
+.tc-painel-topo button{font:inherit;font-size:14px;letter-spacing:0;text-transform:none;background:none;border:2px solid currentColor;color:inherit;border-radius:999px;padding:6px 14px;cursor:pointer}
+/* Cabeçalho em uma linha só: ocupa a largura toda da janela */
+.tc-header-row{max-width:none !important;flex-wrap:nowrap !important;gap:12px 20px !important}
+.tc-nav{flex-wrap:nowrap !important;flex:1 1 auto !important;min-width:0}
+.tc-nav a{white-space:nowrap}
+@media (max-width: 1320px){.tc-nav{gap:2px !important}.tc-nav a{padding:8px 10px !important}.tc-buscar,.tc-menu-btn{font-size:0 !important;gap:0 !important;padding:8px 13px !important}.tc-tema-txt{display:none}.tc-tema{padding:8px 13px !important}}
+@media (max-width: 1100px){.tc-nav,.tc-buscar{display:none !important}.tc-logo{margin-right:auto;min-width:0}}
+</style>
+<style>html,body{margin:0} #app > div{min-height:100vh}
+.tc-uf{cursor:pointer;transition:fill .15s}
+.tc-uf:hover{fill:#8C9A5E}
+.tc-uf[aria-pressed="true"]{fill:#556A2F}
+.tc-uf:focus{outline:none}
+.tc-uf:focus-visible{fill:#8C9A5E;stroke:#101010;stroke-width:3}
+.tc-uf-sigla{cursor:pointer;font-family:"Montserrat",Arial,sans-serif;font-weight:500;user-select:none}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<template id="tpl">
+
+<div style="background: {{c.bg}}; color: {{c.ink}}; min-height: 100%; font-family: &quot;Montserrat&quot;, Arial, sans-serif; font-weight: 500;">
+
+  <header class="tc-topo" style="background: {{c.bg}}; color: {{c.ink}}; border-bottom: 2px solid {{c.ink}};">
+    <div class="tc-header-row" style="max-width: 1240px; margin: 0 auto; padding: 14px 24px; display: flex; flex-wrap: wrap; align-items: center; gap: 12px 40px;">
+      <button type="button" class="tc-menu-btn" onClick="{{alternarMenu}}" aria-expanded="{{menuAbertoTxt}}" aria-controls="tc-painel" style="align-items: center; gap: 8px; font: inherit; font-size: 14px; border: 2px solid {{c.ink}}; background: transparent; color: {{c.ink}}; border-radius: 999px; padding: 8px 14px; min-height: 44px; box-sizing: border-box; cursor: pointer;">
+        <sc-if value="{{menuFechado}}" hint-placeholder-val="{{true}}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"></path></svg></sc-if>
+        <sc-if value="{{menuAberto}}" hint-placeholder-val="{{false}}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></sc-if>
+        Menu
+      </button>
+      <a class="tc-logo" href="index.html" style="display: flex; align-items: center; gap: 12px; text-decoration: none; color: inherit;" aria-label="Tempo Continuum, início">
+        <sc-if value="{{claro}}" hint-placeholder-val="{{true}}"><img src="logos/logo-claro.svg" alt="" width="48" height="48" style="display: block; width: 48px; height: 48px; border-radius: 50%; object-fit: cover; flex: none;"></sc-if><sc-if value="{{escuro}}" hint-placeholder-val="{{false}}"><img src="logos/logo-escuro.svg" alt="" width="48" height="48" style="display: block; width: 48px; height: 48px; border-radius: 50%; object-fit: cover; flex: none;"></sc-if>
+        <span style="font-size: 13px; line-height: 1.05; letter-spacing: 0.08em; text-transform: uppercase;">Tempo<br>Continuum</span>
+      </a>
+      <nav class="tc-nav" aria-label="Seções" style="display: flex; flex-wrap: wrap; gap: 6px 8px; flex: 1 1 560px; font-size: 15px;">
+        <a href="noticias.html" style="text-decoration: none; padding: 8px 14px; border-radius: 999px;">Notícias</a>
+        <a href="streaming.html" style="text-decoration: none; padding: 8px 14px; border-radius: 999px;">Streaming</a>
+        <a href="ferramentas.html" aria-current="page" style="text-decoration: none; padding: 8px 14px; border-radius: 999px; background: #556A2F; color: #FFFAF0;">Recursos</a>
+        <a href="cursos.html" style="text-decoration: none; padding: 8px 14px; border-radius: 999px;">Academia</a>
+        <a href="politicos.html" style="text-decoration: none; padding: 8px 14px; border-radius: 999px;">Wiki</a>
+        <a href="dossies.html" style="text-decoration: none; padding: 8px 14px; border-radius: 999px;">Dossiês</a>
+        <a href="publicacoes.html" style="text-decoration: none; padding: 8px 14px; border-radius: 999px;">Publicações</a>
+      </nav>
+      <a class="tc-buscar" href="noticias.html" style="display: flex; align-items: center; gap: 8px; text-decoration: none; border: 2px solid {{c.ink}}; border-radius: 999px; padding: 8px 16px; font-size: 14px; min-height: 44px; box-sizing: border-box;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-4-4"></path></svg>Buscar</a>
+      <button type="button" class="tc-tema" onClick="{{alternarTema}}" aria-label="{{temaLabel}}" style="display: flex; align-items: center; gap: 8px; font: inherit; font-size: 14px; border: 2px solid {{c.ink}}; background: {{c.ink}}; color: {{c.bg}}; border-radius: 999px; padding: 8px 16px; min-height: 44px; box-sizing: border-box; cursor: pointer;">
+        <sc-if value="{{claro}}" hint-placeholder-val="{{true}}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"></path></svg></sc-if>
+        <sc-if value="{{escuro}}" hint-placeholder-val="{{false}}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg></sc-if>
+        <span class="tc-tema-txt">{{temaTexto}}</span>
+      </button>
+    </div>
+    <sc-if value="{{menuAberto}}" hint-placeholder-val="{{false}}">
+      <button type="button" class="tc-fundo" onClick="{{fecharMenu}}" aria-label="Fechar o menu" tabindex="-1"></button>
+      <nav id="tc-painel" class="tc-painel" aria-label="Menu" style="background: {{c.bg}}; color: {{c.ink}}; border-right: 2px solid {{c.ink}};">
+        <div class="tc-painel-topo"><span>Tempo Continuum</span><button type="button" onClick="{{fecharMenu}}">Fechar</button></div>
+        <a href="index.html" style="text-decoration: none; display: block; padding: 14px 12px; font-size: 18px; border-bottom: 1px solid {{c.line}};">Início</a>
+        <a href="noticias.html" style="text-decoration: none; display: block; padding: 14px 12px; font-size: 18px; border-bottom: 1px solid {{c.line}};">Notícias</a>
+        <a href="streaming.html" style="text-decoration: none; display: block; padding: 14px 12px; font-size: 18px; border-bottom: 1px solid {{c.line}};">Streaming</a>
+        <a href="ferramentas.html" aria-current="page" style="text-decoration: none; display: block; padding: 14px 12px; font-size: 18px; border-bottom: 1px solid {{c.line}}; background: #556A2F; color: #FFFAF0;">Recursos</a>
+        <a href="cursos.html" style="text-decoration: none; display: block; padding: 14px 12px; font-size: 18px; border-bottom: 1px solid {{c.line}};">Academia</a>
+        <a href="politicos.html" style="text-decoration: none; display: block; padding: 14px 12px; font-size: 18px; border-bottom: 1px solid {{c.line}};">Wiki</a>
+        <a href="dossies.html" style="text-decoration: none; display: block; padding: 14px 12px; font-size: 18px; border-bottom: 1px solid {{c.line}};">Dossiês</a>
+        <a href="publicacoes.html" style="text-decoration: none; display: block; padding: 14px 12px; font-size: 18px; border-bottom: 1px solid {{c.line}};">Publicações</a>
+        <a href="noticias.html" onClick="{{fecharMenu}}" style="text-decoration: none; display: flex; align-items: center; gap: 10px; padding: 14px 12px; font-size: 18px;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-4-4"></path></svg>Buscar</a>
+      </nav>
+    </sc-if>
+  </header>
+
+  <main style="max-width: 1240px; margin: 0 auto; padding: 32px 24px 80px; display: flex; flex-direction: column; gap: 32px;">
+    <div style="display: flex; flex-direction: column; gap: 14px;">
+      <p style="margin: 0; font-size: 13px; color: {{c.muted}};"><a href="index.html" style="text-underline-offset: 3px;">Início</a> / <a href="ferramentas.html" style="text-underline-offset: 3px;">Recursos</a> / Contatos de parlamentares</p>
+      <h1 style="margin: 0; font-size: clamp(2.4rem, 5vw, 3.6rem); line-height: 1; letter-spacing: -0.02em;"><span style="background: #556A2F; color: #FFFAF0; padding: 0 10px; box-decoration-break: clone; -webkit-box-decoration-break: clone;">Contatos de parlamentares</span></h1>
+      <p style="margin: 0; font-size: 1.1rem; line-height: 1.55; color: {{c.muted}}; max-width: 66ch;">E-mail, telefone, gabinete e redes sociais dos deputados federais, senadores e deputados estaduais e distritais em exercício. Tudo vem de fontes oficiais: os dados abertos da Câmara e do Senado e os sites das Assembleias Legislativas e da Câmara Legislativa do DF.</p>
+      <p style="margin: 0; font-size: 13px; color: {{c.muted}};">{{atualizadoTxt}}</p>
+    </div>
+
+    <div role="tablist" aria-label="Modo de ver" style="display: flex; gap: 0; border-bottom: 2px solid {{c.ink}}; margin-bottom: -32px;">
+      <sc-for list="{{modos}}" as="m" hint-placeholder-count="2">
+        <sc-if value="{{m.ativo}}" hint-placeholder-val="{{true}}"><button type="button" role="tab" aria-selected="true" onClick="{{m.escolher}}" style="font: inherit; font-size: 15px; padding: 10px 18px; border: 2px solid {{c.ink}}; border-bottom: 0; background: {{c.ink}}; color: {{c.bg}}; cursor: pointer;">{{m.nome}}</button></sc-if>
+        <sc-if value="{{m.inativo}}" hint-placeholder-val="{{false}}"><button type="button" role="tab" aria-selected="false" onClick="{{m.escolher}}" style="font: inherit; font-size: 15px; padding: 10px 18px; border: 2px solid transparent; border-bottom: 0; background: transparent; color: {{c.ink}}; cursor: pointer; text-decoration: underline; text-underline-offset: 4px;">{{m.nome}}</button></sc-if>
+      </sc-for>
+    </div>
+
+    <sc-if value="{{modoEstado}}" hint-placeholder-val="{{false}}">
+    <section aria-label="Navegar por estado" style="display: flex; flex-direction: column; gap: 18px; border-bottom: 1px solid {{c.line}}; padding: 24px 0 20px;">
+      <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 24px 48px;">
+      <div style="flex: 1 1 360px; min-width: 0; max-width: 580px; margin: 0 auto;">
+        <sc-if value="{{temMapa}}" hint-placeholder-val="{{true}}">
+        <svg viewBox="{{mapaVb}}" role="group" aria-label="Mapa do Brasil. Escolha um estado para ver os parlamentares dele." style="display: block; width: 100%; height: auto; overflow: visible;">
+          <sc-for list="{{mapaUfs}}" as="e" hint-placeholder-count="27"><path id="mapa-{{e.uf}}" class="tc-uf" d="{{e.d}}" tabindex="0" role="button" aria-label="{{e.rotulo}}" aria-pressed="{{e.pressed}}" fill="{{c.surface}}" stroke="{{c.bg}}" stroke-width="1.5" stroke-linejoin="round" onClick="{{e.escolher}}" onKeyDown="{{e.tecla}}"><title>{{e.rotulo}}</title></path></sc-for>
+          <sc-for list="{{mapaFora}}" as="e" hint-placeholder-count="8"><line x1="{{e.x}}" y1="{{e.y}}" x2="{{e.lx}}" y2="{{e.ly}}" stroke="{{c.muted}}" stroke-width="1.2" pointer-events="none"></line></sc-for>
+          <sc-for list="{{mapaUfs}}" as="e" hint-placeholder-count="27"><text class="tc-uf-sigla" x="{{e.tx}}" y="{{e.ty}}" text-anchor="{{e.ancora}}" dominant-baseline="central" font-size="24" fill="{{e.corTexto}}" aria-hidden="true" onClick="{{e.escolher}}">{{e.uf}}</text></sc-for>
+        </svg>
+        </sc-if>
+        <sc-if value="{{semMapa}}" hint-placeholder-val="{{false}}"><p style="margin: 0; color: {{c.muted}};">Carregando o mapa…</p></sc-if>
+      </div>
+      <div style="flex: 1 1 300px; min-width: 0; display: flex; flex-direction: column; gap: 18px;">
+      <p style="margin: 0; font-size: 14px; color: {{c.muted}};">Clique num estado no mapa, use as setas ou as siglas abaixo.</p>
+      <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px;">
+        <button type="button" onClick="{{ufAnterior}}" aria-label="{{anteriorLabel}}" style="flex: none; font: inherit; font-size: 15px; min-height: 48px; min-width: 48px; padding: 8px 14px; border: 2px solid {{c.ink}}; background: transparent; color: {{c.ink}}; cursor: pointer;">← <span class="tc-nav-uf">{{ufAntes}}</span></button>
+        <div style="min-width: 0; display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center;">
+          <span aria-hidden="true" style="font-size: clamp(2.6rem, 8vw, 4rem); line-height: 1; letter-spacing: 0.02em; background: #556A2F; color: #FFFAF0; padding: 4px 14px;">{{ufAtual}}</span>
+          <h2 aria-live="polite" style="margin: 0; font-size: clamp(1.2rem, 3vw, 1.6rem); line-height: 1.2;">{{nomeEstado}}</h2>
+        </div>
+        <button type="button" onClick="{{ufProximo}}" aria-label="{{proximoLabel}}" style="flex: none; font: inherit; font-size: 15px; min-height: 48px; min-width: 48px; padding: 8px 14px; border: 2px solid {{c.ink}}; background: transparent; color: {{c.ink}}; cursor: pointer;"><span class="tc-nav-uf">{{ufDepois}}</span> →</button>
+      </div>
+      <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px;">
+        <span role="status" style="font-size: 13px; line-height: 1.5; color: {{c.muted}}; flex: 1 1 100%;">{{contagem}}</span>
+        <sc-if value="{{temLista}}" hint-placeholder-val="{{true}}">
+          <button type="button" onClick="{{copiarEmails}}" style="font: inherit; font-size: 14px; padding: 8px 14px; border: 2px solid {{c.ink}}; background: transparent; color: {{c.ink}}; cursor: pointer;">{{copiarTxt}}</button>
+          <button type="button" onClick="{{baixarCsv}}" style="font: inherit; font-size: 14px; padding: 8px 14px; border: 2px solid #556A2F; background: #556A2F; color: #FFFAF0; cursor: pointer;">Baixar planilha (CSV)</button>
+        </sc-if>
+      </div>
+      </div>
+      </div>
+      <div class="tc-chips tc-estados" role="group" aria-label="Escolher estado" style="display: flex; flex-wrap: wrap; gap: 6px; justify-content: center;">
+        <sc-for list="{{ufsNav}}" as="u" hint-placeholder-count="27">
+          <sc-if value="{{u.ativa}}" hint-placeholder-val="{{false}}"><button type="button" onClick="{{u.escolher}}" aria-pressed="true" title="{{u.nome}}" style="font: inherit; font-size: 13px; min-width: 40px; padding: 6px 8px; border-radius: 999px; background: #556A2F; color: #FFFAF0; border: 1.5px solid #556A2F; cursor: pointer;">{{u.uf}}</button></sc-if>
+          <sc-if value="{{u.inativa}}" hint-placeholder-val="{{true}}"><button type="button" onClick="{{u.escolher}}" aria-pressed="false" title="{{u.nome}}" style="font: inherit; font-size: 13px; min-width: 40px; padding: 6px 8px; border-radius: 999px; background: transparent; color: {{c.ink}}; border: 1.5px solid {{c.line}}; cursor: pointer;">{{u.uf}}</button></sc-if>
+        </sc-for>
+      </div>
+    </section>
+    </sc-if>
+
+    <sc-if value="{{modoLista}}" hint-placeholder-val="{{true}}">
+    <section aria-label="Filtros" style="display: flex; flex-direction: column; gap: 16px; border-bottom: 1px solid {{c.line}}; padding: 24px 0 20px;">
+      <div style="display: flex; flex-wrap: wrap; gap: 16px;">
+        <div style="flex: 2 1 320px; min-width: 0; display: flex; flex-direction: column; gap: 6px;">
+          <label for="cq" style="font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: {{c.muted}};">Buscar</label>
+          <input id="cq" type="search" value="{{q}}" onChange="{{onQ}}" placeholder="Nome, partido ou estado" autocomplete="off" style="font: inherit; font-size: 16px; padding: 12px 14px; border: 2px solid {{c.ink}}; background: {{c.bg}}; color: {{c.ink}}; border-radius: 0; min-width: 0;">
+        </div>
+        <div style="flex: 1 1 150px; min-width: 0; display: flex; flex-direction: column; gap: 6px;">
+          <label for="cuf" style="font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: {{c.muted}};">Estado</label>
+          <select id="cuf" onChange="{{onUf}}" style="font: inherit; font-size: 16px; padding: 12px 14px; border: 2px solid {{c.ink}}; background: {{c.bg}}; color: {{c.ink}}; border-radius: 0; min-width: 0;">
+            <sc-for list="{{ufs}}" as="u" hint-placeholder-count="3"><option value="{{u.v}}" selected="{{u.sel}}">{{u.t}}</option></sc-for>
+          </select>
+        </div>
+        <div style="flex: 1 1 150px; min-width: 0; display: flex; flex-direction: column; gap: 6px;">
+          <label for="cpart" style="font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: {{c.muted}};">Partido</label>
+          <select id="cpart" onChange="{{onPartido}}" style="font: inherit; font-size: 16px; padding: 12px 14px; border: 2px solid {{c.ink}}; background: {{c.bg}}; color: {{c.ink}}; border-radius: 0; min-width: 0;">
+            <sc-for list="{{partidos}}" as="u" hint-placeholder-count="3"><option value="{{u.v}}" selected="{{u.sel}}">{{u.t}}</option></sc-for>
+          </select>
+        </div>
+      </div>
+      <div class="tc-chips" style="display: flex; flex-wrap: wrap; gap: 8px;">
+        <sc-for list="{{casas}}" as="s" hint-placeholder-count="3">
+          <sc-if value="{{s.ativa}}" hint-placeholder-val="{{false}}">
+            <button type="button" onClick="{{s.escolher}}" aria-pressed="true" style="font: inherit; font-size: 13px; padding: 6px 12px; border-radius: 999px; background: #556A2F; color: #FFFAF0; border: 1.5px solid #556A2F; cursor: pointer;">{{s.nome}} · {{s.n}}</button>
+          </sc-if>
+          <sc-if value="{{s.inativa}}" hint-placeholder-val="{{true}}">
+            <button type="button" onClick="{{s.escolher}}" aria-pressed="false" style="font: inherit; font-size: 13px; padding: 6px 12px; border-radius: 999px; background: transparent; color: {{c.ink}}; border: 1.5px solid {{c.line}}; cursor: pointer;">{{s.nome}} · {{s.n}}</button>
+          </sc-if>
+        </sc-for>
+      </div>
+      <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px;">
+        <span role="status" style="font-size: 13px; color: {{c.muted}}; margin-right: auto;">{{contagem}}</span>
+        <sc-if value="{{temLista}}" hint-placeholder-val="{{true}}">
+          <button type="button" onClick="{{copiarEmails}}" style="font: inherit; font-size: 14px; padding: 8px 14px; border: 2px solid {{c.ink}}; background: transparent; color: {{c.ink}}; cursor: pointer;">{{copiarTxt}}</button>
+          <button type="button" onClick="{{baixarCsv}}" style="font: inherit; font-size: 14px; padding: 8px 14px; border: 2px solid #556A2F; background: #556A2F; color: #FFFAF0; cursor: pointer;">Baixar planilha (CSV)</button>
+        </sc-if>
+      </div>
+    </section>
+    </sc-if>
+
+    <sc-if value="{{temAviso}}" hint-placeholder-val="{{false}}">
+      <p role="note" style="margin: 0; padding: 12px 16px; border-left: 4px solid #556A2F; background: {{c.surface}}; font-size: 0.95rem; line-height: 1.5; max-width: 80ch;">{{avisoTxt}}</p>
+    </sc-if>
+
+    <sc-if value="{{carregando}}" hint-placeholder-val="{{false}}">
+      <p style="margin: 0; color: {{c.muted}};">Carregando os contatos…</p>
+    </sc-if>
+
+    <sc-for list="{{grupos}}" as="g" hint-placeholder-count="1">
+    <section aria-label="{{g.rotulo}}" style="display: flex; flex-direction: column; gap: 16px;">
+    <sc-if value="{{g.titulo}}" hint-placeholder-val="{{false}}">
+      <div style="display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 14px; border-top: 2px solid {{c.ink}}; padding-top: 14px;">
+        <h2 style="margin: 0; font-size: 1.5rem; line-height: 1.2;">{{g.titulo}}</h2>
+        <span style="font-size: 14px; color: {{c.muted}};">{{g.nTxt}}</span>
+      </div>
+      <sc-if value="{{g.aviso}}" hint-placeholder-val="{{false}}"><p role="note" style="margin: 0; padding: 10px 14px; border-left: 4px solid #556A2F; background: {{c.surface}}; font-size: 0.95rem; line-height: 1.5; max-width: 80ch;">{{g.aviso}}</p></sc-if>
+    </sc-if>
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr)); gap: 20px;">
+      <sc-for list="{{g.itens}}" as="p" hint-placeholder-count="6">
+        <article aria-labelledby="n-{{p.chave}}" style="background: {{c.surface}}; border: 1px solid {{c.line}}; padding: 20px; display: flex; flex-direction: column; gap: 14px; min-width: 0;">
+          <div style="display: flex; gap: 14px; align-items: center; min-width: 0;">
+            <sc-if value="{{p.foto}}" hint-placeholder-val="{{true}}"><img src="{{p.foto}}" alt="" width="64" height="64" loading="lazy" referrerpolicy="no-referrer" style="flex: none; width: 64px; height: 64px; border-radius: 50%; object-fit: cover; object-position: top; background: {{c.bg}};"></sc-if>
+            <sc-if value="{{p.semFoto}}" hint-placeholder-val="{{false}}"><span aria-hidden="true" style="flex: none; width: 64px; height: 64px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: {{c.bg}}; color: {{c.muted}}; font-size: 1.3rem; letter-spacing: 0.04em;">{{p.iniciais}}</span></sc-if>
+            <div style="min-width: 0; display: flex; flex-direction: column; gap: 6px;">
+              <h3 id="n-{{p.chave}}" style="margin: 0; font-size: 1.2rem; line-height: 1.2; overflow-wrap: anywhere;">{{p.nome}}</h3>
+              <div style="display: flex; flex-wrap: wrap; gap: 6px; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase;">
+                <sc-if value="{{p.senado}}" hint-placeholder-val="{{false}}"><span style="background: #556A2F; color: #FFFAF0; padding: 2px 8px;">Senado</span></sc-if>
+                <sc-if value="{{p.camara}}" hint-placeholder-val="{{true}}"><span style="border: 1.5px solid {{c.ink}}; padding: 1px 7px;">Câmara</span></sc-if>
+                <sc-if value="{{p.estadual}}" hint-placeholder-val="{{false}}"><span style="border: 1.5px dashed {{c.ink}}; padding: 1px 7px;">{{p.casaCurta}} {{p.uf}}</span></sc-if>
+                <span style="color: {{c.muted}}; padding: 2px 0;">{{p.partidoUf}}</span>
+              </div>
+            </div>
+          </div>
+          <dl style="margin: 0; display: flex; flex-direction: column; gap: 10px; font-size: 0.95rem; line-height: 1.4;">
+            <sc-if value="{{p.email}}" hint-placeholder-val="{{true}}">
+              <div style="min-width: 0;"><dt style="font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: {{c.muted}};">E-mail</dt><dd style="margin: 2px 0 0; overflow-wrap: anywhere;"><a href="mailto:{{p.email}}" style="text-underline-offset: 3px;">{{p.email}}</a><sc-for list="{{p.extras}}" as="x" hint-placeholder-count="0"><br><a href="mailto:{{x}}" style="text-underline-offset: 3px;">{{x}}</a></sc-for></dd></div>
+            </sc-if>
+            <sc-if value="{{p.temTel}}" hint-placeholder-val="{{true}}">
+              <div><dt style="font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: {{c.muted}};">Telefone</dt><dd style="margin: 2px 0 0; display: flex; flex-wrap: wrap; gap: 4px 14px;"><sc-for list="{{p.tels}}" as="t" hint-placeholder-count="1"><a href="tel:{{t.href}}" style="text-underline-offset: 3px; white-space: nowrap;">{{t.txt}}</a></sc-for></dd></div>
+            </sc-if>
+            <sc-if value="{{p.endereco}}" hint-placeholder-val="{{true}}">
+              <div><dt style="font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: {{c.muted}};">Gabinete</dt><dd style="margin: 2px 0 0;">{{p.endereco}}</dd></div>
+            </sc-if>
+          </dl>
+          <div style="margin-top: auto; display: flex; flex-wrap: wrap; gap: 8px; font-size: 13px;">
+            <a href="{{p.pagina}}" target="_blank" rel="noopener noreferrer" style="text-decoration: none; border: 1.5px solid {{c.ink}}; padding: 6px 10px;">Página oficial ↗</a>
+            <sc-for list="{{p.redes}}" as="r" hint-placeholder-count="2">
+              <a href="{{r.href}}" target="_blank" rel="noopener noreferrer" style="text-decoration: none; border: 1.5px solid {{c.line}}; padding: 6px 10px;">{{r.nome}} ↗</a>
+            </sc-for>
+          </div>
+        </article>
+      </sc-for>
+    </div>
+    </section>
+    </sc-for>
+
+    <sc-if value="{{temMais}}" hint-placeholder-val="{{false}}">
+      <button type="button" onClick="{{mostrarMais}}" style="align-self: center; font: inherit; font-size: 15px; padding: 12px 22px; border: 2px solid {{c.ink}}; background: transparent; color: {{c.ink}}; cursor: pointer;">{{maisTxt}}</button>
+    </sc-if>
+
+    <sc-if value="{{nenhuma}}" hint-placeholder-val="{{false}}">
+      <div style="border: 1.5px dashed {{c.line}}; padding: 28px 24px; display: flex; flex-direction: column; gap: 6px;">
+        <strong style="font-size: 1.2rem; font-weight: 500;">{{vazioTitulo}}</strong>
+        <span style="color: {{c.muted}};">{{vazioTexto}}</span>
+      </div>
+    </sc-if>
+
+    <p style="margin: 0; font-size: 13px; line-height: 1.55; color: {{c.muted}}; max-width: 72ch;">Fontes: <a href="https://dadosabertos.camara.leg.br" target="_blank" rel="noopener noreferrer" style="text-underline-offset: 3px;">Dados Abertos da Câmara dos Deputados</a> e <a href="https://legis.senado.leg.br/dadosabertos" target="_blank" rel="noopener noreferrer" style="text-underline-offset: 3px;">Dados Abertos do Senado Federal</a>. Os telefones de deputados federais e senadores são dos gabinetes em Brasília. O Senado não publica as redes sociais dos senadores nos dados abertos; elas estão na página oficial de cada um.</p>
+    <p style="margin: 0; font-size: 13px; line-height: 1.55; color: {{c.muted}}; max-width: 72ch;">Deputados estaduais e distritais: não existe uma base nacional, então reunimos o que cada Assembleia publica no próprio site ou no seu sistema legislativo. O que cada uma informa varia: algumas não publicam telefone, partido ou foto. {{coberturaTxt}}</p>
+  </main>
+
+
+  <footer style="background: #101010; color: #FFFAF0; border-top: 1px solid {{c.line}};">
+    <div style="max-width: 1240px; margin: 0 auto; padding: 48px 24px 40px; display: flex; flex-wrap: wrap; gap: 40px; justify-content: space-between;">
+      <div style="flex: 1 1 360px; min-width: 0; display: flex; flex-direction: column; gap: 12px;">
+        <p style="margin: 0; font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase;">Tempo Continuum</p>
+        <p style="margin: 0; font-size: 1.4rem; line-height: 1.25; max-width: 24ch;"><span style="background: #556A2F; color: #FFFAF0; padding: 0 6px; box-decoration-break: clone; -webkit-box-decoration-break: clone;">Conhecer o passado. Organizar o presente. Construir o futuro.</span></p>
+      </div>
+      <nav aria-label="Rodapé" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 40px; font-size: 14px; align-content: start;">
+        <a href="noticias.html" style="text-decoration: none;">Notícias</a>
+        <a href="streaming.html" style="text-decoration: none;">Streaming</a>
+        <a href="ferramentas.html" style="text-decoration: none;">Recursos</a>
+        <a href="cursos.html" style="text-decoration: none;">Academia</a>
+        <a href="politicos.html" style="text-decoration: none;">Wiki</a>
+        <a href="dossies.html" style="text-decoration: none;">Dossiês</a>
+        <a href="publicacoes.html" style="text-decoration: none;">Publicações</a>
+        <a href="index.html" style="text-decoration: none;">Início</a>
+      </nav>
+    </div>
+  </footer>
+</div>
+</template>
+<script src="js/runtime.js"></script>
+<script>
+var POR_PAGINA = 60;
+var UFS = ['AC','AL','AM','AP','BA','CE','DF','ES','GO','MA','MG','MS','MT','PA','PB','PE','PI','PR','RJ','RN','RO','RR','RS','SC','SE','SP','TO'];
+var NOMES_UF = { AC: 'Acre', AL: 'Alagoas', AM: 'Amazonas', AP: 'Amapá', BA: 'Bahia', CE: 'Ceará', DF: 'Distrito Federal',
+  ES: 'Espírito Santo', GO: 'Goiás', MA: 'Maranhão', MG: 'Minas Gerais', MS: 'Mato Grosso do Sul', MT: 'Mato Grosso',
+  PA: 'Pará', PB: 'Paraíba', PE: 'Pernambuco', PI: 'Piauí', PR: 'Paraná', RJ: 'Rio de Janeiro', RN: 'Rio Grande do Norte',
+  RO: 'Rondônia', RR: 'Roraima', RS: 'Rio Grande do Sul', SC: 'Santa Catarina', SE: 'Sergipe', SP: 'São Paulo', TO: 'Tocantins' };
+function ufDoEndereco() {
+  var m = /(?:^|[#&])estado=([A-Za-z]{2})\b/.exec(location.hash || '');
+  return m && UFS.indexOf(m[1].toUpperCase()) >= 0 ? m[1].toUpperCase() : '';
+}
+function plural(n, um, varios) { return n + ' ' + (n === 1 ? um : varios); }
+var REDES = [
+  [/instagram\.com/i, 'Instagram'], [/facebook\.com|fb\.com/i, 'Facebook'], [/(^|\.|\/)(twitter|x)\.com/i, 'X (Twitter)'],
+  [/youtube\.com|youtu\.be/i, 'YouTube'], [/tiktok\.com/i, 'TikTok'], [/threads\.(net|com)/i, 'Threads'],
+  [/linkedin\.com/i, 'LinkedIn'], [/flickr\.com/i, 'Flickr'], [/bsky\.app/i, 'Bluesky'], [/kwai/i, 'Kwai'], [/t\.me\//i, 'Telegram']
+];
+function nomeRede(url) {
+  for (var i = 0; i < REDES.length; i++) if (REDES[i][0].test(url)) return REDES[i][1];
+  return 'Site';
+}
+function linkSeguro(url) {
+  var u = String(url || '').trim();
+  if (!u) return '';
+  if (!/^https?:\/\//i.test(u)) u = 'https://' + u.replace(/^\/+/, '');
+  return /^https?:\/\/[^\s"'<>]+$/i.test(u) ? u : '';
+}
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    var ufInicial = ufDoEndereco();
+    this.state = { escuro: null, q: '', casa: 'Todos', uf: '', partido: '', limite: POR_PAGINA, dados: null, erro: false, copiado: '',
+      modo: ufInicial ? 'estado' : 'lista', ufEstado: ufInicial || 'AC' };
+  }
+  irParaUf(uf) {
+    this.setState({ modo: 'estado', ufEstado: uf, copiado: '' });
+    try { history.replaceState(null, '', '#estado=' + uf); } catch (e) {}
+    this.mostrarSigla();
+  }
+  mostrarSigla() {
+    // Na faixa de siglas (que rola de lado no celular), deixa o estado escolhido à vista
+    setTimeout(function () {
+      var b = document.querySelector('.tc-estados [aria-pressed="true"]');
+      var faixa = b && b.parentNode;
+      if (faixa && faixa.scrollWidth > faixa.clientWidth) faixa.scrollLeft = b.offsetLeft - faixa.offsetLeft - (faixa.clientWidth - b.offsetWidth) / 2;
+    }, 0);
+  }
+  passoUf(delta) {
+    var i = UFS.indexOf((this.state && this.state.ufEstado) || 'AC');
+    this.irParaUf(UFS[(i + delta + UFS.length) % UFS.length]);
+  }
+  mapaUfs(ufAtiva, tinta) {
+    // Um item por estado: contorno, rótulo (dentro dele ou, nos pequenos, fora com uma linha) e total de parlamentares
+    var st = this.state || {}, self = this;
+    if (!st.mapa || !st.mapa.ufs) return [];
+    if (this._cacheMapa && this._cacheMapa.chave === ufAtiva + tinta && this._cacheMapa.dados === st.dados && this._cacheMapa.mapa === st.mapa) return this._cacheMapa.lista;
+    var total = {};
+    (st.dados || []).forEach(function (p) { total[p.uf] = (total[p.uf] || 0) + 1; });
+    var lista = UFS.filter(function (u) { return st.mapa.ufs[u]; }).map(function (u) {
+      var g = st.mapa.ufs[u], ativo = u === ufAtiva, fora = g.rx !== undefined;
+      var n = total[u] || 0;
+      return {
+        uf: u, d: g.d, x: g.x, y: g.y, fora: fora,
+        lx: fora ? g.rx - 4 : g.x, ly: fora ? g.ry : g.y,
+        tx: fora ? g.rx : g.x, ty: fora ? g.ry : g.y, ancora: fora ? 'start' : 'middle',
+        pressed: ativo ? 'true' : 'false',
+        corTexto: ativo && !fora ? '#FFFAF0' : (fora && ativo ? '#556A2F' : tinta),
+        rotulo: (NOMES_UF[u] || u) + ': ' + plural(n, 'parlamentar', 'parlamentares'),
+        escolher: function () { self.irParaUf(u); },
+        tecla: function (e) {
+          if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); self.irParaUf(u); setTimeout(function () { var el = document.getElementById('mapa-' + u); if (el) el.focus(); }, 0); }
+        }
+      };
+    });
+    this._cacheMapa = { chave: ufAtiva + tinta, dados: st.dados, mapa: st.mapa, lista: lista };
+    return lista;
+  }
+  componentDidMount() {
+    try {
+      var v = window.localStorage.getItem('tc-tema');
+      if (v === 'escuro' || v === 'claro') this.setState({ escuro: v === 'escuro' });
+    } catch (e) {}
+    var self = this;
+    // Setas ← → trocam de estado no modo "Por estado" (fora de campos de texto e listas)
+    document.addEventListener('keydown', function (e) {
+      if (!self.state || self.state.modo !== 'estado' || e.altKey || e.ctrlKey || e.metaKey) return;
+      var alvo = e.target && e.target.tagName;
+      if (alvo === 'INPUT' || alvo === 'SELECT' || alvo === 'TEXTAREA') return;
+      if (e.key === 'ArrowLeft') { e.preventDefault(); self.passoUf(-1); }
+      if (e.key === 'ArrowRight') { e.preventDefault(); self.passoUf(1); }
+    });
+    fetch('dados/mapa-ufs.json')
+      .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+      .then(function (m) { self.setState({ mapa: m }); })
+      .catch(function () { self.setState({ mapa: false }); });
+    window.addEventListener('hashchange', function () {
+      var uf = ufDoEndereco();
+      if (uf && uf !== self.state.ufEstado) self.setState({ modo: 'estado', ufEstado: uf });
+    });
+    fetch('dados/parlamentares.json', { cache: 'no-cache' })
+      .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+      .then(function (d) {
+        var norm = function (s) { return String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim(); };
+        var lista = (d && Array.isArray(d.parlamentares) ? d.parlamentares : []).map(function (p) {
+          var senado = p.casa === 'senado', estadual = p.casa === 'estadual';
+          var iniciais = String(p.nome || '').split(/\s+/).filter(function (w) { return /^[A-Za-zÀ-ú]/.test(w) && !/^(da|de|do|das|dos|e|dr|dra)\.?$/i.test(w); });
+          iniciais = ((iniciais[0] || '').charAt(0) + (iniciais.length > 1 ? iniciais[iniciais.length - 1].charAt(0) : '')).toUpperCase();
+          var redes = (p.redes || []).map(function (r) { var href = linkSeguro(r); return href ? { href: href, nome: nomeRede(href) } : null; }).filter(Boolean);
+          return {
+            chave: p.casa + '-' + p.id, casa: p.casa, senado: senado, camara: p.casa === 'camara', estadual: estadual,
+            casaCurta: p.uf === 'DF' ? 'Câmara Legislativa' : 'Assembleia', casaNome: estadual ? (p.assembleia || 'Assembleia Legislativa') : (senado ? 'Senado' : 'Câmara dos Deputados'),
+            iniciais: iniciais, extras: (p.emails_extras || []).filter(function (e) { return /^[^\s@<>"']+@[^\s@<>"']+$/.test(e); }),
+            nome: p.nome, partido: p.partido || '', uf: p.uf || '',
+            partidoUf: estadual ? (p.partido || '') : [p.partido, p.uf].filter(Boolean).join(' · '),
+            foto: linkSeguro(p.foto), semFoto: !linkSeguro(p.foto), email: p.email || '', endereco: p.endereco || '',
+            tels: (p.telefones || []).map(function (t) { return { txt: t, href: '+55' + String(t).replace(/\D/g, '') }; }),
+            temTel: !!(p.telefones && p.telefones.length),
+            pagina: linkSeguro(p.pagina), redes: redes, redesBrutas: redes.map(function (r) { return r.href; }),
+            busca: norm([p.nome, p.partido, p.uf, senado ? 'senado senador senadora federal' : estadual ? 'assembleia estadual distrital deputado deputada' : 'camara deputado deputada federal', p.email].join(' '))
+          };
+        });
+        self.setState({ dados: lista, atualizado: d && d.atualizado_em, cobertura: (d && d.cobertura_estadual) || {} });
+        self.mostrarSigla();
+      })
+      .catch(function () { self.setState({ dados: [], erro: true }); });
+  }
+  filtrar() {
+    var st = this.state || {};
+    var norm = function (s) { return String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim(); };
+    var palavras = norm(st.q).split(/\s+/).filter(Boolean);
+    var base = (st.dados || []).filter(function (p) {
+      return (!st.uf || p.uf === st.uf) && (!st.partido || p.partido === st.partido)
+        && palavras.every(function (w) { return p.busca.indexOf(w) >= 0; });
+    });
+    var cam = base.filter(function (p) { return p.camara; }), sen = base.filter(function (p) { return p.senado; });
+    var est = base.filter(function (p) { return p.estadual; });
+    var lista = st.casa === 'Câmara' ? cam : st.casa === 'Senado' ? sen : st.casa === 'Assembleias' ? est : base;
+    return { base: base, cam: cam, sen: sen, est: est, lista: lista };
+  }
+  renderVals() {
+    var self = this;
+    var st = this.state || {};
+    var escuro = (st.escuro !== null && st.escuro !== undefined) ? st.escuro : (this.props.tema ?? 'claro') === 'escuro';
+    var c = escuro
+      ? { bg: '#101010', surface: '#2F2E25', ink: '#FFFAF0', muted: '#DDD5CA', line: 'rgba(221, 213, 202, 0.3)' }
+      : { bg: '#FFFAF0', surface: '#DDD5CA', ink: '#101010', muted: '#2F2E25', line: 'rgba(47, 46, 37, 0.28)' };
+    var f = this.filtrar();
+    var casa = st.casa || 'Todos';
+    var casas = [['Todos', f.base.length], ['Câmara', f.cam.length], ['Senado', f.sen.length], ['Assembleias', f.est.length]].map(function (x) {
+      var ativa = x[0] === casa;
+      return { nome: x[0], n: x[1], ativa: ativa, inativa: !ativa, escolher: function () { self.setState({ casa: x[0], limite: POR_PAGINA }); } };
+    });
+    var ufs = [{ v: '', t: 'Todos', sel: !st.uf }].concat(UFS.map(function (u) { return { v: u, t: u, sel: st.uf === u }; }));
+    var siglas = {};
+    (st.dados || []).forEach(function (p) { if (p.partido) siglas[p.partido] = 1; });
+    var partidos = [{ v: '', t: 'Todos', sel: !st.partido }].concat(Object.keys(siglas).sort().map(function (s) { return { v: s, t: s, sel: st.partido === s }; }));
+    var cob = st.cobertura || {};
+    var modoEstado = st.modo === 'estado';
+    var ufE = st.ufEstado || 'AC';
+    var iE = UFS.indexOf(ufE);
+    var ufAntes = UFS[(iE - 1 + UFS.length) % UFS.length], ufDepois = UFS[(iE + 1) % UFS.length];
+    var limite = st.limite || POR_PAGINA;
+    var atual, grupos, resto = 0;
+    if (modoEstado) {
+      var doUf = (st.dados || []).filter(function (p) { return p.uf === ufE; });
+      var gSen = doUf.filter(function (p) { return p.senado; }), gCam = doUf.filter(function (p) { return p.camara; });
+      var gEst = doUf.filter(function (p) { return p.estadual; });
+      var kE = cob[ufE] || {};
+      var casaEst = (gEst[0] && gEst[0].casaNome) || kE.casa || (ufE === 'DF' ? 'Câmara Legislativa do Distrito Federal' : 'Assembleia Legislativa');
+      atual = gSen.concat(gCam, gEst);
+      grupos = [
+        { rotulo: 'Senadores', titulo: 'Senado Federal', nTxt: plural(gSen.length, 'senador', 'senadores'), itens: gSen, aviso: '' },
+        { rotulo: 'Deputados federais', titulo: 'Câmara dos Deputados', nTxt: plural(gCam.length, 'deputado federal', 'deputados federais'), itens: gCam, aviso: '' },
+        { rotulo: ufE === 'DF' ? 'Deputados distritais' : 'Deputados estaduais', titulo: casaEst,
+          nTxt: plural(gEst.length, ufE === 'DF' ? 'deputado distrital' : 'deputado estadual', ufE === 'DF' ? 'deputados distritais' : 'deputados estaduais'),
+          itens: gEst, aviso: !gEst.length ? (kE.aviso || 'Ainda não conseguimos coletar os contatos desta casa.') : (kE.aviso || '') }
+      ];
+    } else {
+      atual = f.lista;
+      var visiveis = f.lista.slice(0, limite);
+      resto = f.lista.length - visiveis.length;
+      grupos = [{ rotulo: 'Resultados', titulo: '', itens: visiveis, aviso: '' }];
+    }
+    var carregando = st.dados === null;
+    var n = atual.length;
+    var nDep = atual.filter(function (p) { return p.camara; }).length, nSen = atual.filter(function (p) { return p.senado; }).length;
+    var nEst = n - nDep - nSen;
+    var partes = [];
+    if (nDep) partes.push(nDep + (nDep === 1 ? ' deputado federal' : ' deputados federais'));
+    if (nSen) partes.push(nSen + (nSen === 1 ? ' senador' : ' senadores'));
+    if (nEst) partes.push(nEst + (nEst === 1 ? ' deputado estadual ou distrital' : ' deputados estaduais e distritais'));
+    var aviso = '';
+    if (!modoEstado && st.uf && cob[st.uf] && casa !== 'Câmara' && casa !== 'Senado') {
+      var k = cob[st.uf];
+      aviso = !k.n ? (k.casa || 'A Assembleia') + ': ' + (k.aviso || 'ainda não conseguimos coletar os contatos.')
+        : (k.aviso ? (k.casa || 'Assembleia') + ': ' + k.aviso : '');
+    }
+    var faltam = Object.keys(cob).filter(function (u) { return !cob[u].n; }).sort();
+    var coberturaTxt = faltam.length ? 'Ainda sem dados: ' + faltam.join(', ') + ' (o site da Assembleia não respondeu na última coleta).' : 'Todas as 27 casas estão incluídas.';
+    var dataTxt = '';
+    var m = /^(\d{4})-(\d{2})-(\d{2})/.exec(String(st.atualizado || ''));
+    if (m) dataTxt = 'Dados atualizados em ' + m[3] + '/' + m[2] + '/' + m[1] + '.';
+    var emails = function () { return atual.map(function (p) { return p.email; }).filter(Boolean); };
+    return {
+      menuAberto: !!st.menuAberto,
+      menuFechado: !st.menuAberto,
+      menuAbertoTxt: st.menuAberto ? 'true' : 'false',
+      alternarMenu: function () { self.setState({ menuAberto: !(self.state && self.state.menuAberto) }); },
+      fecharMenu: function () { self.setState({ menuAberto: false }); },
+      c: c, escuro: escuro, claro: !escuro,
+      temaTexto: escuro ? 'Claro' : 'Escuro',
+      temaLabel: escuro ? 'Mudar para o tema claro' : 'Mudar para o tema escuro',
+      alternarTema: function () {
+        var novo = !escuro;
+        self.setState({ escuro: novo });
+        try { window.localStorage.setItem('tc-tema', novo ? 'escuro' : 'claro'); } catch (e) {}
+      },
+      atualizadoTxt: dataTxt,
+      q: st.q || '',
+      onQ: function (e) { self.setState({ q: e.target.value, limite: POR_PAGINA, copiado: '' }); },
+      onUf: function (e) { self.setState({ uf: e.target.value, limite: POR_PAGINA, copiado: '' }); },
+      onPartido: function (e) { self.setState({ partido: e.target.value, limite: POR_PAGINA, copiado: '' }); },
+      ufs: ufs, partidos: partidos, casas: casas,
+      grupos: carregando ? [] : grupos, carregando: carregando, temLista: !carregando && n > 0,
+      nenhuma: !carregando && n === 0 && !modoEstado,
+      modoEstado: modoEstado, modoLista: !modoEstado,
+      modos: [['lista', 'Lista completa'], ['estado', 'Mapa por estado']].map(function (x) {
+        var ativo = (st.modo || 'lista') === x[0];
+        return { nome: x[1], ativo: ativo, inativo: !ativo, escolher: function () {
+          if (x[0] === 'estado') self.irParaUf(st.ufEstado || st.uf || 'AC');
+          else { self.setState({ modo: 'lista', copiado: '' }); try { history.replaceState(null, '', location.pathname + location.search); } catch (e) {} }
+        } };
+      }),
+      ufAtual: ufE, nomeEstado: NOMES_UF[ufE] || ufE, ufAntes: ufAntes, ufDepois: ufDepois,
+      anteriorLabel: 'Estado anterior: ' + (NOMES_UF[ufAntes] || ufAntes),
+      proximoLabel: 'Próximo estado: ' + (NOMES_UF[ufDepois] || ufDepois),
+      ufAnterior: function () { self.passoUf(-1); },
+      ufProximo: function () { self.passoUf(1); },
+      temMapa: !!(st.mapa && st.mapa.ufs), semMapa: st.mapa === undefined,
+      mapaVb: st.mapa ? '0 0 ' + st.mapa.largura + ' ' + st.mapa.altura : '0 0 10 10',
+      mapaUfs: this.mapaUfs(ufE, c.ink),
+      mapaFora: this.mapaUfs(ufE, c.ink).filter(function (e) { return e.fora; }),
+      ufsNav: UFS.map(function (u) {
+        var ativa = u === ufE;
+        return { uf: u, nome: NOMES_UF[u], ativa: ativa, inativa: !ativa, escolher: function () { self.irParaUf(u); } };
+      }),
+      temMais: resto > 0,
+      maisTxt: 'Mostrar mais ' + Math.min(resto, POR_PAGINA) + ' (faltam ' + resto + ')',
+      mostrarMais: function () { self.setState({ limite: limite + POR_PAGINA }); },
+      contagem: carregando ? '' : modoEstado
+        ? plural(n, 'parlamentar', 'parlamentares') + ' com mandato por ' + (NOMES_UF[ufE] || ufE) + ': ' + grupos.map(function (g) { return g.nTxt; }).join(', ') + '.'
+        : n + (n === 1 ? ' parlamentar' : ' parlamentares') + (partes.length ? ' (' + partes.join(', ') + ')' : ''),
+      temAviso: !!aviso, avisoTxt: aviso, coberturaTxt: coberturaTxt,
+      copiarTxt: st.copiado || ('Copiar os ' + emails().length + ' e-mails'),
+      copiarEmails: function () {
+        var txt = emails().join('; ');
+        var ok = function () { self.setState({ copiado: 'E-mails copiados!' }); setTimeout(function () { self.setState({ copiado: '' }); }, 2500); };
+        var falha = function () { window.prompt('Copie os e-mails abaixo:', txt); };
+        if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(ok, falha);
+        else falha();
+      },
+      baixarCsv: function () {
+        var cel = function (s) { s = String(s == null ? '' : s); return /[";\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s; };
+        var linhas = [['Casa', 'Nome', 'Partido', 'UF', 'E-mail', 'Telefones', 'Gabinete', 'Página oficial', 'Redes sociais']].concat(atual.map(function (p) {
+          return [p.casaNome, p.nome, p.partido, p.uf, [p.email].concat(p.extras).filter(Boolean).join(' / '), p.tels.map(function (t) { return t.txt; }).join(' / '), p.endereco, p.pagina, p.redesBrutas.join(' ')];
+        }));
+        var csv = '﻿' + linhas.map(function (l) { return l.map(cel).join(';'); }).join('\r\n');
+        var url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
+        var a = document.createElement('a');
+        a.href = url; a.download = modoEstado ? 'contatos-parlamentares-' + ufE + '.csv' : 'contatos-parlamentares.csv';
+        document.body.appendChild(a); a.click(); a.remove();
+        setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+      },
+      vazioTitulo: st.erro ? 'Não deu para carregar os contatos' : 'Ninguém encontrado',
+      vazioTexto: st.erro ? 'Rode "python scripts/parlamentares.py" para baixar os dados e recarregue a página.' : 'Tente outro nome ou limpe os filtros de estado e partido.'
+    };
+  }
+}
+iniciarPagina(Component, {"tema": "claro"});
+</script>
+</body>
+</html>
