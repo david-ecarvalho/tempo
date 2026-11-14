@@ -1,0 +1,400 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tempo Continuum — Home</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500&amp;display=swap">
+<style>
+body{margin:0;font-family:"Montserrat","Helvetica Neue",Arial,sans-serif;font-weight:500}
+h1,h2,h3,h4,p{font-weight:500}
+a{color:inherit}a:hover{text-decoration-thickness:2px}
+a:focus-visible,button:focus-visible,input:focus-visible{outline:2px solid currentColor;outline-offset:3px}
+@media (max-width: 760px){
+.tc-header-row{flex-wrap:nowrap !important;gap:8px !important;padding:10px 16px !important}
+.tc-nav,.tc-buscar{display:none !important}
+.tc-logo{margin-right:auto;min-width:0}
+.tc-tema-txt{display:none}
+.tc-tema{padding:8px 12px !important}
+.tc-chips{flex-wrap:nowrap !important;overflow-x:auto;padding-bottom:8px;margin-right:-16px;padding-right:16px;-webkit-overflow-scrolling:touch;scrollbar-width:thin}
+.tc-chips>*{flex:none}
+main{padding-left:16px !important;padding-right:16px !important;gap:32px !important}
+footer>div{padding-left:16px !important;padding-right:16px !important}
+}
+
+/* Cabeçalho fixo e menu lateral */
+.tc-topo{position:sticky;top:0;z-index:50}
+.tc-menu-btn{display:flex !important}
+.tc-painel{display:block !important;position:fixed;top:0;left:0;bottom:0;width:min(340px,86vw);overflow-y:auto;z-index:70;box-shadow:8px 0 32px rgba(16,16,16,.35);padding:12px 16px 24px !important;border-top:0 !important;box-sizing:border-box}
+.tc-fundo{position:fixed;inset:0;z-index:60;background:rgba(16,16,16,.45);border:0;padding:0;cursor:pointer}
+.tc-painel-topo{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:6px 4px 14px;font-size:12px;letter-spacing:.1em;text-transform:uppercase}
+.tc-painel-topo button{font:inherit;font-size:14px;letter-spacing:0;text-transform:none;background:none;border:2px solid currentColor;color:inherit;border-radius:999px;padding:6px 14px;cursor:pointer}
+/* Cabeçalho em uma linha só: ocupa a largura toda da janela */
+.tc-header-row{max-width:none !important;flex-wrap:nowrap !important;gap:12px 20px !important}
+.tc-nav{flex-wrap:nowrap !important;flex:1 1 auto !important;min-width:0}
+.tc-nav a{white-space:nowrap}
+@media (max-width: 1320px){.tc-nav{gap:2px !important}.tc-nav a{padding:8px 10px !important}.tc-buscar,.tc-menu-btn{font-size:0 !important;gap:0 !important;padding:8px 13px !important}.tc-tema-txt{display:none}.tc-tema{padding:8px 13px !important}}
+@media (max-width: 1100px){.tc-nav,.tc-buscar{display:none !important}.tc-logo{margin-right:auto;min-width:0}}
+</style>
+<style>html,body{margin:0} #app > div{min-height:100vh}</style>
+</head>
+<body>
+<div id="app"></div>
+<template id="tpl">
+
+<div style="background: {{c.bg}}; color: {{c.ink}}; min-height: 100%; font-family: &quot;Montserrat&quot;, Arial, sans-serif; font-weight: 500;">
+
+  <header class="tc-topo" style="background: {{c.bg}}; color: {{c.ink}}; border-bottom: 2px solid {{c.ink}};">
+    <div class="tc-header-row" style="max-width: 1240px; margin: 0 auto; padding: 14px 24px; display: flex; flex-wrap: wrap; align-items: center; gap: 12px 40px;">
+      <button type="button" class="tc-menu-btn" onClick="{{alternarMenu}}" aria-expanded="{{menuAbertoTxt}}" aria-controls="tc-painel" style="align-items: center; gap: 8px; font: inherit; font-size: 14px; border: 2px solid {{c.ink}}; background: transparent; color: {{c.ink}}; border-radius: 999px; padding: 8px 14px; min-height: 44px; box-sizing: border-box; cursor: pointer;">
+        <sc-if value="{{menuFechado}}" hint-placeholder-val="{{true}}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"></path></svg></sc-if>
+        <sc-if value="{{menuAberto}}" hint-placeholder-val="{{false}}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></sc-if>
+        Menu
+      </button>
+      <a class="tc-logo" href="index.html" aria-current="page" style="display: flex; align-items: center; gap: 12px; text-decoration: none; color: inherit;" aria-label="Tempo Continuum, início">
+        <sc-if value="{{claro}}" hint-placeholder-val="{{true}}"><img src="logos/logo-claro.svg" alt="" width="48" height="48" style="display: block; width: 48px; height: 48px; border-radius: 50%; object-fit: cover; flex: none;"></sc-if><sc-if value="{{escuro}}" hint-placeholder-val="{{false}}"><img src="logos/logo-escuro.svg" alt="" width="48" height="48" style="display: block; width: 48px; height: 48px; border-radius: 50%; object-fit: cover; flex: none;"></sc-if>
+        <span style="font-size: 13px; line-height: 1.05; letter-spacing: 0.08em; text-transform: uppercase;">Tempo<br>Continuum</span>
+      </a>
+      <nav class="tc-nav" aria-label="Seções" style="display: flex; flex-wrap: wrap; gap: 6px 8px; flex: 1 1 560px; font-size: 15px;">
+        <a href="noticias.html" style="text-decoration: none; padding: 8px 14px; border-radius: 999px;">Notícias</a>
+        <a href="streaming.html" style="text-decoration: none; padding: 8px 14px; border-radius: 999px;">Streaming</a>
+        <a href="ferramentas.html" style="text-decoration: none; padding: 8px 14px; border-radius: 999px;">Recursos</a>
+        <a href="cursos.html" style="text-decoration: none; padding: 8px 14px; border-radius: 999px;">Academia</a>
+        <a href="politicos.html" style="text-decoration: none; padding: 8px 14px; border-radius: 999px;">Wiki</a>
+        <a href="dossies.html" style="text-decoration: none; padding: 8px 14px; border-radius: 999px;">Dossiês</a>
+        <a href="publicacoes.html" style="text-decoration: none; padding: 8px 14px; border-radius: 999px;">Publicações</a>
+      </nav>
+      <a class="tc-buscar" href="noticias.html" style="display: flex; align-items: center; gap: 8px; text-decoration: none; border: 2px solid {{c.ink}}; border-radius: 999px; padding: 8px 16px; font-size: 14px; min-height: 44px; box-sizing: border-box;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-4-4"></path></svg>
+        Buscar
+      </a>
+      <button type="button" class="tc-tema" onClick="{{alternarTema}}" aria-label="{{temaLabel}}" style="display: flex; align-items: center; gap: 8px; font: inherit; font-size: 14px; border: 2px solid {{c.ink}}; background: {{c.ink}}; color: {{c.bg}}; border-radius: 999px; padding: 8px 16px; min-height: 44px; box-sizing: border-box; cursor: pointer;">
+        <sc-if value="{{claro}}" hint-placeholder-val="{{true}}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"></path></svg></sc-if>
+        <sc-if value="{{escuro}}" hint-placeholder-val="{{false}}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg></sc-if>
+        <span class="tc-tema-txt">{{temaTexto}}</span>
+      </button>
+    </div>
+    <sc-if value="{{menuAberto}}" hint-placeholder-val="{{false}}">
+      <button type="button" class="tc-fundo" onClick="{{fecharMenu}}" aria-label="Fechar o menu" tabindex="-1"></button>
+      <nav id="tc-painel" class="tc-painel" aria-label="Menu" style="background: {{c.bg}}; color: {{c.ink}}; border-right: 2px solid {{c.ink}};">
+        <div class="tc-painel-topo"><span>Tempo Continuum</span><button type="button" onClick="{{fecharMenu}}">Fechar</button></div>
+        <a href="index.html" aria-current="page" style="text-decoration: none; display: block; padding: 14px 12px; font-size: 18px; border-bottom: 1px solid {{c.line}}; background: #556A2F; color: #FFFAF0;">Início</a>
+        <a href="noticias.html" style="text-decoration: none; display: block; padding: 14px 12px; font-size: 18px; border-bottom: 1px solid {{c.line}};">Notícias</a>
+        <a href="streaming.html" style="text-decoration: none; display: block; padding: 14px 12px; font-size: 18px; border-bottom: 1px solid {{c.line}};">Streaming</a>
+        <a href="ferramentas.html" style="text-decoration: none; display: block; padding: 14px 12px; font-size: 18px; border-bottom: 1px solid {{c.line}};">Recursos</a>
+        <a href="cursos.html" style="text-decoration: none; display: block; padding: 14px 12px; font-size: 18px; border-bottom: 1px solid {{c.line}};">Academia</a>
+        <a href="politicos.html" style="text-decoration: none; display: block; padding: 14px 12px; font-size: 18px; border-bottom: 1px solid {{c.line}};">Wiki</a>
+        <a href="dossies.html" style="text-decoration: none; display: block; padding: 14px 12px; font-size: 18px; border-bottom: 1px solid {{c.line}};">Dossiês</a>
+        <a href="publicacoes.html" style="text-decoration: none; display: block; padding: 14px 12px; font-size: 18px; border-bottom: 1px solid {{c.line}};">Publicações</a>
+        <a href="noticias.html" onClick="{{fecharMenu}}" style="text-decoration: none; display: flex; align-items: center; gap: 10px; padding: 14px 12px; font-size: 18px;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-4-4"></path></svg>Buscar</a>
+      </nav>
+    </sc-if>
+  </header>
+
+  <main id="topo" style="max-width: 1240px; margin: 0 auto; padding: 40px 24px 80px; display: flex; flex-direction: column; gap: 80px;">
+
+    <section aria-label="Destaques" style="display: flex; flex-wrap: wrap; gap: 40px;">
+      <article style="flex: 999 1 560px; min-width: 0; display: flex; flex-direction: column; gap: 16px;">
+        <sc-if value="{{principal.temFoto}}" hint-placeholder-val="{{false}}"><a href="{{principal.link}}" tabindex="-1" aria-hidden="true" style="display: block;"><img src="{{principal.foto}}" referrerpolicy="no-referrer" alt="" style="display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: cover; border: 1px solid {{c.line}}; box-sizing: border-box;"></a></sc-if>
+        <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap; font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase;">
+          <span style="background: #556A2F; color: #FFFAF0; padding: 3px 10px;">{{principal.editoria}}</span>
+          <span style="color: {{c.muted}};">{{principal.dataTexto}}</span>
+        </div>
+        <h1 style="margin: 0; font-size: clamp(2rem, 4.2vw, 3.4rem); line-height: 1.05; letter-spacing: -0.02em; text-wrap: balance;"><a href="{{principal.link}}" style="text-decoration: none;">{{principal.titulo}}</a></h1>
+        <p style="margin: 0; font-size: 1.15rem; line-height: 1.55; color: {{c.muted}}; max-width: 62ch;">{{principal.linha}}</p>
+      </article>
+
+      <aside style="flex: 1 1 320px; min-width: 0; display: flex; flex-direction: column; gap: 0;">
+        <p style="margin: 0 0 4px; font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: {{c.muted}};">Também em destaque</p>
+        <sc-for list="{{destaques}}" as="d" hint-placeholder-count="3">
+          <article style="border-top: 1px solid {{c.line}}; padding: 16px 0; display: flex; flex-direction: column; gap: 8px;">
+            <span style="font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: {{c.muted}};">{{d.editoria}} · {{d.dataTexto}}</span>
+            <h3 style="margin: 0; font-size: 1.2rem; line-height: 1.25;"><a href="{{d.link}}" style="text-decoration: none;">{{d.titulo}}</a></h3>
+          </article>
+        </sc-for>
+
+        <form id="busca" style="margin-top: 12px; background: {{c.surface}}; color: {{c.ink}}; border: 2px solid {{c.ink}}; padding: 20px; display: flex; flex-direction: column; gap: 12px;">
+          <label for="q" style="font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase;">Pesquise o acervo</label>
+          <div style="display: flex; gap: 8px;">
+            <input id="q" type="search" value="{{busca}}" onChange="{{onBusca}}" placeholder="Palavra, nome ou tag" autocomplete="off" style="flex: 1; min-width: 0; font: inherit; font-size: 15px; padding: 10px 12px; border: 2px solid {{c.ink}}; background: {{c.bg}}; color: {{c.ink}}; border-radius: 0;">
+            <a href="noticias.html" onClick="{{buscar}}" style="display: flex; align-items: center; text-decoration: none; font-size: 14px; padding: 10px 16px; background: #556A2F; color: #FFFAF0; min-height: 44px; box-sizing: border-box;">Buscar</a>
+          </div>
+          <div style="display: flex; flex-wrap: wrap; gap: 6px; font-size: 12px;">
+            <a href="noticias.html" onClick="{{tagMarxismo}}" style="text-decoration: none; border: 1.5px solid {{c.ink}}; padding: 4px 10px; border-radius: 999px;">marxismo</a>
+            <a href="noticias.html" onClick="{{tagTrabalho}}" style="text-decoration: none; border: 1.5px solid {{c.ink}}; padding: 4px 10px; border-radius: 999px;">trabalho</a>
+            <a href="noticias.html" onClick="{{tagHistoria}}" style="text-decoration: none; border: 1.5px solid {{c.ink}}; padding: 4px 10px; border-radius: 999px;">história do Brasil</a>
+            <a href="noticias.html" onClick="{{tagReforma}}" style="text-decoration: none; border: 1.5px solid {{c.ink}}; padding: 4px 10px; border-radius: 999px;">reforma agrária</a>
+          </div>
+        </form>
+      </aside>
+    </section>
+
+    <section id="noticias" aria-labelledby="h-noticias" style="display: flex; flex-direction: column; gap: 24px;">
+      <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 12px; border-top: 2px solid {{c.ink}}; padding-top: 16px;">
+        <h2 id="h-noticias" style="margin: 0; font-size: 2rem; letter-spacing: -0.01em;"><span style="background: #556A2F; color: #FFFAF0; padding: 0 8px;">Notícias</span></h2>
+        <a href="noticias.html" style="font-size: 14px; text-underline-offset: 4px;">Todas as notícias</a>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 32px 28px;">
+        <sc-for list="{{ultimas}}" as="n" hint-placeholder-count="4">
+          <article style="display: flex; flex-direction: column; gap: 10px;">
+            <sc-if value="{{n.temFoto}}" hint-placeholder-val="{{false}}"><a href="{{n.link}}" tabindex="-1" aria-hidden="true" style="display: block;"><img src="{{n.foto}}" referrerpolicy="no-referrer" alt="" loading="lazy" style="display: block; width: 100%; aspect-ratio: 3 / 2; object-fit: cover; border: 1px solid {{c.line}}; box-sizing: border-box;"></a></sc-if>
+            <sc-if value="{{n.semFoto}}" hint-placeholder-val="{{true}}"><div style="aspect-ratio: 3 / 2; background: {{c.surface}}; border: 1px solid {{c.line}};"></div></sc-if>
+            <span style="font-size: 12px; color: {{c.muted}};">{{n.dataTexto}} · {{n.tagPrincipal}}</span>
+            <h3 style="margin: 0; font-size: 1.15rem; line-height: 1.3;"><a href="{{n.link}}" style="text-decoration: none;">{{n.titulo}}</a></h3>
+            <p style="margin: 0; font-size: 0.92rem; line-height: 1.55; color: {{c.muted}};">{{n.linha}}</p>
+          </article>
+        </sc-for>
+      </div>
+    </section>
+
+    <section id="politicos" aria-labelledby="h-politicos" style="display: flex; flex-direction: column; gap: 24px;">
+      <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 12px; border-top: 2px solid {{c.ink}}; padding-top: 16px;">
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <h2 id="h-politicos" style="margin: 0; font-size: 2rem; letter-spacing: -0.01em;"><span style="background: #556A2F; color: #FFFAF0; padding: 0 8px;">Wiki</span></h2>
+          <p style="margin: 0; font-size: 0.95rem; color: {{c.muted}};">Perfis com votações, declarações e os casos em que cada um aparece.</p>
+        </div>
+        <a href="politicos.html" style="font-size: 14px; text-underline-offset: 4px;">Todos os perfis</a>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 20px;">
+        <article style="background: {{c.surface}}; border: 1px solid {{c.line}}; padding: 20px; display: flex; flex-direction: column; gap: 12px;">
+          <div style="width: 64px; height: 64px; border-radius: 50%; background: {{c.line}};"></div>
+          <h3 style="margin: 0; font-size: 1.1rem;">[Nome do político]</h3>
+          <p style="margin: 0; font-size: 0.85rem; color: {{c.muted}};">[Cargo] · [Partido] · [UF]</p>
+          <p style="margin: 0; font-size: 0.85rem;">[N] casos acompanhados</p>
+          <a href="#" style="font-size: 14px; text-underline-offset: 4px; margin-top: auto;">Ver perfil</a>
+        </article>
+        <article style="background: {{c.surface}}; border: 1px solid {{c.line}}; padding: 20px; display: flex; flex-direction: column; gap: 12px;">
+          <div style="width: 64px; height: 64px; border-radius: 50%; background: {{c.line}};"></div>
+          <h3 style="margin: 0; font-size: 1.1rem;">[Nome do político]</h3>
+          <p style="margin: 0; font-size: 0.85rem; color: {{c.muted}};">[Cargo] · [Partido] · [UF]</p>
+          <p style="margin: 0; font-size: 0.85rem;">[N] casos acompanhados</p>
+          <a href="#" style="font-size: 14px; text-underline-offset: 4px; margin-top: auto;">Ver perfil</a>
+        </article>
+        <article style="background: {{c.surface}}; border: 1px solid {{c.line}}; padding: 20px; display: flex; flex-direction: column; gap: 12px;">
+          <div style="width: 64px; height: 64px; border-radius: 50%; background: {{c.line}};"></div>
+          <h3 style="margin: 0; font-size: 1.1rem;">[Nome do político]</h3>
+          <p style="margin: 0; font-size: 0.85rem; color: {{c.muted}};">[Cargo] · [Partido] · [UF]</p>
+          <p style="margin: 0; font-size: 0.85rem;">[N] casos acompanhados</p>
+          <a href="#" style="font-size: 14px; text-underline-offset: 4px; margin-top: auto;">Ver perfil</a>
+        </article>
+        <article style="background: {{c.surface}}; border: 1px solid {{c.line}}; padding: 20px; display: flex; flex-direction: column; gap: 12px;">
+          <div style="width: 64px; height: 64px; border-radius: 50%; background: {{c.line}};"></div>
+          <h3 style="margin: 0; font-size: 1.1rem;">[Nome do político]</h3>
+          <p style="margin: 0; font-size: 0.85rem; color: {{c.muted}};">[Cargo] · [Partido] · [UF]</p>
+          <p style="margin: 0; font-size: 0.85rem;">[N] casos acompanhados</p>
+          <a href="#" style="font-size: 14px; text-underline-offset: 4px; margin-top: auto;">Ver perfil</a>
+        </article>
+      </div>
+    </section>
+
+    <section id="casos" aria-labelledby="h-casos" style="display: flex; flex-direction: column; gap: 24px;">
+      <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 12px; border-top: 2px solid {{c.ink}}; padding-top: 16px;">
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <h2 id="h-casos" style="margin: 0; font-size: 2rem; letter-spacing: -0.01em;"><span style="background: #556A2F; color: #FFFAF0; padding: 0 8px;">Casos</span></h2>
+          <p style="margin: 0; font-size: 0.95rem; color: {{c.muted}};">Investigações acompanhadas do início ao fim, com linha do tempo e documentos.</p>
+        </div>
+        <a href="dossies.html#casos" style="font-size: 14px; text-underline-offset: 4px;">Todos os casos</a>
+      </div>
+      <div style="display: flex; flex-direction: column;">
+        <article style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px 24px; padding: 20px 0; border-bottom: 1px solid {{c.line}};">
+          <span style="flex: none; width: 132px; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; border: 1.5px solid {{c.ink}}; padding: 5px 10px; text-align: center; box-sizing: border-box;">Em andamento</span>
+          <h3 style="margin: 0; font-size: 1.25rem; flex: 1 1 380px; min-width: 0;">[Título do caso]</h3>
+          <span style="font-size: 13px; color: {{c.muted}};">Atualizado em [data]</span>
+        </article>
+        <article style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px 24px; padding: 20px 0; border-bottom: 1px solid {{c.line}};">
+          <span style="flex: none; width: 132px; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; background: #556A2F; color: #FFFAF0; border: 1.5px solid #556A2F; padding: 5px 10px; text-align: center; box-sizing: border-box;">Em julgamento</span>
+          <h3 style="margin: 0; font-size: 1.25rem; flex: 1 1 380px; min-width: 0;">[Título do caso]</h3>
+          <span style="font-size: 13px; color: {{c.muted}};">Atualizado em [data]</span>
+        </article>
+        <article style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px 24px; padding: 20px 0; border-bottom: 1px solid {{c.line}};">
+          <span style="flex: none; width: 132px; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; border: 1.5px dashed {{c.muted}}; color: {{c.muted}}; padding: 5px 10px; text-align: center; box-sizing: border-box;">Encerrado</span>
+          <h3 style="margin: 0; font-size: 1.25rem; flex: 1 1 380px; min-width: 0;">[Título do caso]</h3>
+          <span style="font-size: 13px; color: {{c.muted}};">Atualizado em [data]</span>
+        </article>
+      </div>
+    </section>
+
+    <section id="streaming" aria-labelledby="h-docs" style="display: flex; flex-direction: column; gap: 24px;">
+      <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 12px; border-top: 2px solid {{c.ink}}; padding-top: 16px;">
+        <h2 id="h-docs" style="margin: 0; font-size: 2rem; letter-spacing: -0.01em;"><span style="background: #556A2F; color: #FFFAF0; padding: 0 8px;">Streaming</span></h2>
+        <a href="streaming.html" style="font-size: 14px; text-underline-offset: 4px;">Ver tudo em Streaming</a>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 28px;">
+        <article style="display: flex; flex-direction: column; gap: 12px;">
+          <div style="aspect-ratio: 16 / 9; background: #101010; position: relative; display: flex; align-items: center; justify-content: center;">
+            <span style="width: 56px; height: 56px; border-radius: 50%; background: #556A2F; display: flex; align-items: center; justify-content: center;"><svg width="20" height="20" viewBox="0 0 24 24" fill="#FFFAF0" aria-hidden="true"><path d="M8 5v14l11-7z"></path></svg></span>
+            <span style="position: absolute; right: 10px; bottom: 10px; background: #FFFAF0; color: #101010; font-size: 12px; padding: 2px 8px;">[00:00]</span>
+          </div>
+          <h3 style="margin: 0; font-size: 1.15rem; line-height: 1.3;">[Título do documentário]</h3>
+          <p style="margin: 0; font-size: 0.9rem; color: {{c.muted}};">[Uma frase sobre o tema do filme.]</p>
+        </article>
+        <article style="display: flex; flex-direction: column; gap: 12px;">
+          <div style="aspect-ratio: 16 / 9; background: #101010; position: relative; display: flex; align-items: center; justify-content: center;">
+            <span style="width: 56px; height: 56px; border-radius: 50%; background: #556A2F; display: flex; align-items: center; justify-content: center;"><svg width="20" height="20" viewBox="0 0 24 24" fill="#FFFAF0" aria-hidden="true"><path d="M8 5v14l11-7z"></path></svg></span>
+            <span style="position: absolute; right: 10px; bottom: 10px; background: #FFFAF0; color: #101010; font-size: 12px; padding: 2px 8px;">[00:00]</span>
+          </div>
+          <h3 style="margin: 0; font-size: 1.15rem; line-height: 1.3;">[Título do documentário]</h3>
+          <p style="margin: 0; font-size: 0.9rem; color: {{c.muted}};">[Uma frase sobre o tema do filme.]</p>
+        </article>
+        <article style="display: flex; flex-direction: column; gap: 12px;">
+          <div style="aspect-ratio: 16 / 9; background: #101010; position: relative; display: flex; align-items: center; justify-content: center;">
+            <span style="width: 56px; height: 56px; border-radius: 50%; background: #556A2F; display: flex; align-items: center; justify-content: center;"><svg width="20" height="20" viewBox="0 0 24 24" fill="#FFFAF0" aria-hidden="true"><path d="M8 5v14l11-7z"></path></svg></span>
+            <span style="position: absolute; right: 10px; bottom: 10px; background: #FFFAF0; color: #101010; font-size: 12px; padding: 2px 8px;">[00:00]</span>
+          </div>
+          <h3 style="margin: 0; font-size: 1.15rem; line-height: 1.3;">[Título do documentário]</h3>
+          <p style="margin: 0; font-size: 0.9rem; color: {{c.muted}};">[Uma frase sobre o tema do filme.]</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="dossies" aria-labelledby="h-dossies" style="display: flex; flex-direction: column; gap: 24px;">
+      <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 12px; border-top: 2px solid {{c.ink}}; padding-top: 16px;">
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <h2 id="h-dossies" style="margin: 0; font-size: 2rem; letter-spacing: -0.01em;"><span style="background: #556A2F; color: #FFFAF0; padding: 0 8px;">Dossiês</span></h2>
+          <p style="margin: 0; font-size: 0.95rem; color: {{c.muted}};">Reportagens longas que reúnem pesquisa, documentos e entrevistas sobre um tema.</p>
+        </div>
+        <a href="dossies.html" style="font-size: 14px; text-underline-offset: 4px;">Todos os dossiês</a>
+      </div>
+      <div style="display: flex; flex-wrap: wrap; gap: 28px;">
+        <article style="flex: 999 1 520px; min-width: 0; background: #556A2F; color: #FFFAF0; padding: 32px; display: flex; flex-direction: column; gap: 14px; box-sizing: border-box;">
+          <span style="font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase;">Dossiê · [N] capítulos</span>
+          <h3 style="margin: 0; font-size: clamp(1.6rem, 3vw, 2.4rem); line-height: 1.1; letter-spacing: -0.01em; text-wrap: balance;">[Título do dossiê em destaque]</h3>
+          <p style="margin: 0; font-size: 1rem; line-height: 1.55; max-width: 56ch;">[Duas frases que apresentam o dossiê: a pergunta que ele responde e o material que reúne.]</p>
+          <a href="#" style="align-self: flex-start; text-decoration: none; background: #101010; color: #FFFAF0; padding: 12px 20px; font-size: 14px; margin-top: 8px;">Ler o dossiê</a>
+        </article>
+        <div style="flex: 1 1 300px; min-width: 0; display: flex; flex-direction: column; gap: 0;">
+          <article style="border-top: 2px solid {{c.ink}}; padding: 18px 0; display: flex; flex-direction: column; gap: 8px;">
+            <span style="font-size: 12px; color: {{c.muted}};">[N] capítulos</span>
+            <h3 style="margin: 0; font-size: 1.2rem; line-height: 1.25;">[Título do dossiê]</h3>
+          </article>
+          <article style="border-top: 1px solid {{c.line}}; padding: 18px 0; display: flex; flex-direction: column; gap: 8px;">
+            <span style="font-size: 12px; color: {{c.muted}};">[N] capítulos</span>
+            <h3 style="margin: 0; font-size: 1.2rem; line-height: 1.25;">[Título do dossiê]</h3>
+          </article>
+          <article style="border-top: 1px solid {{c.line}}; border-bottom: 1px solid {{c.line}}; padding: 18px 0; display: flex; flex-direction: column; gap: 8px;">
+            <span style="font-size: 12px; color: {{c.muted}};">[N] capítulos</span>
+            <h3 style="margin: 0; font-size: 1.2rem; line-height: 1.25;">[Título do dossiê]</h3>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="cursos" aria-labelledby="h-cursos" style="display: flex; flex-direction: column; gap: 24px;">
+      <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 12px; border-top: 2px solid {{c.ink}}; padding-top: 16px;">
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <h2 id="h-cursos" style="margin: 0; font-size: 2rem; letter-spacing: -0.01em;"><span style="background: #556A2F; color: #FFFAF0; padding: 0 8px;">Academia</span></h2>
+          <p style="margin: 0; font-size: 0.95rem; color: {{c.muted}};">Formação política em módulos, para estudar no seu ritmo ou em grupo.</p>
+        </div>
+        <a href="cursos.html" style="font-size: 14px; text-underline-offset: 4px;">Todos os cursos</a>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 20px;">
+        <article style="border: 2px solid {{c.ink}}; padding: 22px; display: flex; flex-direction: column; gap: 12px;">
+          <span style="font-size: 12px; color: {{c.muted}};">9 módulos · leitura online</span>
+          <h3 style="margin: 0; font-size: 1.25rem; line-height: 1.2;">Marxismo</h3>
+          <a href="curso-marxismo.html" style="margin-top: auto; text-decoration: none; align-self: flex-start; background: #556A2F; color: #FFFAF0; padding: 10px 16px; font-size: 14px;">Ver curso</a>
+        </article>
+        <article style="border: 2px solid {{c.ink}}; padding: 22px; display: flex; flex-direction: column; gap: 12px;">
+          <span style="font-size: 12px; color: {{c.muted}};">[N] aulas · [carga horária]</span>
+          <h3 style="margin: 0; font-size: 1.25rem; line-height: 1.2;">Direitos dos trabalhadores</h3>
+          <a href="#" style="margin-top: auto; text-decoration: none; align-self: flex-start; background: #556A2F; color: #FFFAF0; padding: 10px 16px; font-size: 14px;">Ver curso</a>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <footer style="background: #101010; color: #FFFAF0; border-top: 1px solid {{c.line}};">
+    <div style="max-width: 1240px; margin: 0 auto; padding: 56px 24px 40px; display: flex; flex-wrap: wrap; gap: 40px; justify-content: space-between;">
+      <div style="flex: 1 1 360px; min-width: 0; display: flex; flex-direction: column; gap: 14px;">
+        <p style="margin: 0; font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase;">Tempo Continuum</p>
+        <p style="margin: 0; font-size: clamp(1.4rem, 2.6vw, 2rem); line-height: 1.2; max-width: 22ch;"><span style="background: #556A2F; color: #FFFAF0; padding: 0 6px; box-decoration-break: clone; -webkit-box-decoration-break: clone;">Conhecer o passado. Organizar o presente. Construir o futuro.</span></p>
+        <p style="margin: 0; font-size: 0.9rem; color: #DDD5CA; max-width: 48ch;">Formação política, consciência de classe e Revolução Brasileira.</p>
+      </div>
+      <nav aria-label="Rodapé" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 40px; font-size: 14px; align-content: start;">
+        <a href="noticias.html" style="text-decoration: none;">Notícias</a>
+        <a href="streaming.html" style="text-decoration: none;">Streaming</a>
+        <a href="ferramentas.html" style="text-decoration: none;">Recursos</a>
+        <a href="cursos.html" style="text-decoration: none;">Academia</a>
+        <a href="politicos.html" style="text-decoration: none;">Wiki</a>
+        <a href="dossies.html" style="text-decoration: none;">Dossiês</a>
+        <a href="publicacoes.html" style="text-decoration: none;">Publicações</a>
+        <a href="#" style="text-decoration: none;">Quem somos</a>
+        <a href="#" style="text-decoration: none;">Contato</a>
+      </nav>
+    </div>
+  </footer>
+</div>
+</template>
+<script src="js/runtime.js"></script>
+<script src="js/tags.js"></script>
+<script>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { escuro: null };
+  }
+  exemplos() {
+    return [];   // enquanto dados/noticias.json não carrega
+  }
+  componentDidMount() {
+    var eu = this;
+    try {
+      fetch('dados/noticias.json', { cache: 'no-cache' })
+        .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+        .then(function (lista) { if (Array.isArray(lista)) eu.setState({ remoto: lista }); })
+        .catch(function () {});
+    } catch (e) {}
+    try {
+      var v = window.localStorage.getItem('tc-tema');
+      if (v === 'escuro' || v === 'claro') this.setState({ escuro: v === 'escuro' });
+    } catch (e) {}
+  }
+  renderVals() {
+    var escuro = (this.state && this.state.escuro !== null && this.state.escuro !== undefined)
+      ? this.state.escuro
+      : (this.props.tema ?? 'claro') === 'escuro';
+    var self = this;
+    var c = escuro
+      ? { bg: '#101010', surface: '#2F2E25', ink: '#FFFAF0', muted: '#DDD5CA', line: 'rgba(221, 213, 202, 0.3)' }
+      : { bg: '#FFFAF0', surface: '#DDD5CA', ink: '#101010', muted: '#2F2E25', line: 'rgba(47, 46, 37, 0.28)' };
+    var guardar = function (chave, valor) { try { if (valor) window.localStorage.setItem(chave, valor); } catch (e) {} };
+    var irTag = function (tag) { return function () { guardar('tc-busca-tag', tag); }; };
+    var meses = ['jan.', 'fev.', 'mar.', 'abr.', 'maio', 'jun.', 'jul.', 'ago.', 'set.', 'out.', 'nov.', 'dez.'];
+    var fmtData = function (iso) { var p = String(iso || '').slice(0, 10).split('-'); return p.length === 3 ? Number(p[2]) + ' ' + meses[Number(p[1]) - 1] + ' ' + p[0] : ''; };
+    var noticias = ((this.state && this.state.remoto) || this.exemplos()).slice().sort(function (x, y) { return String(x.data) < String(y.data) ? 1 : -1; }).map(function (n) {
+      return { titulo: n.titulo, linha: n.linha || '', editoria: n.editoria || 'Notícia', dataTexto: fmtData(n.data), tagPrincipal: (n.tags || [])[0] ? TCTags.rotulo(n.tags[0]) : (n.editoria || '').toLowerCase(),
+        link: 'materia.html?id=' + encodeURIComponent(n.id), foto: n.foto || '', temFoto: !!n.foto, semFoto: !n.foto, destaque: !!n.destaque };
+    });
+    var iPrincipal = Math.max(0, noticias.findIndex(function (n) { return n.destaque; }));
+    var principal = noticias[iPrincipal] || { titulo: 'Nenhuma matéria publicada ainda', linha: '', editoria: 'Notícias', dataTexto: '', link: 'noticias.html', temFoto: false };
+    var resto = noticias.filter(function (n, i) { return i !== iPrincipal; });
+    return {
+      principal: principal, destaques: resto.slice(0, 3), ultimas: resto.slice(3, 7),
+      menuAberto: !!(this.state && this.state.menuAberto),
+      menuFechado: !(this.state && this.state.menuAberto),
+      menuAbertoTxt: (this.state && this.state.menuAberto) ? 'true' : 'false',
+      alternarMenu: (function (eu) { return function () { eu.setState({ menuAberto: !(eu.state && eu.state.menuAberto) }); }; })(this),
+      fecharMenu: (function (eu) { return function () { eu.setState({ menuAberto: false }); }; })(this),
+      busca: (this.state && this.state.busca) || '',
+      onBusca: function (e) { self.setState({ busca: e.target.value }); },
+      buscar: function () { guardar('tc-busca-q', ((self.state && self.state.busca) || '').trim()); },
+      tagMarxismo: irTag('marxismo'),
+      tagTrabalho: irTag('trabalho'),
+      tagHistoria: irTag('história do Brasil'),
+      tagReforma: irTag('reforma agrária'),
+      c: c,
+      escuro: escuro,
+      claro: !escuro,
+      temaTexto: escuro ? 'Claro' : 'Escuro',
+      temaLabel: escuro ? 'Mudar para o tema claro' : 'Mudar para o tema escuro',
+      alternarTema: function () {
+        var novo = !escuro;
+        self.setState({ escuro: novo });
+        try { window.localStorage.setItem('tc-tema', novo ? 'escuro' : 'claro'); } catch (e) {}
+      }
+    };
+  }
+}
+iniciarPagina(Component, {"tema": "claro"});
+</script>
+</body>
+</html>

@@ -1,0 +1,92 @@
+# Tempo Continuum
+
+Site do Tempo Continuum: notícias, perfis de políticos, casos, streaming (documentários e vídeos do YouTube), dossiês, cursos com biblioteca e ferramentas de tecnologia cívica.
+
+O site roda localmente para edição (veja "Rodar no computador") e é publicado como site estático (veja "Publicar o site"). O endereço antigo no GitHub Pages era https://tempocontinuum.github.io/tempocontinuum/.
+
+## Como lançar matérias
+
+Com o servidor local rodando (`python scripts/servidor.py`), abra http://localhost:8000/admin/ em qualquer navegador deste computador. O editor é próprio do site: tem as abas **Matérias**, **Políticos**, **Votações** e **Vídeos**, sugere as tags e subtags que já existem, reduz as fotos ao enviar e mostra a prévia do texto enquanto você escreve. Cada matéria é gravada como um arquivo Markdown em `conteudo/noticias/`, e o servidor atualiza o índice sozinho. Não há etapa de revisão: salvou, aparece no site.
+
+O botão **Arquivo Markdown** mostra e permite editar o arquivo inteiro, como ele fica gravado.
+
+## Onde fica cada coisa
+
+- `*.html` e `js/runtime.js`: as páginas do site.
+- `conteudo/noticias/*.md`: uma matéria por arquivo Markdown. O cabeçalho entre linhas `---` guarda título, data, tags, foto etc.; o texto vem embaixo. A página `materia.html?id=<arquivo>` mostra a matéria.
+- `conteudo/politicos/*.md`: uma ficha por arquivo Markdown. O cabeçalho guarda os dados, selos e eleições; o texto tem uma seção `## ` para Resumo, Trajetória, Atuação, Posições declaradas, Controvérsias e processos e Fontes. A página `ficha.html?id=<arquivo>` monta a ficha.
+- `js/markdown.js`: lê e grava esses arquivos (usado pelas páginas e pelo editor). O formato completo está descrito no começo dele.
+- `dados/noticias.json`, `dados/politicos.json` e `dados/votacoes.json`: índices gerados por `scripts/gerar-indice.py`. A Home e a página Notícias leem o primeiro; a página Políticos, o segundo; a página Votações, o terceiro (que já traz a descrição de cada votação).
+- `conteudo/votacoes/*.md`: uma votação do e-Cidadania por arquivo. O cabeçalho guarda os dados da consulta, o placar e a `recomendacao` (`sim` ou `nao`); o texto é a nossa descrição.
+- `scripts/ecidadania.py`: lê uma consulta pública do e-Cidadania (o editor usa pelo servidor local).
+- `conteudo/videos/*.md`: um vídeo do YouTube por arquivo (só cabeçalho: `titulo`, `criador`, `link`, `capa`, `data`). Indexado em `dados/videos.json`, que a parte "Vídeos do YouTube" de `streaming.html` lê.
+- `imagens/materias/`, `imagens/politicos/` e `imagens/videos/`: fotos e capas enviadas pelo editor.
+- `admin/`: o editor de matérias e fichas (`index.html`, `editor.js`, `editor.css`). Ele grava pelos endereços `/api/...` do servidor local, que só aceitam pedidos do próprio computador.
+- `gerador-de-imagens.html` e `js/gerador-imagens.js`: o Gerador de imagens (Ferramentas). Monta a imagem num canvas no navegador de quem usa; nada é enviado ao site. Os formatos e as áreas de cada um ficam em `dados/layouts-imagens.json`. O desenho é feito por um motor em Rust compilado para WebAssembly (`js/motor/`; o código-fonte fica fora do site, em `../motor-imagens/`).
+- `js/tags.js`: tags com subtag ("violência/contra indígenas"), usadas por Home, Notícias, Matéria e Casos.
+- `scripts/servidor.py`: servidor local que refaz os índices sozinho.
+- `scripts/publicar.py`: monta a versão publicável do site em `_site/` (veja "Publicar o site").
+- `../.github/workflows/publicar-site.yml` (na raiz do repositório): publicação no GitHub Pages, usando `scripts/publicar.py`.
+
+## Como lançar ou editar fichas de políticos
+
+No editor, abra **Políticos** e crie uma ficha nova ou edite uma existente. Como as matérias, a ficha é gravada direto em `conteudo/politicos/`. Toda informação precisa estar nas fontes da ficha. O link "Ver histórico de edições" de cada ficha mostra todas as mudanças feitas nela.
+
+## Como lançar votações do e-Cidadania
+
+No editor, abra **Votações** e clique em **+ Nova votação**. Cole o link da consulta pública no e-Cidadania (por exemplo `https://www12.senado.leg.br/ecidadania/visualizacaomateria?id=173618`) ou só o número dela e clique em **Trazer do e-Cidadania**: o editor traz a sigla, a autoria, a ementa e o placar (o servidor lê a página do Senado, por isso precisa de internet). Depois escreva um título em linguagem simples, escolha a recomendação (**Vote SIM** ou **Vote NÃO**) e escreva a descrição em Markdown. Cada votação é gravada em `conteudo/votacoes/` e aparece em `votacoes.html` (link em Ferramentas), com o botão para votar no e-Cidadania.
+
+O placar não se atualiza sozinho: abra a votação, clique em **Atualizar dados e votos** e salve. Para testar a leitura de uma consulta no terminal: `python scripts/ecidadania.py 173618`.
+
+## Contatos de parlamentares
+
+A página `contatos.html` (link em Recursos) mostra e-mail, telefone, gabinete, página oficial e redes sociais dos deputados federais, senadores e deputados estaduais e distritais em exercício, com busca e filtros por casa (Câmara, Senado, Assembleias), estado e partido. Quem usa pode copiar os e-mails da lista filtrada ou baixar uma planilha CSV.
+
+A aba **Mapa por estado** tem um mapa do Brasil clicável (também funciona pelo teclado: Tab até o estado e Enter) e mostra, de um estado só, os senadores, os deputados federais e os deputados estaduais (ou distritais), separados por casa. Dá para passar de um estado ao outro pelas setas da página, pela faixa de siglas ou pelas setas ← → do teclado; o endereço `contatos.html#estado=SP` abre direto num estado. O desenho do mapa fica em `dados/mapa-ufs.json`, gerado por `scripts/gerar-mapa.py` a partir da malha oficial de estados do IBGE (só precisa rodar de novo para mudar o desenho).
+
+Os dados ficam em `dados/parlamentares.json`. De onde vêm:
+
+- **Câmara e Senado:** APIs oficiais de dados abertos (`scripts/parlamentares.py`).
+- **Assembleias e CLDF:** não há base nacional, então `scripts/estaduais.py` lê o que cada casa publica. SP, MG e RS têm dados estruturados; AC, AL, PB, PI, RR e TO usam o SAPL (sistema do Interlegis, com API); as outras são lidas da página de cada deputado no site oficial. O que se repete em quase todos os perfis de um estado (telefone geral, ouvidoria, redes da própria Assembleia) é descartado.
+
+Para atualizar (depois de eleições, trocas de partido ou suplentes que assumem), rode com internet:
+
+```
+python scripts/parlamentares.py
+```
+
+Leva uns 8 minutos. Com `--estaduais`, atualiza só as Assembleias. Se o site de uma Assembleia estiver fora do ar, os dados anteriores dela são mantidos e a página avisa. Para testar um estado sem gravar nada: `python scripts/estaduais.py RJ`.
+
+Limites conhecidos: Goiás ainda não entrou (o site da Alego não respondeu às coletas); MT não publica e-mail nem telefone dos gabinetes; MS e TO não informam partido; o cadastro de AL lista mais parlamentares ativos do que cadeiras. Sites de Assembleia mudam de layout sem aviso: se um estado vier com contagem estranha, o script avisa (`<- esperado ~N`) e o coletor dele precisa de ajuste.
+
+O script só guarda dados de contato do mandato, nada de CPF ou outros dados pessoais.
+
+## Como adicionar vídeos do YouTube
+
+No editor, abra **Vídeos** e clique em **+ Novo vídeo**. Cole o link do vídeo, escreva o nome do vídeo e o nome do criador, e escolha a capa: **Enviar imagem** (ou arraste uma) ou **Usar a miniatura do YouTube**. Ao salvar, o vídeo aparece em Streaming › Vídeos do YouTube (`streaming.html#youtube`); clicar no cartão abre o vídeo no YouTube, numa aba nova. A antiga página `documentarios.html` agora só redireciona para `streaming.html`.
+
+## Rodar no computador
+
+```
+python scripts/servidor.py
+```
+
+Depois abra http://localhost:8000 (site) e http://localhost:8000/admin/ (editor). Com `--rede`, outros aparelhos do mesmo Wi-Fi também abrem o site.
+
+## Publicar o site
+
+```
+python scripts/publicar.py
+```
+
+Monta em `_site/` a versão para a internet: refaz os índices de `dados/` e copia só o que o público usa (páginas, `js/`, `dados/`, `conteudo/`, `imagens/`, `logos/`, `arquivos/`). Fica de fora o editor (`admin/`), que só funciona com o servidor local: no site publicado não há como editar nada, e o conteúdo continua sendo lançado pelo editor local e publicado de novo. Também ficam de fora os dossiês que ainda estão com o texto-modelo do editor ("Texto do capítulo..."); eles entram sozinhos quando o texto for escrito.
+
+`_site/` é um site estático comum (não está no Git) e pode ir para qualquer hospedagem:
+
+- **GitHub Pages:** com Settings › Pages › Source = "GitHub Actions", cada push no `main` que mexa em `site/` roda `.github/workflows/publicar-site.yml` (na raiz do repositório), que usa este mesmo script.
+- **Netlify ou Cloudflare Pages:** comando de build `python3 scripts/publicar.py`, pasta de publicação `_site`. Ou arraste a pasta `_site/` no painel.
+- **Servidor próprio:** copie o conteúdo de `_site/` para a pasta pública do servidor.
+
+Para conferir antes de enviar: `python -m http.server 8000 --directory _site` e abra http://localhost:8000.
+
+Os PDFs dos dossiês (`arquivos/dossies/`) só são gerados pelo editor local; se o PDF de um dossiê não existir, o botão "Baixar PDF" abre a impressão do navegador.

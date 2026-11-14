@@ -1,0 +1,29 @@
+TEMPO CONTINUUM — versão para teste local
+
+Jeito mais simples
+  Abra o arquivo index.html no navegador (Chrome, Edge ou Firefox).
+
+Jeito recomendado (servidor local)
+  Alguns navegadores, como o Firefox, não guardam a escolha de tema nem
+  levam a busca da Home para a página de Notícias quando o site é aberto
+  direto do arquivo. Para testar tudo, rode um servidor local nesta pasta:
+
+    python scripts/servidor.py
+
+  e abra http://localhost:8000 no navegador. O editor de matérias fica
+  em http://localhost:8000/admin/.
+
+O que funciona
+  - Navegação entre as 10 páginas, com a página atual marcada no menu.
+  - Botão de tema claro/escuro, com o logo correspondente a cada tema.
+  - Busca por texto, tags e período em Notícias; por texto, tags e
+    situação em Casos.
+  - Tags com subtag, separadas por barra: "violência/contra indígenas"
+    aparece como "violência › contra indígenas". Filtrar por "violência"
+    traz também as matérias com qualquer subtag dela.
+  - A caixa de busca e as tags da Home abrem Notícias já filtrada.
+
+Observações
+  - A fonte é a Montserrat, carregada do Google Fonts (precisa de internet);
+    sem conexão, a página usa Arial.
+  - Gerado a partir do canvas "Home Tempo Continuum".
