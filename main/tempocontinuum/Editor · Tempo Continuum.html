@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<!-- saved from url=(0067)http://localhost:8001/admin/#noticias/2026-11-09-o-que-sao-os-cieps -->
+<html lang="pt-BR" data-tema="escuro"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Editor · Tempo Continuum</title>
+  <link rel="icon" href="./Editor · Tempo Continuum_files/logo-escuro.png">
+  <link rel="stylesheet" href="./Editor · Tempo Continuum_files/css2">
+  <link rel="stylesheet" href="./Editor · Tempo Continuum_files/editor.css">
+</head>
+<body>
+  <header class="topo">
+    <a class="marca" href="http://localhost:8001/admin/" title="Recarregar o editor">
+      <img src="./Editor · Tempo Continuum_files/logo-claro.png" alt="" class="logo-claro"><img src="./Editor · Tempo Continuum_files/logo-escuro.png" alt="" class="logo-escuro">
+      <span>Tempo Continuum <b>Editor</b></span>
+    </a>
+    <nav class="abas" aria-label="Coleções">
+      <button type="button" data-tipo="noticias" aria-pressed="true">Matérias</button>
+      <button type="button" data-tipo="politicos" aria-pressed="false">Políticos</button>
+      <button type="button" data-tipo="votacoes" aria-pressed="false">Votações</button>
+      <button type="button" data-tipo="videos" aria-pressed="false">Vídeos</button>
+    </nav>
+    <div class="topo-acoes">
+      <a href="http://localhost:8001/" target="_blank" rel="noopener">Ver site</a>
+      <button type="button" id="tema" class="botao-texto">Claro</button>
+    </div>
+  </header>
+
+  <div class="corpo">
+    <aside class="lateral" aria-label="Lista">
+      <div class="lateral-topo">
+        <button type="button" id="novo" class="botao principal">+ Nova matéria</button>
+        <input type="search" id="busca" placeholder="Buscar" aria-label="Buscar na lista">
+      </div>
+      <ul id="lista" class="lista"><li><button type="button" aria-current="true"><span class="t">O que são os CIEPs, as escolas de tempo integral de Darcy Ribeiro e Brizola</span><span class="m">09/11/2026 · Educação · Manchete</span></button></li></ul>
+    </aside>
+
+    <main id="area" class="area"><div class="barra"><span class="estado">Salvo às 21:52</span><div class="modos" role="group" aria-label="Modo de edição"><button type="button" aria-pressed="true">Formulário</button><button type="button" aria-pressed="false">Arquivo Markdown</button></div><a class="botao" href="http://localhost:8001/materia.html?id=2026-11-09-o-que-sao-os-cieps" target="_blank" rel="noopener">Ver no site</a><button type="button" class="botao perigo">Apagar</button><button type="button" class="botao principal" data-acao="salvar" title="Ctrl+S">Salvar</button></div><div class="form"><section class="secao"><h2>Matéria</h2><div class="grade"><label class="campo largo"><span>Título<span class="contador">75/140</span></span><input type="text" maxlength="200" placeholder="O fato, em uma ou duas linhas"></label><label class="campo largo"><span>Linha fina</span><textarea rows="2"></textarea><small>Uma ou duas frases sobre o que está em jogo. Aparece sob o título e nas listas.</small></label><label class="campo"><span>Data de publicação</span><input type="datetime-local" step="60"></label><div class="campo"><span>Última edição<span class="contador">opcional</span></span><input type="datetime-local" step="60" id="campo-editado"><div class="linhas-acoes"><button type="button" class="botao-mini">Agora</button><button type="button" class="botao-mini">Limpar</button></div><label class="marcar"><input type="checkbox">Marcar a hora ao salvar</label><small>Aparece na matéria como "Atualizada em …". Use quando corrigir ou acrescentar informação.</small></div><label class="campo"><span>Editoria</span><select><option value="Trabalho">Trabalho</option><option value="Política">Política</option><option value="Economia">Economia</option><option value="Cidades">Cidades</option><option value="Campo">Campo</option><option value="Educação" selected="selected">Educação</option><option value="Memória">Memória</option><option value="Formação">Formação</option><option value="Cultura">Cultura</option><option value="Internacional">Internacional</option></select></label><label class="campo"><span>Autoria</span><input type="text"></label><div class="campo"><span>Home</span><label class="marcar"><input type="checkbox">Manchete principal da Home</label><small>Se várias estiverem marcadas, vale a mais recente.</small></div></div><p class="dica">Endereço: materia.html?id=2026-11-09-o-que-sao-os-cieps (não muda, mesmo que o título seja corrigido)</p></section><section class="secao"><h2>Tags</h2><div><div class="tags"><span class="tag" title="">Rio de Janeiro<button type="button" aria-label="Remover Rio de Janeiro">×</button></span><span class="tag" title="">Darcy Ribeiro<button type="button" aria-label="Remover Darcy Ribeiro">×</button></span><span class="tag" title="">Brizola<button type="button" aria-label="Remover Brizola">×</button></span><span class="tag" title="">educação<button type="button" aria-label="Remover educação">×</button></span><input type="text" placeholder="Outra tag" aria-label="Nova tag" autocomplete="off"></div><div class="sugestoes"></div></div><p class="dica">De 1 a 8, em minúsculas. Reaproveite as sugeridas: "greve" e "greves" viram filtros diferentes. Para uma subtag, use a barra: violência/contra indígenas. Tags com borda tracejada são novas.</p></section><section class="secao"><h2>Foto principal</h2><div class="foto"><div class="foto-previa"><img src="./Editor · Tempo Continuum_files/CIEP-Nelson-Rodrigues.png" alt="" referrerpolicy="no-referrer"></div><div class="foto-acoes"><button type="button" class="botao">Enviar imagem</button><button type="button" class="botao-texto">Escolher uma já enviada</button><div class="foto-link"><input type="url" placeholder="https://… (link direto da imagem)" aria-label="Link da foto"><button type="button" class="botao-mini">Usar link</button></div><button type="button" class="botao-texto">Remover</button><span class="caminho">https://rioonwatch.org.br/wp-content/uploads/2026/01/CIEP-Nelson-Rodrigues.png</span><small class="dica">Horizontal. Fotos grandes são reduzidas para 1600 px de largura ao enviar.</small></div></div><div class="grade"><label class="campo"><span>Legenda</span><input type="text" placeholder="O que aparece na foto"><small>Também é lida por leitores de tela.</small></label><label class="campo"><span>Crédito</span><input type="text" placeholder="Nome / Tempo Continuum"></label></div></section><section class="secao"><h2>Texto</h2><p class="dica">Escrito em Markdown. Use T2 para os intertítulos, citação para falas de entrevistados e parágrafos curtos, de 2 a 4 frases. Uma linha em branco separa os parágrafos.</p><div class="texto"><div class="texto-editor"><div class="ferramentas" role="toolbar" aria-label="Formatação"><button type="button" title="Negrito (Ctrl+B)" aria-label="Negrito (Ctrl+B)">B</button><button type="button" title="Itálico (Ctrl+I)" aria-label="Itálico (Ctrl+I)">I</button><span class="sep"></span><button type="button" title="Intertítulo (Título 2)" aria-label="Intertítulo (Título 2)">T2</button><button type="button" title="Subdivisão (Título 3)" aria-label="Subdivisão (Título 3)">T3</button><button type="button" title="Citação" aria-label="Citação">❝</button><button type="button" title="Lista com marcadores" aria-label="Lista com marcadores">• Lista</button><button type="button" title="Lista numerada" aria-label="Lista numerada">1. Lista</button><span class="sep"></span><button type="button" title="Link (Ctrl+K)" aria-label="Link (Ctrl+K)">Link</button><button type="button" title="Enviar e inserir uma imagem" aria-label="Enviar e inserir uma imagem">Imagem</button><button type="button" title="Inserir uma imagem de outro site pelo link" aria-label="Inserir uma imagem de outro site pelo link">Imagem por link</button><button type="button" title="Inserir uma imagem já enviada" aria-label="Inserir uma imagem já enviada">Galeria</button><button type="button" class="direita" title="Mostrar ou esconder a prévia">Prévia</button></div><textarea spellcheck="true" aria-label="Texto da matéria"></textarea></div><div class="previa" aria-live="off"><p class="previa-rotulo">Prévia</p><div><p>Quem cresceu no estado do Rio de Janeiro conhece o desenho: um bloco comprido de concreto, com três andares, janelas em arco e uma quadra coberta ao lado. São os <strong>CIEPs</strong>, os Centros Integrados de Educação Pública, apelidados de "Brizolões". Mais do que um modelo de prédio, eles foram a aposta de uma geração de educadores numa ideia simples e até hoje pouco cumprida no Brasil: a escola pública de <strong>tempo integral</strong>, que cuida da criança o dia inteiro.</p>
+<h2>De onde vieram</h2>
+<p>Os CIEPs nasceram no primeiro governo de <strong>Leonel Brizola</strong> no Rio (1983–1987), dentro do Programa Especial de Educação. O projeto pedagógico foi coordenado pelo antropólogo <strong>Darcy Ribeiro</strong>, então vice-governador, e o projeto arquitetônico ficou com <strong>Oscar Niemeyer</strong>.</p>
+<p>A inspiração vinha de longe. Darcy foi discípulo de <strong>Anísio Teixeira</strong>, que nos anos 1950 criou em Salvador a Escola-Parque, uma experiência pioneira de educação integral. A ideia era que a escola pública brasileira, de turnos curtos e turmas que se revezavam no mesmo prédio, não dava conta das crianças mais pobres, justamente as que mais dependiam dela.</p>
+<p>O primeiro CIEP foi inaugurado em 1985, no Catete, zona sul do Rio, e recebeu o nome de Tancredo Neves.</p>
+<h2>Como funcionava um CIEP</h2>
+<p>O modelo previa que o aluno passasse o dia na escola, de manhã até o fim da tarde. Lá dentro, além das aulas, havia:</p>
+<ul><li><strong>refeições completas</strong> ao longo do dia;</li><li><strong>atendimento médico e odontológico</strong>;</li><li><strong>esportes</strong>, na quadra coberta, que também servia de auditório;</li><li><strong>biblioteca</strong>, pensada para ser aberta também à comunidade do bairro;</li><li><strong>atividades culturais</strong>, com a figura do "animador cultural", alguém da própria comunidade que levava arte e cultura local para dentro da escola;</li><li><strong>estudo dirigido</strong>, para que o dever de casa fosse feito com orientação, e não dependesse do que a família podia oferecer.</li></ul>
+<p>Alguns CIEPs também tinham alojamento para crianças em situação de risco, que moravam na escola sob os cuidados de casais chamados de "pais sociais".</p>
+<h2>Os prédios de Niemeyer</h2>
+<p>Para construir muitas escolas em pouco tempo, Niemeyer desenhou um projeto padronizado com <strong>peças de concreto pré-moldado</strong>, fabricadas em série e montadas no terreno. O conjunto básico reúne o prédio principal, com salas de aula, refeitório e consultórios; o ginásio; e um prédio menor, para a biblioteca e a moradia dos alunos residentes.</p>
+<p>A padronização permitiu erguer cerca de <strong>500 CIEPs</strong> em todo o estado, somando os dois governos de Brizola (o segundo foi de 1991 a 1994). Por isso o prédio se tornou parte da paisagem de bairros da capital, da Baixada Fluminense e do interior.</p>
+<h2>Críticas e descontinuidade</h2>
+<p>O projeto sempre foi alvo de disputa. Opositores acusavam o programa de ser caro demais e de ter uso eleitoral, por colocar prédios iguais e facilmente reconhecíveis em todo o estado. Defensores respondiam que caro era manter crianças fora da escola, e costumam lembrar uma frase atribuída a Darcy Ribeiro: se os governantes não construíssem escolas, em vinte anos faltaria dinheiro para construir presídios.</p>
+<p>O maior problema, porém, foi a falta de continuidade. Os governos que vieram entre e depois das gestões de Brizola não mantiveram o horário integral nem a estrutura de saúde, cultura e alimentação que fazia do CIEP algo diferente. Muitos prédios foram municipalizados, passaram a funcionar em turnos comuns ou ficaram sem manutenção. O projeto pedagógico se perdeu, mas os prédios ficaram, e muitos seguem funcionando como escolas até hoje.</p>
+<h2>O legado</h2>
+<p>A experiência dos CIEPs influenciou programas federais, como os CIACs (depois chamados de CAICs), lançados no início dos anos 1990, e voltou ao debate sempre que o país discute educação integral. O Plano Nacional de Educação estabeleceu metas de ampliar o número de escolas e alunos em tempo integral, e o governo federal criou em 2023 o Programa Escola em Tempo Integral.</p>
+<p>Quarenta anos depois do primeiro CIEP, a pergunta que Darcy e Brizola fizeram continua de pé: o que a escola pública precisa oferecer para que a criança pobre tenha as mesmas chances que as outras? A resposta deles foi uma escola aberta o dia inteiro, que alimenta, cuida e ensina. Os prédios espalhados pelo Rio são a lembrança concreta de que isso já foi tentado em grande escala no Brasil.</p></div></div></div></section></div></main>
+  </div>
+
+  <div id="aviso" class="aviso" role="status" aria-live="polite" hidden="">Salvo.</div>
+
+  <dialog id="galeria" class="galeria">
+    <form method="dialog">
+      <header><strong>Escolher uma imagem já enviada</strong><button value="fechar" class="botao-texto">Fechar</button></header>
+      <div id="galeria-grade" class="galeria-grade"></div>
+    </form>
+  </dialog>
+
+  <script src="./Editor · Tempo Continuum_files/tags.js.download"></script>
+  <script src="./Editor · Tempo Continuum_files/markdown.js.download"></script>
+  <script src="./Editor · Tempo Continuum_files/editor.js.download"></script>
+
+
+</body></html>

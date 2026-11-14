@@ -1,0 +1,6 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    { "name": "site", "runtimeExecutable": "python", "runtimeArgs": ["site/scripts/servidor.py", "--porta", "8001"], "port": 8001 }
+  ]
+}

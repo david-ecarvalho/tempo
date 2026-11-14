@@ -1,0 +1,63 @@
+{
+  "folders": [
+    { "name": "Site (tempocontinuum)", "path": "site" },
+    { "name": "Motor de imagens (Rust)", "path": "motor-imagens" },
+    { "name": "Leia-me", "path": "." }
+  ],
+  "settings": {
+    "files.eol": "\n",
+    "files.encoding": "utf8",
+    "files.exclude": { "site": true, "motor-imagens": true, "**/__pycache__": true },
+    "git.autoRepositoryDetection": "subFolders",
+    "git.openRepositoryInParentFolders": "always",
+    "editor.renderWhitespace": "boundary"
+  },
+  "extensions": {
+    "recommendations": ["ms-python.python", "rust-lang.rust-analyzer"]
+  },
+  "tasks": {
+    "version": "2.0.0",
+    "tasks": [
+      {
+        "label": "Site: abrir no navegador (servidor local)",
+        "type": "shell",
+        "command": "python scripts/servidor.py",
+        "options": { "cwd": "${workspaceFolder:Site (tempocontinuum)}" },
+        "isBackground": true,
+        "problemMatcher": [],
+        "detail": "Site em http://localhost:8000 e editor em http://localhost:8000/admin/"
+      },
+      {
+        "label": "Site: servidor local acessível na rede (celular, outros PCs)",
+        "type": "shell",
+        "command": "python scripts/servidor.py --rede",
+        "options": { "cwd": "${workspaceFolder:Site (tempocontinuum)}" },
+        "isBackground": true,
+        "problemMatcher": [],
+        "detail": "Mostra o endereço para abrir em outros aparelhos do mesmo Wi-Fi"
+      },
+      {
+        "label": "Motor de imagens: compilar",
+        "type": "shell",
+        "command": "powershell -ExecutionPolicy Bypass -File compilar.ps1",
+        "options": { "cwd": "${workspaceFolder:Motor de imagens (Rust)}" },
+        "problemMatcher": ["$rustc"],
+        "detail": "Grava o resultado em site/js/motor/"
+      },
+      {
+        "label": "Motor de imagens: testar",
+        "type": "shell",
+        "command": "cargo test --release",
+        "options": { "cwd": "${workspaceFolder:Motor de imagens (Rust)}" },
+        "problemMatcher": ["$rustc"]
+      },
+      {
+        "label": "Site: buscar ramos do GitHub (quando o acesso voltar)",
+        "type": "shell",
+        "command": "git fetch --unshallow origin; git fetch origin '+refs/heads/*:refs/remotes/origin/*'; git branch -r",
+        "options": { "cwd": "${workspaceFolder:Site (tempocontinuum)}" },
+        "problemMatcher": []
+      }
+    ]
+  }
+}
