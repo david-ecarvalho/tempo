@@ -79,7 +79,7 @@ Depois abra http://localhost:8000 (site) e http://localhost:8000/admin/ (editor)
 python scripts/publicar.py
 ```
 
-Monta em `_site/` a versão para a internet: refaz os índices de `dados/` e copia só o que o público usa (páginas, `js/`, `dados/`, `conteudo/`, `imagens/`, `logos/`, `arquivos/`). Fica de fora o editor (`admin/`), que só funciona com o servidor local: no site publicado não há como editar nada, e o conteúdo continua sendo lançado pelo editor local e publicado de novo. Também ficam de fora os dossiês que ainda estão com o texto-modelo do editor ("Texto do capítulo..."); eles entram sozinhos quando o texto for escrito.
+Monta em `_site/` a versão para a internet: refaz os índices de `dados/` e copia só o que o público usa (páginas, `js/`, `dados/`, `conteudo/`, `imagens/`, `logos/`, `arquivos/`). Fica de fora o editor (`admin/`), que só funciona com o servidor local: no site publicado não há como editar nada, e o conteúdo continua sendo lançado pelo editor local e publicado de novo. Todos os dossiês são publicados, inclusive os que ainda estão com o texto-modelo do editor.
 
 `_site/` é um site estático comum (não está no Git) e pode ir para qualquer hospedagem:
 
