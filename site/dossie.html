@@ -54,7 +54,8 @@ footer>div{padding-left:16px !important;padding-right:16px !important}
   .tc-capa-pdf{break-after:page;min-height:247mm;box-sizing:border-box}
   .tc-sumario{border:0 !important;padding:0 0 18pt !important;margin-bottom:18pt}
   .tc-sumario ol{font-size:12pt !important}
-  .tc-capitulo{break-before:page}
+  .tc-capitulo,.tc-parte{break-before:page}
+  .tc-parte{min-height:200mm;justify-content:center}
   .tc-texto{font-size:11pt !important;line-height:1.6 !important;gap:10pt !important}
   h1,h2,h3{break-after:avoid}
   figure,img,blockquote,li{break-inside:avoid}
@@ -137,7 +138,7 @@ footer>div{padding-left:16px !important;padding-right:16px !important}
             <span style="font-size: 12px; line-height: 1.05; letter-spacing: 0.08em; text-transform: uppercase;">Tempo<br>Continuum</span>
           </div>
           <div style="display: flex; flex-direction: column; gap: 18px;">
-            <span style="align-self: flex-start; background: #556A2F; color: #FFFAF0; padding: 4px 12px; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;">Dossiê · {{d.capitulosTexto}}</span>
+            <span style="align-self: flex-start; background: #556A2F; color: #FFFAF0; padding: 4px 12px; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;">{{d.rotulo}} · {{d.capitulosTexto}}</span>
             <h1 style="margin: 0; font-size: 34pt; line-height: 1.05; letter-spacing: -0.02em;">{{d.titulo}}</h1>
             <sc-if value="{{d.temLinha}}" hint-placeholder-val="{{true}}"><p style="margin: 0; font-size: 14pt; line-height: 1.45; color: #2F2E25;">{{d.linha}}</p></sc-if>
           </div>
@@ -151,7 +152,7 @@ footer>div{padding-left:16px !important;padding-right:16px !important}
         <!-- Cabeçalho na tela -->
         <header class="tc-nao-imprimir" style="display: flex; flex-direction: column; gap: 16px;">
           <div style="display: flex; flex-wrap: wrap; gap: 6px 12px; align-items: center; font-size: 13px; color: {{c.muted}};">
-            <span style="background: #556A2F; color: #FFFAF0; padding: 3px 10px; letter-spacing: 0.08em; text-transform: uppercase; font-size: 12px;">Dossiê · {{d.capitulosTexto}}</span>
+            <span style="background: #556A2F; color: #FFFAF0; padding: 3px 10px; letter-spacing: 0.08em; text-transform: uppercase; font-size: 12px;">{{d.rotulo}} · {{d.capitulosTexto}}</span>
             <span>{{d.dataTexto}}</span>
             <sc-if value="{{d.temAutor}}" hint-placeholder-val="{{true}}"><span>· {{d.autor}}</span></sc-if>
             <sc-if value="{{d.temEditado}}" hint-placeholder-val="{{false}}"><span>· Atualizado em {{d.editadoTexto}}</span></sc-if>
@@ -181,7 +182,8 @@ footer>div{padding-left:16px !important;padding-right:16px !important}
           <span style="font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: {{c.muted}};">Sumário</span>
           <ol style="margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 2px; font-size: 1.05rem;">
             <sc-for list="{{capitulos}}" as="k" hint-placeholder-count="4">
-              <li style="display: flex; gap: 14px; align-items: baseline; padding: 6px 0; border-bottom: 1px solid {{c.line}};"><span style="flex: none; width: 2.2em; color: #556A2F; font-variant-numeric: tabular-nums;">{{k.n}}</span><a href="{{k.href}}" style="line-height: 1.35;">{{k.titulo}}</a></li>
+              <sc-if value="{{k.temParte}}" hint-placeholder-val="{{false}}"><li style="padding: 14px 0 6px; border-bottom: 1px solid {{c.line}}; font-size: 0.8rem; letter-spacing: 0.08em; text-transform: uppercase; color: {{c.muted}};"><a href="{{k.parteHref}}" style="line-height: 1.35;"><span style="color: #556A2F;">Parte {{k.parteN}}</span> · {{k.parteTitulo}}</a></li></sc-if>
+              <sc-if value="{{k.temCapitulo}}" hint-placeholder-val="{{true}}"><li style="display: flex; gap: 14px; align-items: baseline; padding: 6px 0; border-bottom: 1px solid {{c.line}};"><span style="flex: none; width: 2.2em; color: #556A2F; font-variant-numeric: tabular-nums;">{{k.n}}</span><a href="{{k.href}}" style="line-height: 1.35;">{{k.titulo}}</a></li></sc-if>
             </sc-for>
           </ol>
         </nav>
@@ -201,6 +203,16 @@ footer>div{padding-left:16px !important;padding-right:16px !important}
         </sc-if>
 
         <sc-for list="{{capitulos}}" as="k" hint-placeholder-count="3">
+          <sc-if value="{{k.temParte}}" hint-placeholder-val="{{false}}">
+          <section id="{{k.parteAncora}}" class="tc-parte" style="display: flex; flex-direction: column; gap: 14px; scroll-margin-top: 110px; padding: 28px 0 8px; border-top: 6px solid #556A2F;">
+            <span style="font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: #556A2F;">Parte {{k.parteN}} · Dossiê · {{k.parteCapitulos}}</span>
+            <h2 style="margin: 0; font-size: clamp(1.9rem, 5vw, 2.6rem); line-height: 1.08; letter-spacing: -0.02em; text-wrap: balance;">{{k.parteTitulo}}</h2>
+            <sc-if value="{{k.temParteLinha}}" hint-placeholder-val="{{true}}"><p style="margin: 0; font-size: 1.12rem; line-height: 1.5; color: {{c.muted}};">{{k.parteLinha}}</p></sc-if>
+            <sc-for list="{{k.parteTextos}}" as="pt" hint-placeholder-count="1"><p style="margin: 0; font-size: 1.05rem; line-height: 1.65;">{{pt}}</p></sc-for>
+            <a class="tc-nao-imprimir" href="{{k.parteHref2}}" style="align-self: flex-start; font-size: 13px; color: {{c.muted}}; text-underline-offset: 3px;">Abrir este dossiê sozinho</a>
+          </section>
+          </sc-if>
+          <sc-if value="{{k.temCapitulo}}" hint-placeholder-val="{{true}}">
           <section id="{{k.ancora}}" class="tc-capitulo" style="display: flex; flex-direction: column; gap: 18px; scroll-margin-top: 110px; padding-top: 8px; border-top: 2px solid {{c.ink}};">
             <header style="display: flex; flex-direction: column; gap: 6px;">
               <span style="font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: #556A2F;">Capítulo {{k.n}}</span>
@@ -219,6 +231,7 @@ footer>div{padding-left:16px !important;padding-right:16px !important}
             </div>
             <a class="tc-nao-imprimir" href="#sumario" style="align-self: flex-start; font-size: 13px; color: {{c.muted}}; text-underline-offset: 3px;">↑ Sumário</a>
           </section>
+          </sc-if>
         </sc-for>
 
         <sc-if value="{{temTags}}" hint-placeholder-val="{{true}}">
@@ -276,7 +289,7 @@ class Component extends DCLogic {
   }
   componentDidMount() {
     var self = this, q = new URLSearchParams(window.location.search);
-    var id = q.get('id') || '', modoPdf = q.get('pdf') || '';
+    var meta = q.get('meta') || '', id = meta || q.get('id') || '', modoPdf = q.get('pdf') || '';
     try {
       var v = window.localStorage.getItem('tc-tema');
       if (v === 'escuro' || v === 'claro') this.setState({ escuro: v === 'escuro' });
@@ -286,18 +299,30 @@ class Component extends DCLogic {
     window.addEventListener('beforeprint', function () { self.setState({ imprimindo: true }); });
     window.addEventListener('afterprint', function () { if (!modoPdf) self.setState({ imprimindo: false }); });
     if (!/^[a-z0-9][a-z0-9-]*$/.test(id)) { this.setState({ status: 'erro' }); return; }
-    fetch('conteudo/dossies/' + id + '.md', { cache: 'no-cache' })
-      .then(function (r) { if (!r.ok) throw new Error(r.status); return r.text(); })
-      .then(function (t) {
-        var d = TCMarkdown.lerDossie(t);
-        d.id = id;
-        self.setState({ dossie: d, status: 'ok' });
-        try { document.title = d.titulo + ' — Dossiê — Tempo Continuum'; } catch (e) {}
-        if (modoPdf === 'previa') self.imprimirQuandoPronto();
-      })
-      .catch(function () { self.setState({ status: 'erro' }); });
+    var texto = function (url) { return fetch(url, { cache: 'no-cache' }).then(function (r) { if (!r.ok) throw new Error(r.status); return r.text(); }); };
+    var pronto = function (d, partes) {
+      d.id = id;
+      self.setState({ dossie: d, partes: partes, status: 'ok' });
+      try { document.title = d.titulo + (meta ? ' — Meta-dossiê' : ' — Dossiê') + ' — Tempo Continuum'; } catch (e) {}
+      if (modoPdf === 'previa') self.imprimirQuandoPronto();
+    };
+    if (meta) {
+      // Meta-dossiê: o arquivo dele e, na ordem da lista, cada dossiê que ele junta (os que faltarem ficam de fora)
+      texto('conteudo/metadossies/' + id + '.md')
+        .then(function (t) {
+          var d = TCMarkdown.lerMetaDossie(t);
+          return Promise.all(d.dossies.filter(function (x) { return /^[a-z0-9][a-z0-9-]*$/.test(x); }).map(function (x) {
+            return texto('conteudo/dossies/' + x + '.md').then(function (tx) { var p = TCMarkdown.lerDossie(tx); p.id = x; return p; }, function () { return null; });
+          })).then(function (partes) { pronto(d, partes.filter(Boolean)); });
+        })
+        .catch(function () { self.setState({ status: 'erro' }); });
+    } else {
+      texto('conteudo/dossies/' + id + '.md')
+        .then(function (t) { pronto(TCMarkdown.lerDossie(t), null); })
+        .catch(function () { self.setState({ status: 'erro' }); });
+    }
     if (modoPdf !== 'arquivo') {
-      fetch('dados/dossies.json', { cache: 'no-cache' })
+      fetch(meta ? 'dados/metadossies.json' : 'dados/dossies.json', { cache: 'no-cache' })
         .then(function (r) { return r.ok ? r.json() : []; })
         .then(function (lista) {
           var item = (Array.isArray(lista) ? lista : []).filter(function (x) { return x && x.id === id; })[0];
@@ -328,7 +353,33 @@ class Component extends DCLogic {
     var rel = function (u) { u = String(u || '').trim(); return /^https?:/i.test(u) ? u : u.replace(/^\/+/, '').replace(/^tempocontinuum\//, ''); };
     var dos = st.dossie;
     var partes = dos ? TCMarkdown.capitulosDossie(dos.corpo) : { apresentacao: '', capitulos: [] };
-    var n = partes.capitulos.length;
+    var ehMeta = !!st.partes;
+    var paragrafos = function (md) {
+      return String(md || '').split(/\n\s*\n/).map(function (p) { return TCMarkdown.textoSimples(p.replace(/^#+\s+/gm, '').replace(/^>\s?/gm, '').replace(/\s*\n\s*/g, ' ')); }).filter(Boolean);
+    };
+    var nCap = function (n) { return n + (n === 1 ? ' capítulo' : ' capítulos'); };
+    var capitulos = [];
+    if (ehMeta) {
+      // Cada dossiê vira uma parte; os capítulos seguem numerados de 1 até o fim
+      st.partes.forEach(function (p, i) {
+        var pp = TCMarkdown.capitulosDossie(p.corpo);
+        var parte = { temParte: true, parteN: i + 1, parteTitulo: p.titulo || p.id, parteLinha: p.linha || '', temParteLinha: !!p.linha,
+          parteTextos: paragrafos(pp.apresentacao), parteAncora: 'parte-' + p.id, parteHref: '#parte-' + p.id,
+          parteHref2: 'dossie.html?id=' + encodeURIComponent(p.id), parteCapitulos: nCap(pp.capitulos.length) };
+        if (!pp.capitulos.length) { capitulos.push(Object.assign({ temCapitulo: false, blocos: [] }, parte)); return; }
+        pp.capitulos.forEach(function (k, j) {
+          var ancora = p.id + '-' + k.ancora;
+          capitulos.push(Object.assign(j === 0 ? parte : { temParte: false }, {
+            temCapitulo: true, n: capitulos.filter(function (x) { return x.temCapitulo; }).length + 1,
+            titulo: k.titulo, ancora: ancora, href: '#' + ancora, blocos: TCMarkdown.blocos(k.corpo) }));
+        });
+      });
+    } else {
+      capitulos = partes.capitulos.map(function (k) {
+        return { temParte: false, temCapitulo: true, n: k.n, titulo: k.titulo, ancora: k.ancora, href: '#' + k.ancora, blocos: TCMarkdown.blocos(k.corpo) };
+      });
+    }
+    var n = capitulos.filter(function (x) { return x.temCapitulo; }).length;
     var editado = dos && dos.editado && String(dos.editado).slice(0, 10) > String(dos.data || '').slice(0, 10) ? String(dos.editado) : '';
     var d = dos ? {
       titulo: dos.titulo || '', linha: dos.linha || '', temLinha: !!dos.linha,
@@ -336,11 +387,9 @@ class Component extends DCLogic {
       temEditado: !!editado, editadoTexto: fmt(editado),
       capa: rel(dos.capa), temCapa: !!dos.capa, legenda: dos.legenda || '', temLegenda: !!(dos.legenda || dos.credito),
       credito: dos.credito || '', temCredito: !!dos.credito,
-      capitulosTexto: n + (n === 1 ? ' capítulo' : ' capítulos')
+      rotulo: ehMeta ? 'Meta-dossiê' : 'Dossiê',
+      capitulosTexto: (ehMeta ? st.partes.length + (st.partes.length === 1 ? ' dossiê · ' : ' dossiês · ') : '') + nCap(n)
     } : {};
-    var capitulos = partes.capitulos.map(function (k) {
-      return { n: k.n, titulo: k.titulo, ancora: k.ancora, href: '#' + k.ancora, blocos: TCMarkdown.blocos(k.corpo) };
-    });
     var tags = (dos && dos.tags || []).map(function (t) {
       return { nome: TCTags.rotulo(t), ir: function () { try { window.localStorage.setItem('tc-busca-tag', TCTags.limpa(t)); } catch (e) {} } };
     });

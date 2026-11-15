@@ -135,6 +135,34 @@ footer>div{padding-left:16px !important;padding-right:16px !important}
       </div>
     </sc-if>
 
+    <sc-if value="{{temMetas}}" hint-placeholder-val="{{true}}">
+      <section id="meta-dossies" aria-labelledby="h-metas" style="display: flex; flex-direction: column; gap: 18px; scroll-margin-top: 110px;">
+        <div style="display: flex; flex-direction: column; gap: 10px;">
+          <h2 id="h-metas" style="margin: 0; font-size: clamp(1.6rem, 3vw, 2.2rem); line-height: 1.1; letter-spacing: -0.01em;">Meta-dossiês</h2>
+          <p style="margin: 0; font-size: 1rem; line-height: 1.55; color: {{c.muted}}; max-width: 60ch;">Vários dossiês reunidos num só documento, para ler um tema de ponta a ponta. Cada dossiê vira uma parte, com os seus capítulos.</p>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 22px;">
+          <sc-for list="{{metas}}" as="m" hint-placeholder-count="2">
+            <article style="border: 2px solid {{c.ink}}; display: flex; flex-direction: column;">
+              <sc-if value="{{m.temCapa}}" hint-placeholder-val="{{false}}"><a href="{{m.href}}" tabindex="-1" aria-hidden="true" style="display: block; aspect-ratio: 16 / 7; background: #101010 url('{{m.capa}}') center / cover no-repeat;"></a></sc-if>
+              <div style="padding: 22px; display: flex; flex-direction: column; gap: 12px; flex: 1;">
+                <span style="font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: #556A2F;">Meta-dossiê · {{m.contagem}}</span>
+                <h3 style="margin: 0; font-size: 1.45rem; line-height: 1.15;"><a href="{{m.href}}" style="text-decoration: none;">{{m.titulo}}</a></h3>
+                <sc-if value="{{m.temLinha}}" hint-placeholder-val="{{true}}"><p style="margin: 0; font-size: 0.95rem; line-height: 1.5; color: {{c.muted}};">{{m.linha}}</p></sc-if>
+                <ol style="margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 4px; font-size: 0.92rem;">
+                  <sc-for list="{{m.partes}}" as="p" hint-placeholder-count="3"><li><a href="{{p.href}}" style="text-underline-offset: 3px;">{{p.titulo}}</a> <span style="color: {{c.muted}};">· {{p.capitulosTexto}}</span></li></sc-for>
+                </ol>
+                <div style="margin-top: auto; display: flex; flex-wrap: wrap; gap: 10px; padding-top: 6px;">
+                  <a href="{{m.href}}" style="text-decoration: none; background: #556A2F; color: #FFFAF0; padding: 10px 16px; font-size: 14px;">Ler o meta-dossiê</a>
+                  <sc-if value="{{m.temPdf}}" hint-placeholder-val="{{false}}"><a href="{{m.pdf}}" download="{{m.pdfNome}}" style="text-decoration: none; border: 2px solid {{c.ink}}; padding: 8px 14px; font-size: 14px;">Baixar PDF</a></sc-if>
+                </div>
+              </div>
+            </article>
+          </sc-for>
+        </div>
+      </section>
+    </sc-if>
+
     <div id="casos" style="display: flex; flex-direction: column; gap: 10px; scroll-margin-top: 110px;">
       <h2 style="margin: 0; font-size: clamp(1.6rem, 3vw, 2.2rem); line-height: 1.1; letter-spacing: -0.01em;">Casos acompanhados</h2>
       <p style="margin: 0; font-size: 1rem; line-height: 1.55; color: {{c.muted}}; max-width: 60ch;">Investigações acompanhadas do início ao fim, com a situação atual, os envolvidos, a última etapa e os documentos reunidos.</p>
@@ -195,7 +223,7 @@ footer>div{padding-left:16px !important;padding-right:16px !important}
 
     <div style="display: flex; flex-direction: column;">
       <sc-for list="{{itens}}" as="k" hint-placeholder-count="5">
-        <article style="display: flex; flex-wrap: wrap; gap: 16px 28px; padding: 26px 0; border-bottom: 1px solid {{c.line}};">
+        <article id="{{k.ancora}}" style="display: flex; flex-wrap: wrap; gap: 16px 28px; padding: 26px 0; border-bottom: 1px solid {{c.line}}; scroll-margin-top: 110px;">
           <div style="flex: none; width: 150px; display: flex; flex-direction: column; gap: 8px;">
             <sc-if value="{{k.andamento}}" hint-placeholder-val="{{true}}"><span style="display: block; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; border: 1.5px solid {{c.ink}}; padding: 5px 10px; text-align: center;">Em andamento</span></sc-if>
             <sc-if value="{{k.julgamento}}" hint-placeholder-val="{{false}}"><span style="display: block; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; background: #556A2F; color: #FFFAF0; border: 1.5px solid #556A2F; padding: 5px 10px; text-align: center;">Em julgamento</span></sc-if>
@@ -206,10 +234,15 @@ footer>div{padding-left:16px !important;padding-right:16px !important}
             <h2 style="margin: 0; font-size: 1.35rem; line-height: 1.2;">{{k.titulo}}</h2>
             <p style="margin: 0; font-size: 0.95rem; line-height: 1.55; color: {{c.muted}}; max-width: 66ch;">{{k.resumo}}</p>
             <dl style="margin: 0; display: flex; flex-wrap: wrap; gap: 8px 28px; font-size: 0.85rem;">
-              <div><dt style="font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: {{c.muted}};">Envolvidos</dt><dd style="margin: 2px 0 0;">{{k.envolvidosTexto}}</dd></div>
-              <div><dt style="font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: {{c.muted}};">Última etapa</dt><dd style="margin: 2px 0 0;">{{k.etapa}} · {{k.atualizadoTexto}}</dd></div>
+              <sc-if value="{{k.temEnvolvidos}}" hint-placeholder-val="{{true}}"><div><dt style="font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: {{c.muted}};">Envolvidos</dt><dd style="margin: 2px 0 0;">{{k.envolvidosTexto}}</dd></div></sc-if>
+              <div><dt style="font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: {{c.muted}};">Última etapa</dt><dd style="margin: 2px 0 0;">{{k.etapaTexto}}</dd></div>
               <div><dt style="font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: {{c.muted}};">Documentos</dt><dd style="margin: 2px 0 0;">{{k.docs}}</dd></div>
             </dl>
+            <sc-if value="{{k.temDocumentos}}" hint-placeholder-val="{{false}}">
+              <ul style="margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 4px; font-size: 0.88rem;">
+                <sc-for list="{{k.documentos}}" as="dc" hint-placeholder-count="2"><li><a href="{{dc.link}}" target="{{dc.alvo}}" rel="noopener noreferrer" style="text-underline-offset: 3px;">{{dc.titulo}}</a></li></sc-for>
+              </ul>
+            </sc-if>
             <div style="display: flex; flex-wrap: wrap; gap: 6px;">
               <sc-for list="{{k.tags}}" as="t" hint-placeholder-count="3">
                 <sc-if value="{{t.ativa}}" hint-placeholder-val="{{false}}">
@@ -262,7 +295,7 @@ footer>div{padding-left:16px !important;padding-right:16px !important}
 class Component extends DCLogic {
   constructor(props) {
     super(props);
-    this.state = { escuro: null, q: '', tags: [], situacao: 'Todos', dossies: [] };
+    this.state = { escuro: null, q: '', tags: [], situacao: 'Todos', dossies: [], metas: [], casos: [] };
   }
   componentDidMount() {
     var self = this;
@@ -271,15 +304,29 @@ class Component extends DCLogic {
       .then(function (r) { return r.ok ? r.json() : []; })
       .then(function (lista) { self.setState({ dossies: Array.isArray(lista) ? lista : [] }); })
       .catch(function () {});
+    // Meta-dossiês (conteudo/metadossies/) e casos acompanhados (conteudo/casos/), lançados pelo editor
+    [['metadossies', 'metas'], ['casos', 'casos']].forEach(function (x) {
+      fetch('dados/' + x[0] + '.json', { cache: 'no-cache' })
+        .then(function (r) { return r.ok ? r.json() : []; })
+        .then(function (lista) {
+          var p = {}; p[x[1]] = Array.isArray(lista) ? lista : []; self.setState(p);
+          // dossies.html#caso-<id> ou #meta-<id>: rola até o item
+          var alvo = decodeURIComponent((location.hash || '').slice(1));
+          if (alvo && alvo !== 'casos') setTimeout(function () { var el = document.getElementById(alvo); if (el) el.scrollIntoView({ block: 'start' }); }, 60);
+        })
+        .catch(function () {});
+    });
     try {
       var v = window.localStorage.getItem('tc-tema');
       if (v === 'escuro' || v === 'claro') this.setState({ escuro: v === 'escuro' });
     } catch (e) {}
   }
   dados() {
-    // Cada caso: { id, status ('Em andamento' | 'Em julgamento' | 'Encerrado'), titulo, resumo, aberto: 'AAAA-MM-DD',
-    //   atualizado: 'AAAA-MM-DD', etapa, envolvidos: [..], docs: número, tags: [..] }. Subtag com barra: 'violência/contra indígenas'.
-    return [];
+    // Casos de dados/casos.json: { id, status ('Em andamento' | 'Em julgamento' | 'Encerrado'), titulo, resumo, aberto: 'AAAA-MM-DD',
+    //   atualizado: 'AAAA-MM-DD', etapa, envolvidos: [..], documentos: [{ titulo, link }], tags: [..] }. Subtag com barra: 'violência/contra indígenas'.
+    return ((this.state && this.state.casos) || []).map(function (k) {
+      return Object.assign({ envolvidos: [], tags: [], documentos: [], resumo: '', etapa: '' }, k, { atualizado: k.atualizado || k.aberto || '', aberto: k.aberto || '' });
+    });
   }
   renderVals() {
     var self = this;
@@ -290,7 +337,8 @@ class Component extends DCLogic {
       : { bg: '#FFFAF0', surface: '#DDD5CA', ink: '#101010', muted: '#2F2E25', line: 'rgba(47, 46, 37, 0.28)' };
     var norm = function (s) { return String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim(); };
     var meses = ['jan.', 'fev.', 'mar.', 'abr.', 'maio', 'jun.', 'jul.', 'ago.', 'set.', 'out.', 'nov.', 'dez.'];
-    var fmt = function (iso) { var p = iso.split('-'); return Number(p[2]) + ' ' + meses[Number(p[1]) - 1] + ' ' + p[0]; };
+    var fmt = function (iso) { var p = String(iso || '').slice(0, 10).split('-'); return p.length === 3 ? Number(p[2]) + ' ' + meses[Number(p[1]) - 1] + ' ' + p[0] : ''; };
+    var caminho = function (u) { u = String(u || '').trim(); return /^https?:/i.test(u) ? u : u.replace(/^\/+/, ''); };
     var sel = st.tags || [];
     var selN = sel.map(TCTags.norm);
     var situacao = st.situacao || 'Todos';
@@ -323,7 +371,11 @@ class Component extends DCLogic {
     });
     var itens = filtrados.map(function (k) {
       return {
-        id: k.id, titulo: k.titulo, resumo: k.resumo, etapa: k.etapa, docs: k.docs,
+        id: k.id, ancora: 'caso-' + k.id, titulo: k.titulo, resumo: k.resumo, etapa: k.etapa,
+        etapaTexto: [k.etapa, fmt(k.atualizado)].filter(Boolean).join(' · '),
+        docs: k.documentos.length ? k.documentos.length : 'Nenhum ainda',
+        documentos: k.documentos.map(function (d) { var l = caminho(d.link); return { titulo: d.titulo || l, link: l || '#', alvo: /^https?:/i.test(l) ? '_blank' : '_self' }; }),
+        temDocumentos: k.documentos.length > 0, temEnvolvidos: k.envolvidos.length > 0,
         andamento: k.status === 'Em andamento', julgamento: k.status === 'Em julgamento', encerrado: k.status === 'Encerrado',
         abertoTexto: fmt(k.aberto), atualizadoTexto: fmt(k.atualizado), envolvidosTexto: k.envolvidos.join(' · '),
         tags: k.tags.map(function (t) { var a = selN.indexOf(TCTags.norm(t)) >= 0; return { nome: TCTags.rotulo(t), ativa: a, inativa: !a, toggle: toggle(TCTags.limpa(t)) }; })
@@ -341,6 +393,17 @@ class Component extends DCLogic {
       };
     };
     var outros = listaD.filter(function (x) { return x !== principal; }).map(cartao);
+    var metas = (st.metas || []).slice().sort(function (a, b) { return String(a.data) < String(b.data) ? 1 : -1; }).map(function (x) {
+      var partesM = (x.dossies || []).map(function (p) {
+        return { titulo: p.titulo, href: 'dossie.html?id=' + encodeURIComponent(p.id), capitulosTexto: p.capitulos + (p.capitulos === 1 ? ' capítulo' : ' capítulos') };
+      });
+      return {
+        titulo: x.titulo, linha: x.linha || '', temLinha: !!x.linha, href: 'dossie.html?meta=' + encodeURIComponent(x.id),
+        capa: String(x.capa || '').replace(/'/g, '%27'), temCapa: !!x.capa, partes: partesM,
+        contagem: partesM.length + (partesM.length === 1 ? ' dossiê · ' : ' dossiês · ') + (x.capitulos || 0) + ((x.capitulos || 0) === 1 ? ' capítulo' : ' capítulos'),
+        pdf: x.pdf || '', temPdf: !!x.pdf, pdfNome: x.id + '.pdf'
+      };
+    });
     var temFiltros = !!(palavras.length || sel.length || situacao !== 'Todos');
     var contagem = temFiltros
       ? itens.length + ' de ' + dados.length + (dados.length === 1 ? ' caso' : ' casos') + (sel.length ? ' com ' + (sel.length === 1 ? 'a tag ' : 'as tags ') + sel.map(TCTags.rotulo).join(' + ') : '')
@@ -364,7 +427,7 @@ class Component extends DCLogic {
       limpar: function () { self.setState({ q: '', tags: [], situacao: 'Todos' }); },
       situacoes: situacoes, todasTags: todasTags, itens: itens,
       semDossies: listaD.length === 0, temDestaque: !!principal, destaque: principal ? cartao(principal) : {},
-      outros: outros, temOutros: outros.length > 0,
+      outros: outros, temOutros: outros.length > 0, metas: metas, temMetas: metas.length > 0,
       semCasos: dados.length === 0, vazio: dados.length > 0 && itens.length === 0, temFiltros: temFiltros, contagem: contagem
     };
   }

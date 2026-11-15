@@ -478,7 +478,67 @@
     return escrever(dados, c.corpo || '', ORDEM_CURTO);
   }
 
+  // =========================================================================
+  // Meta-dossiê (conteudo/metadossies/<id>.md): junta vários dossiês, na ordem da lista "dossies", num documento só
+  // (dossie.html?meta=<id>). Cabeçalho: os mesmos campos do dossiê, mais dossies (lista de ids de conteudo/dossies/).
+  // Texto: a apresentação do meta-dossiê, em Markdown (os capítulos vêm dos dossiês).
+  // =========================================================================
+  var ORDEM_META = ORDEM_DOSSIE.concat(['dossies']);
+
+  function lerMetaDossie(texto) {
+    var d = lerDossie(texto), r = ler(texto);
+    d.dossies = Array.isArray(r.dados.dossies) ? r.dados.dossies.map(String).filter(Boolean) : (r.dados.dossies ? [String(r.dados.dossies)] : []);
+    return d;
+  }
+
+  function escreverMetaDossie(d) {
+    var dados = {};
+    ORDEM_META.forEach(function (k) {
+      if (k === 'tags') dados.tags = (d.tags || []).filter(Boolean);
+      else if (k === 'dossies') dados.dossies = (d.dossies || []).filter(Boolean);
+      else if (k === 'destaque') dados.destaque = !!d.destaque;
+      else if (k === 'editado') { if (d.editado) dados.editado = String(d.editado); }
+      else dados[k] = d[k] == null ? '' : String(d[k]).trim();
+    });
+    return escrever(dados, d.corpo || '', ORDEM_META);
+  }
+
+  // =========================================================================
+  // Caso acompanhado (conteudo/casos/<id>.md), na parte "Casos acompanhados" de dossies.html.
+  // Cabeçalho: titulo, status ("Em andamento", "Em julgamento" ou "Encerrado"), aberto e atualizado (AAAA-MM-DD),
+  // etapa (a última etapa do caso), envolvidos (lista), tags (lista) e documentos (lista de titulo + link).
+  // Texto: o resumo do caso.
+  // =========================================================================
+  var ORDEM_CASO = ['titulo', 'status', 'aberto', 'atualizado', 'etapa', 'envolvidos', 'tags', 'documentos'];
+  var STATUS_CASO = ['Em andamento', 'Em julgamento', 'Encerrado'];
+
+  function lerCaso(texto) {
+    var r = ler(texto), k = {};
+    ORDEM_CASO.forEach(function (c) { k[c] = r.dados[c] == null ? '' : r.dados[c]; });
+    var lista = function (v) { return Array.isArray(v) ? v.map(String).filter(Boolean) : (v ? [String(v)] : []); };
+    k.envolvidos = lista(k.envolvidos);
+    k.tags = lista(k.tags);
+    k.documentos = Array.isArray(k.documentos) ? k.documentos.filter(function (d) { return d && typeof d === 'object'; })
+      .map(function (d) { return { titulo: String(d.titulo || ''), link: String(d.link || '') }; }) : [];
+    ['titulo', 'status', 'aberto', 'atualizado', 'etapa'].forEach(function (c) { k[c] = String(k[c]); });
+    k.corpo = r.corpo;
+    return k;
+  }
+
+  function escreverCaso(k) {
+    var dados = {};
+    ORDEM_CASO.forEach(function (c) {
+      if (c === 'envolvidos' || c === 'tags') dados[c] = (k[c] || []).map(function (x) { return String(x).trim(); }).filter(Boolean);
+      else if (c === 'documentos') dados.documentos = (k.documentos || []).filter(function (d) { return d && (String(d.titulo || '').trim() || String(d.link || '').trim()); })
+        .map(function (d) { return { titulo: String(d.titulo || '').trim(), link: String(d.link || '').trim() }; });
+      else dados[c] = k[c] == null ? '' : String(k[c]).trim();
+    });
+    return escrever(dados, k.corpo || '', ORDEM_CASO);
+  }
+
   window.TCMarkdown = {
+    lerMetaDossie: lerMetaDossie, escreverMetaDossie: escreverMetaDossie,
+    lerCaso: lerCaso, escreverCaso: escreverCaso, STATUS_CASO: STATUS_CASO,
     lerCurto: lerCurto, escreverCurto: escreverCurto,
     lerDossie: lerDossie, escreverDossie: escreverDossie, capitulosDossie: capitulosDossie, textoSimples: textoSimples,
     lerPublicacao: lerPublicacao, escreverPublicacao: escreverPublicacao,

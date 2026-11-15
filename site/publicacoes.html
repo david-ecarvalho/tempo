@@ -92,13 +92,13 @@ footer>div{padding-left:16px !important;padding-right:16px !important}
     <div style="display: flex; flex-direction: column; gap: 14px;">
       <p style="margin: 0; font-size: 13px; color: {{c.muted}};"><a href="index.html" style="text-underline-offset: 3px;">Início</a> / Publicações</p>
       <h1 style="margin: 0; font-size: clamp(2.4rem, 5vw, 3.6rem); line-height: 1; letter-spacing: -0.02em;"><span style="background: #556A2F; color: #FFFAF0; padding: 0 10px;">Publicações</span></h1>
-      <p style="margin: 0; font-size: 1.1rem; line-height: 1.55; color: {{c.muted}}; max-width: 62ch;">Livros e revistas do Tempo Continuum e de parceiros, para ler, baixar ou adquirir.</p>
+      <p style="margin: 0; font-size: 1.1rem; line-height: 1.55; color: {{c.muted}}; max-width: 62ch;">Livros, revistas e dossiês impressos do Tempo Continuum e de parceiros, para ler, baixar ou adquirir.</p>
     </div>
 
     <section aria-label="Filtros" style="display: flex; flex-direction: column; gap: 16px; border-top: 2px solid {{c.ink}}; border-bottom: 1px solid {{c.line}}; padding: 20px 0;">
       <div style="display: flex; flex-direction: column; gap: 6px; max-width: 640px;">
         <label for="pq" style="font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: {{c.muted}};">Buscar</label>
-        <input id="pq" type="search" value="{{q}}" onChange="{{onQ}}" placeholder="Título, autoria, editora ou assunto" autocomplete="off" style="font: inherit; font-size: 16px; padding: 12px 14px; border: 2px solid {{c.ink}}; background: {{c.bg}}; color: {{c.ink}}; border-radius: 0; min-width: 0;">
+        <input id="pq" type="search" value="{{q}}" onChange="{{onQ}}" placeholder="Título, autoria, editora, assunto ou tag" autocomplete="off" style="font: inherit; font-size: 16px; padding: 12px 14px; border: 2px solid {{c.ink}}; background: {{c.bg}}; color: {{c.ink}}; border-radius: 0; min-width: 0;">
       </div>
       <div class="tc-chips" style="display: flex; flex-wrap: wrap; gap: 8px;">
         <sc-for list="{{partes}}" as="s" hint-placeholder-count="3">
@@ -164,6 +164,38 @@ footer>div{padding-left:16px !important;padding-right:16px !important}
         </div>
       </section>
     </sc-if>
+    <sc-if value="{{mostrarImpressos}}" hint-placeholder-val="{{true}}">
+      <section id="dossies-impressos" aria-labelledby="h-impressos" style="display: flex; flex-direction: column; gap: 20px; scroll-margin-top: 110px; border-top: 2px solid {{c.ink}}; padding-top: 24px;">
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <h2 id="h-impressos" style="margin: 0; font-size: 1.6rem;">Dossiês impressos</h2>
+          <p style="margin: 0; font-size: 0.95rem; color: {{c.muted}}; max-width: 64ch;">Os dossiês e meta-dossiês em versão para imprimir: capa, sumário e cada capítulo numa página nova. Baixe o PDF ou, se ele ainda não estiver pronto, salve pela janela de impressão do navegador ("Salvar como PDF").</p>
+        </div>
+        <sc-if value="{{semImpressos}}" hint-placeholder-val="{{false}}">
+          <div style="border: 1.5px dashed {{c.line}}; padding: 24px; color: {{c.muted}};">{{textoSemImpressos}}</div>
+        </sc-if>
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 28px 22px;">
+          <sc-for list="{{impressos}}" as="p" hint-placeholder-count="4">
+            <article style="display: flex; flex-direction: column; gap: 10px; min-width: 0;">
+              <a href="{{p.ler}}" tabindex="-1" aria-hidden="true" style="display: block; text-decoration: none;">
+                <sc-if value="{{p.temCapa}}" hint-placeholder-val="{{false}}"><div style="aspect-ratio: 210 / 297; background: #FFFAF0; color: #101010; border: 1px solid {{c.line}}; box-sizing: border-box; display: flex; flex-direction: column;"><img src="{{p.capa}}" alt="" loading="lazy" referrerpolicy="no-referrer" style="display: block; width: 100%; aspect-ratio: 4 / 3; object-fit: cover;"><span style="padding: 12px 14px; font-size: 1rem; line-height: 1.2;">{{p.titulo}}</span></div></sc-if>
+                <sc-if value="{{p.semCapa}}" hint-placeholder-val="{{true}}"><div style="aspect-ratio: 210 / 297; background: #FFFAF0; color: #101010; border: 1px solid {{c.line}}; border-top: 10px solid #556A2F; padding: 18px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: space-between;"><span style="font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: #556A2F;">{{p.tipo}}</span><span style="font-size: 1.15rem; line-height: 1.2;">{{p.titulo}}</span><span style="font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase;">Tempo Continuum</span></div></sc-if>
+              </a>
+              <div style="display: flex; flex-direction: column; gap: 4px;">
+                <span style="font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: #556A2F;">{{p.tipo}}</span>
+                <h3 style="margin: 0; font-size: 1.1rem; line-height: 1.25;"><a href="{{p.ler}}" style="text-decoration: none;">{{p.titulo}}</a></h3>
+                <span style="font-size: 13px; color: {{c.muted}};">{{p.linhaInfo}}</span>
+              </div>
+              <sc-if value="{{p.temDescricao}}" hint-placeholder-val="{{true}}"><p style="margin: 0; font-size: 0.92rem; line-height: 1.5; color: {{c.muted}};">{{p.descricao}}</p></sc-if>
+              <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: auto;">
+                <sc-if value="{{p.temPdf}}" hint-placeholder-val="{{false}}"><a href="{{p.pdf}}" download="{{p.pdfNome}}" style="text-decoration: none; background: #556A2F; color: #FFFAF0; padding: 8px 14px; font-size: 14px;">Baixar PDF</a></sc-if>
+                <sc-if value="{{p.semPdf}}" hint-placeholder-val="{{true}}"><a href="{{p.imprimir}}" target="_blank" rel="noopener" title="Abre a versão impressa com a janela de impressão: escolha &quot;Salvar como PDF&quot;" style="text-decoration: none; background: #556A2F; color: #FFFAF0; padding: 8px 14px; font-size: 14px;">Imprimir / salvar PDF</a></sc-if>
+                <a href="{{p.ler}}" style="text-decoration: none; border: 2px solid {{c.ink}}; padding: 6px 12px; font-size: 14px;">Ler online</a>
+              </div>
+            </article>
+          </sc-for>
+        </div>
+      </section>
+    </sc-if>
   </main>
 
   <footer style="background: #101010; color: #FFFAF0; border-top: 1px solid {{c.line}};">
@@ -201,7 +233,7 @@ footer>div{padding-left:16px !important;padding-right:16px !important}
 class Component extends DCLogic {
   constructor(props) {
     super(props);
-    this.state = { escuro: null, q: '', parte: 'Todas', livros: [], revistas: [], carregado: false };
+    this.state = { escuro: null, q: '', parte: 'Todas', livros: [], revistas: [], dossies: [], metas: [], carregado: false };
   }
   componentDidMount() {
     var self = this;
@@ -214,10 +246,18 @@ class Component extends DCLogic {
       .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
       .then(function (d) { self.setState({ livros: d.livros || [], revistas: d.revistas || [], carregado: true }); })
       .catch(function () { self.setState({ carregado: true }); });
-    // #livros ou #revistas no endereço abre direto naquela parte
+    // Dossiês impressos: os dossiês e meta-dossiês, com o PDF quando ele estiver em dia
+    [['dossies', 'dossies'], ['metadossies', 'metas']].forEach(function (x) {
+      fetch('dados/' + x[0] + '.json', { cache: 'no-cache' })
+        .then(function (r) { return r.ok ? r.json() : []; })
+        .then(function (lista) { var p = {}; p[x[1]] = Array.isArray(lista) ? lista : []; self.setState(p); })
+        .catch(function () {});
+    });
+    // #livros, #revistas ou #dossies-impressos no endereço abre direto naquela parte
     var h = (location.hash || '').replace('#', '');
     if (h === 'livros') this.setState({ parte: 'Livros' });
     if (h === 'revistas') this.setState({ parte: 'Revistas' });
+    if (h === 'dossies-impressos') this.setState({ parte: 'Dossiês impressos' });
   }
   renderVals() {
     var self = this;
@@ -255,12 +295,30 @@ class Component extends DCLogic {
     var porData = function (a, b) { return a._ordem < b._ordem ? 1 : a._ordem > b._ordem ? -1 : a.titulo.localeCompare(b.titulo, 'pt'); };
     var livros = filtrar((st.livros || []).map(function (p) { return preparar(p, 'livro'); })).sort(porData);
     var revistas = filtrar((st.revistas || []).map(function (p) { return preparar(p, 'revista'); })).sort(porData);
-    var partes = [['Todas', livros.length + revistas.length], ['Livros', livros.length], ['Revistas', revistas.length]].map(function (x) {
+    var nCap = function (n) { n = n || 0; return n + (n === 1 ? ' capítulo' : ' capítulos'); };
+    var impresso = function (x, meta) {
+      var pdf = caminho(x.pdf), n = (x.dossies || []).length;
+      var param = (meta ? 'meta=' : 'id=') + encodeURIComponent(x.id);
+      return {
+        tipo: meta ? 'Meta-dossiê' : 'Dossiê', titulo: x.titulo || '',
+        linhaInfo: [meta ? n + (n === 1 ? ' dossiê' : ' dossiês') + ' · ' + nCap(x.capitulos) : nCap((x.capitulos || []).length), dataTexto(x.data)].filter(Boolean).join(' · '),
+        descricao: x.linha || '', temDescricao: !!x.linha,
+        capa: caminho(x.capa), temCapa: !!x.capa, semCapa: !x.capa,
+        pdf: pdf, temPdf: !!pdf, semPdf: !pdf, pdfNome: x.id + '.pdf',
+        ler: 'dossie.html?' + param, imprimir: 'dossie.html?' + param + '&pdf=previa',
+        _busca: norm([x.titulo, x.linha, x.autor, (x.tags || []).join(' '), meta ? (x.dossies || []).map(function (p) { return p.titulo; }).join(' ') : (x.capitulos || []).join(' ')].join(' ')),
+        _ordem: String(x.data || '')
+      };
+    };
+    var impressos = filtrar((st.metas || []).map(function (x) { return impresso(x, true); })
+      .concat((st.dossies || []).map(function (x) { return impresso(x, false); }))).sort(porData);
+    var partes = [['Todas', livros.length + revistas.length + impressos.length], ['Livros', livros.length], ['Revistas', revistas.length], ['Dossiês impressos', impressos.length]].map(function (x) {
       var ativa = x[0] === parte;
       return { nome: x[0], n: x[1], ativa: ativa, inativa: !ativa, escolher: function () { self.setState({ parte: x[0] }); } };
     });
     var buscando = palavras.length > 0;
-    var total = (parte !== 'Revistas' ? livros.length : 0) + (parte !== 'Livros' ? revistas.length : 0);
+    var ver = function (nome) { return parte === 'Todas' || parte === nome; };
+    var total = (ver('Livros') ? livros.length : 0) + (ver('Revistas') ? revistas.length : 0) + (ver('Dossiês impressos') ? impressos.length : 0);
     return {
       menuAberto: !!(this.state && this.state.menuAberto),
       menuFechado: !(this.state && this.state.menuAberto),
@@ -278,7 +336,10 @@ class Component extends DCLogic {
       q: st.q || '',
       onQ: function (e) { self.setState({ q: e.target.value }); },
       partes: partes, livros: livros, revistas: revistas,
-      mostrarLivros: parte !== 'Revistas', mostrarRevistas: parte !== 'Livros',
+      impressos: impressos, mostrarImpressos: ver('Dossiês impressos'),
+      semImpressos: st.carregado && impressos.length === 0,
+      textoSemImpressos: buscando ? 'Nenhum dossiê com essas palavras.' : 'Nenhum dossiê publicado ainda.',
+      mostrarLivros: ver('Livros'), mostrarRevistas: ver('Revistas'),
       semLivros: st.carregado && livros.length === 0, semRevistas: st.carregado && revistas.length === 0,
       textoSemLivros: buscando ? 'Nenhum livro com essas palavras.' : 'Nenhum livro publicado ainda.',
       textoSemRevistas: buscando ? 'Nenhuma revista com essas palavras.' : 'Nenhuma revista publicada ainda.',

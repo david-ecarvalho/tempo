@@ -17,9 +17,15 @@ Matérias e fichas são arquivos Markdown (.md) com um cabeçalho de dados entre
   gerado, o PDF em arquivos/dossies/<id>.pdf). A página dossies.html lê este índice; o texto é lido em dossie.html.
 - dados/curtos.json, com os vídeos curtos de conteudo/curtos/ (título, link, plataforma, criador, data, capa,
   tags e descrição). A página curtos.html (Repositório de Vídeos Curtos, em Recursos) lê só este índice.
+- dados/metadossies.json, com os meta-dossiês de conteudo/metadossies/: cada um junta vários dossiês, na ordem
+  escolhida, num documento só (dossie.html?meta=<id>). Traz os dossiês que existem, o total de capítulos e, se
+  estiver em dia, o PDF em arquivos/metadossies/<id>.pdf. As páginas dossies.html e publicacoes.html leem este índice.
+- dados/casos.json, com os casos acompanhados de conteudo/casos/ (situação, datas, etapa, envolvidos, documentos,
+  tags e resumo). A parte "Casos acompanhados" de dossies.html lê só este índice.
 
 Uso: python3 scripts/gerar-indice.py
 """
+import contextlib
 import json
 import re
 import sys
@@ -47,6 +53,12 @@ PASTA_DOSSIES = RAIZ / "conteudo" / "dossies"
 SAIDA_DOSSIES = RAIZ / "dados" / "dossies.json"
 CAMPOS_DOSSIES = ("titulo", "linha", "data", "editado", "autor", "capa")
 PASTA_PDF_DOSSIES = RAIZ / "arquivos" / "dossies"
+PASTA_METADOSSIES = RAIZ / "conteudo" / "metadossies"
+SAIDA_METADOSSIES = RAIZ / "dados" / "metadossies.json"
+PASTA_PDF_METADOSSIES = RAIZ / "arquivos" / "metadossies"
+PASTA_CASOS = RAIZ / "conteudo" / "casos"
+SAIDA_CASOS = RAIZ / "dados" / "casos.json"
+STATUS_CASO = ("Em andamento", "Em julgamento", "Encerrado")
 PASTA_CURTOS = RAIZ / "conteudo" / "curtos"
 SAIDA_CURTOS = RAIZ / "dados" / "curtos.json"
 CAMPOS_CURTOS = ("titulo", "link", "plataforma", "criador", "data", "capa")
@@ -116,6 +128,8 @@ def main():
     problemas += gerar_publicacoes()
     problemas += gerar_dossies()
     problemas += gerar_curtos()
+    problemas += gerar_metadossies()
+    problemas += gerar_casos()
     for problema in problemas:
         print(f"Aviso: {problema}", file=sys.stderr)
 
@@ -326,6 +340,88 @@ def gerar_curtos():
     curtos.sort(key=lambda c: (c["data"], c["titulo"]), reverse=True)
     SAIDA_CURTOS.write_text(json.dumps(curtos, ensure_ascii=False, indent=1) + "\n", encoding="utf-8", newline="\n")
     print(f"{len(curtos)} vídeos curtos em {SAIDA_CURTOS.relative_to(RAIZ)}")
+    return problemas
+
+
+def lista_de_textos(valor):
+    """Lista do cabeçalho (ou um valor só) como lista de textos sem espaços sobrando."""
+    valor = valor if isinstance(valor, list) else ([valor] if valor else [])
+    return [str(v).strip() for v in valor if str(v).strip()]
+
+
+def gerar_metadossies():
+    """Grava dados/metadossies.json e devolve a lista de avisos."""
+    metas, problemas = [], []
+    dossies = {}
+    for arquivo in sorted(PASTA_DOSSIES.glob("*.md")) if PASTA_DOSSIES.exists() else []:
+        with contextlib.suppress(OSError, ValueError):
+            dados, corpo = cabecalho.ler(arquivo.read_text(encoding="utf-8"))
+            dossies[arquivo.stem] = {"titulo": str(dados.get("titulo") or arquivo.stem), "capitulos": len(capitulos(corpo)),
+                                    "modificado": arquivo.stat().st_mtime}
+    for arquivo in sorted(PASTA_METADOSSIES.glob("*.md")) if PASTA_METADOSSIES.exists() else []:
+        try:
+            dados, _ = cabecalho.ler(arquivo.read_text(encoding="utf-8"))
+        except (OSError, ValueError) as erro:
+            problemas.append(f"{arquivo.name}: arquivo inválido ({erro})")
+            continue
+        if not dados.get("titulo") or not dados.get("data"):
+            problemas.append(f"{arquivo.name}: sem título ou sem data, ficou de fora")
+            continue
+        ids = lista_de_textos(dados.get("dossies"))
+        faltam = [i for i in ids if i not in dossies]
+        if faltam:
+            problemas.append(f"{arquivo.name}: dossiê(s) que não existem mais, ignorados: {', '.join(faltam)}")
+        partes = [{"id": i, "titulo": dossies[i]["titulo"], "capitulos": dossies[i]["capitulos"]} for i in ids if i in dossies]
+        if not partes:
+            problemas.append(f"{arquivo.name}: nenhum dossiê válido, ficou de fora")
+            continue
+        item = {"id": arquivo.stem}
+        for campo in CAMPOS_DOSSIES:
+            item[campo] = str(dados.get(campo) or "").strip()
+        item["capa"] = caminho_relativo(item["capa"])
+        item["tags"] = [limpar_tag(t) for t in lista_de_textos(dados.get("tags"))]
+        item["destaque"] = dados.get("destaque") is True
+        item["dossies"] = partes
+        item["capitulos"] = sum(p["capitulos"] for p in partes)
+        # PDF em dia: gerado depois da última mudança do meta-dossiê e de cada dossiê que ele junta
+        pdf = PASTA_PDF_METADOSSIES / f"{arquivo.stem}.pdf"
+        ultima = max([arquivo.stat().st_mtime] + [dossies[p["id"]]["modificado"] for p in partes])
+        item["pdf"] = f"arquivos/metadossies/{pdf.name}" if pdf.exists() and pdf.stat().st_mtime >= ultima else ""
+        metas.append(item)
+
+    metas.sort(key=lambda d: d["data"], reverse=True)
+    SAIDA_METADOSSIES.write_text(json.dumps(metas, ensure_ascii=False, indent=1) + "\n", encoding="utf-8", newline="\n")
+    print(f"{len(metas)} meta-dossiês em {SAIDA_METADOSSIES.relative_to(RAIZ)}")
+    return problemas
+
+
+def gerar_casos():
+    """Grava dados/casos.json e devolve a lista de avisos."""
+    casos, problemas = [], []
+    for arquivo in sorted(PASTA_CASOS.glob("*.md")) if PASTA_CASOS.exists() else []:
+        try:
+            dados, corpo = cabecalho.ler(arquivo.read_text(encoding="utf-8"))
+        except (OSError, ValueError) as erro:
+            problemas.append(f"{arquivo.name}: arquivo inválido ({erro})")
+            continue
+        if not dados.get("titulo") or dados.get("status") not in STATUS_CASO:
+            problemas.append(f"{arquivo.name}: sem título ou sem situação válida, ficou de fora")
+            continue
+        item = {"id": arquivo.stem}
+        for campo in ("titulo", "status", "aberto", "atualizado", "etapa"):
+            item[campo] = str(dados.get(campo) or "").strip()
+        item["atualizado"] = item["atualizado"] or item["aberto"]
+        item["envolvidos"] = lista_de_textos(dados.get("envolvidos"))
+        item["tags"] = [limpar_tag(t) for t in lista_de_textos(dados.get("tags"))]
+        documentos = dados.get("documentos") if isinstance(dados.get("documentos"), list) else []
+        item["documentos"] = [{"titulo": str(d.get("titulo") or d.get("link") or "").strip(), "link": caminho_relativo(str(d.get("link") or ""))}
+                              for d in documentos if isinstance(d, dict) and (d.get("titulo") or d.get("link"))]
+        item["resumo"] = texto_simples(corpo)
+        casos.append(item)
+
+    casos.sort(key=lambda k: (k["atualizado"], k["titulo"]), reverse=True)
+    SAIDA_CASOS.write_text(json.dumps(casos, ensure_ascii=False, indent=1) + "\n", encoding="utf-8", newline="\n")
+    print(f"{len(casos)} casos em {SAIDA_CASOS.relative_to(RAIZ)}")
     return problemas
 
 

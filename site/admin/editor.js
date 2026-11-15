@@ -16,6 +16,8 @@
     videos: { novo: '+ Novo vídeo', vazio: 'Escolha um vídeo na lista ou adicione um novo do YouTube.', pasta: 'videos', pagina: 'streaming.html' },
     publicacoes: { novo: '+ Nova publicação', vazio: 'Escolha um livro ou uma revista na lista, ou crie uma publicação nova.', pasta: 'publicacoes', pagina: 'publicacoes.html' },
     dossies: { novo: '+ Novo dossiê', vazio: 'Escolha um dossiê na lista ou crie um novo.', pasta: 'dossies', pagina: 'dossie.html' },
+    metadossies: { novo: '+ Novo meta-dossiê', vazio: 'Escolha um meta-dossiê na lista ou crie um novo, juntando dossiês que já existem.', pasta: 'dossies', pagina: 'dossie.html' },
+    casos: { novo: '+ Novo caso', vazio: 'Escolha um caso na lista ou crie um novo.', pasta: 'casos', pagina: 'dossies.html' },
     curtos: { novo: '+ Novo vídeo curto', vazio: 'Escolha um vídeo curto na lista ou adicione um novo, de qualquer plataforma.', pasta: 'curtos', pagina: 'curtos.html' }
   };
   var PLATAFORMAS = ['YouTube', 'TikTok', 'Instagram', 'Kwai', 'X', 'Facebook', 'Threads', 'Bluesky', 'Outra'];
@@ -35,6 +37,8 @@
   function enderecoNoSite(tipo, id) {
     if (tipo === 'videos') return NOMES.videos.pagina + '#youtube';
     if (tipo === 'curtos') return NOMES.curtos.pagina + '#' + id;
+    if (tipo === 'metadossies') return NOMES.metadossies.pagina + '?meta=' + id;
+    if (tipo === 'casos') return NOMES.casos.pagina + '#caso-' + id;
     if (tipo === 'publicacoes') {
       var pub = estado.atual && estado.atual.tipo === 'publicacoes' ? estado.atual.m : null;
       return NOMES.publicacoes.pagina + (pub ? (pub.tipo === 'revista' ? '#revistas' : '#livros') : '');
@@ -147,11 +151,12 @@
     }).catch(function (e) { aviso(e.message, true); });
   }
 
-  // Tags sugeridas no campo de tags: as das matérias ou, na aba Curtos, as dos vídeos curtos
+  // Tags sugeridas no campo de tags: as das matérias ou, nas abas Curtos e Casos, as dos vídeos curtos e dos casos
+  function fonteTags() { return estado.tipo === 'curtos' || estado.tipo === 'casos' ? estado.tipo : 'noticias'; }
   function carregarTags() {
-    var tipo = estado.tipo === 'curtos' ? 'curtos' : 'noticias';
+    var tipo = fonteTags();
     return fetch('../dados/' + tipo + '.json', { cache: 'no-store' }).then(function (r) { return r.json(); }).then(function (lista) {
-      if ((estado.tipo === 'curtos' ? 'curtos' : 'noticias') !== tipo) return;
+      if (fonteTags() !== tipo) return;
       estado.tags = TCTags.contar(lista.map(function (n) { return n.tags || []; }));
     }).catch(function () { estado.tags = []; });
   }
@@ -169,8 +174,10 @@
       var atual = estado.atual && estado.atual.tipo === estado.tipo && estado.atual.id === i.id;
       var meta = estado.tipo === 'noticias'
         ? [dataCurta(i.data), i.editoria, i.destaque ? 'Manchete' : ''].filter(Boolean).join(' · ')
-        : estado.tipo === 'dossies'
+        : estado.tipo === 'dossies' || estado.tipo === 'metadossies'
           ? [dataCurta(i.data), i.editoria].filter(Boolean).join(' · ')
+        : estado.tipo === 'casos'
+          ? [i.editoria, i.data ? 'atualizado em ' + dataCurta(i.data) : ''].filter(Boolean).join(' · ')
         : estado.tipo === 'votacoes' || estado.tipo === 'videos' || estado.tipo === 'publicacoes' || estado.tipo === 'curtos'
           ? [i.editoria, dataCurta(i.data)].filter(Boolean).join(' · ')
           : [i.editoria, i.data ? 'revisada em ' + dataCurta(i.data) : ''].filter(Boolean).join(' · ');
@@ -211,6 +218,8 @@
     if (tipo === 'votacoes') return TCMarkdown.lerVotacao(r.texto);
     if (tipo === 'videos') return TCMarkdown.lerVideo(r.texto);
     if (tipo === 'curtos') return TCMarkdown.lerCurto(r.texto);
+    if (tipo === 'metadossies') return TCMarkdown.lerMetaDossie(r.texto);
+    if (tipo === 'casos') return TCMarkdown.lerCaso(r.texto);
     if (tipo === 'publicacoes') return TCMarkdown.lerPublicacao(r.texto);
     if (tipo === 'dossies') return TCMarkdown.lerDossie(r.texto);
     if (r.formato === 'md') {
@@ -247,6 +256,10 @@
       ? { titulo: '', criador: '', foto_criador: '', link: '', capa: '', data: hoje() }
       : tipo === 'curtos'
       ? { titulo: '', link: '', plataforma: '', criador: '', data: hoje(), capa: '', tags: [], corpo: '' }
+      : tipo === 'metadossies'
+      ? { titulo: '', linha: '', data: hoje(), autor: 'Redação', capa: '', legenda: '', credito: '', tags: [], destaque: false, dossies: [], corpo: '' }
+      : tipo === 'casos'
+      ? { titulo: '', status: TCMarkdown.STATUS_CASO[0], aberto: hoje(), atualizado: hoje(), etapa: '', envolvidos: [], tags: [], documentos: [], corpo: '' }
       : tipo === 'votacoes'
       ? { titulo: '', sigla: '', identificacao: '', autoria: '', ementa: '', ecidadania_id: '', recomendacao: '',
           votos_sim: '', votos_nao: '', apurado_em: '', data: hoje(), corpo: '' }
@@ -282,6 +295,8 @@
     if (a.tipo === 'votacoes') return TCMarkdown.escreverVotacao(a.m);
     if (a.tipo === 'videos') return TCMarkdown.escreverVideo(a.m);
     if (a.tipo === 'curtos') return TCMarkdown.escreverCurto(a.m);
+    if (a.tipo === 'metadossies') return TCMarkdown.escreverMetaDossie(a.m);
+    if (a.tipo === 'casos') return TCMarkdown.escreverCaso(a.m);
     if (a.tipo === 'publicacoes') return TCMarkdown.escreverPublicacao(a.m);
     if (a.tipo === 'dossies') return TCMarkdown.escreverDossie(a.m);
     return a.tipo === 'noticias' ? TCMarkdown.escreverMateria(a.m) : TCMarkdown.escreverFicha(a.m, a.m.corpo);
@@ -303,6 +318,15 @@
       if (!/^https?:\/\//i.test(String(m.link || '').trim())) erros.push('o link do vídeo (começando com https://)');
       if (!String(m.titulo || '').trim()) erros.push('o nome do vídeo');
       if (!String(m.criador || '').trim()) erros.push('o nome do criador');
+    } else if (a.tipo === 'metadossies') {
+      if (!String(m.titulo || '').trim()) erros.push('o título');
+      if (!String(m.data || '').trim()) erros.push('a data');
+      if (!(m.dossies || []).length) erros.push('pelo menos um dossiê na lista "Dossiês reunidos"');
+    } else if (a.tipo === 'casos') {
+      if (!String(m.titulo || '').trim()) erros.push('o título');
+      if (TCMarkdown.STATUS_CASO.indexOf(m.status) < 0) erros.push('a situação');
+      if (!String(m.aberto || '').trim()) erros.push('a data de abertura');
+      if (!String(m.corpo || '').trim()) erros.push('o resumo');
     } else if (a.tipo === 'curtos') {
       if (!/^https?:\/\//i.test(String(m.link || '').trim())) erros.push('o link do vídeo (começando com https://)');
       if (!String(m.titulo || '').trim()) erros.push('o título');
@@ -352,8 +376,8 @@
       if (novoItem) desenharEditor();
       history.replaceState(null, '', '#' + a.tipo + '/' + a.id);
       carregarLista();
-      if (a.tipo === 'noticias' || a.tipo === 'curtos') carregarTags();
-      if (a.tipo === 'dossies') a.pdf = a.pdf ? 'PDF desatualizado' : '';
+      if (a.tipo === 'noticias' || a.tipo === 'curtos' || a.tipo === 'casos') carregarTags();
+      if (a.tipo === 'dossies' || a.tipo === 'metadossies') a.pdf = a.pdf ? 'PDF desatualizado' : '';
       return true;
     }).catch(function (e) { aviso('Não salvou: ' + e.message, true); return false; })
       .then(function (ok) { if (botao) botao.disabled = false; return ok; });
@@ -366,6 +390,8 @@
       : a.tipo === 'votacoes' ? 'a votação "' + (a.m.titulo || a.id) + '"'
       : a.tipo === 'videos' ? 'o vídeo "' + (a.m.titulo || a.id) + '"'
       : a.tipo === 'curtos' ? 'o vídeo curto "' + (a.m.titulo || a.id) + '"'
+      : a.tipo === 'metadossies' ? 'o meta-dossiê "' + (a.m.titulo || a.id) + '" (e o PDF dele, se houver; os dossiês que ele junta continuam)'
+      : a.tipo === 'casos' ? 'o caso "' + (a.m.titulo || a.id) + '"'
       : a.tipo === 'dossies' ? 'o dossiê "' + (a.m.titulo || a.id) + '" (e o PDF dele, se houver)'
       : a.tipo === 'publicacoes' ? (a.m.tipo === 'revista' ? 'a revista "' : 'o livro "') + (a.m.titulo || a.id) + '"' : 'a ficha de ' + (a.m.nome || a.id);
     if (!confirm('Apagar ' + nome + '? O arquivo será removido da pasta conteudo e sai do site. Links já compartilhados param de funcionar.')) return;
@@ -465,7 +491,7 @@
       if (!opcoes.length) return;
       listaSug.appendChild(h('ul', { role: 'listbox' }, opcoes.map(function (x, i) {
         return h('li', { role: 'option', class: x.sub ? 'sub' : '', 'aria-selected': 'false',
-          onmousedown: function (e) { e.preventDefault(); adicionar(x.tag); } }, x.rotulo, h('small', null, x.n + (estado.tipo === 'curtos' ? (x.n === 1 ? ' vídeo' : ' vídeos') : (x.n === 1 ? ' matéria' : ' matérias'))));
+          onmousedown: function (e) { e.preventDefault(); adicionar(x.tag); } }, x.rotulo, h('small', null, x.n + (estado.tipo === 'curtos' ? (x.n === 1 ? ' vídeo' : ' vídeos') : estado.tipo === 'casos' ? (x.n === 1 ? ' caso' : ' casos') : (x.n === 1 ? ' matéria' : ' matérias'))));
       })));
     }
     function destacar(i) {
@@ -767,7 +793,7 @@
     area.appendChild(h('div', { class: 'barra' },
       h('span', { class: 'estado' }),
       modos, verSite,
-      a.tipo === 'dossies' ? h('button', { type: 'button', class: 'botao', 'data-acao': 'pdf', title: 'Salva e gera o PDF do dossiê', onclick: gerarPdf }, 'Gerar PDF') : null,
+      a.tipo === 'dossies' || a.tipo === 'metadossies' ? h('button', { type: 'button', class: 'botao', 'data-acao': 'pdf', title: 'Salva e gera o PDF', onclick: gerarPdf }, 'Gerar PDF') : null,
       a.id ? h('button', { type: 'button', class: 'botao perigo', onclick: apagar }, 'Apagar') : null,
       h('button', { type: 'button', class: 'botao principal', 'data-acao': 'salvar', title: 'Ctrl+S', onclick: salvar }, a.id ? 'Salvar' : 'Criar')));
     marcarSujo(estado.sujo);
@@ -781,7 +807,8 @@
     }
     area.appendChild(a.tipo === 'noticias' ? formMateria(a) : a.tipo === 'votacoes' ? formVotacao(a)
       : a.tipo === 'videos' ? formVideo(a) : a.tipo === 'publicacoes' ? formPublicacao(a)
-      : a.tipo === 'dossies' ? formDossie(a) : a.tipo === 'curtos' ? formCurto(a) : formFicha(a));
+      : a.tipo === 'dossies' ? formDossie(a) : a.tipo === 'curtos' ? formCurto(a)
+      : a.tipo === 'metadossies' ? formMetaDossie(a) : a.tipo === 'casos' ? formCaso(a) : formFicha(a));
   }
 
   function trocarModo(modo) {
@@ -1195,16 +1222,16 @@
   // Salva (se preciso) e pede ao servidor o PDF; abre o PDF numa aba nova
   function gerarPdf() {
     var a = estado.atual;
-    if (!a || a.tipo !== 'dossies') return;
+    if (!a || (a.tipo !== 'dossies' && a.tipo !== 'metadossies')) return;
     var botao = document.querySelector('[data-acao="pdf"]');
     var janela = window.open('', '_blank');   // aberta já, para o navegador não bloquear
-    if (janela) janela.document.write('<p style="font:16px sans-serif;padding:24px">Gerando o PDF do dossiê…</p>');
+    if (janela) janela.document.write('<p style="font:16px sans-serif;padding:24px">Gerando o PDF…</p>');
     var antes = estado.sujo || !a.id ? salvar() : Promise.resolve(true);
     antes.then(function (ok) {
       if (!ok) { if (janela) janela.close(); return; }
       if (botao) { botao.disabled = true; botao.textContent = 'Gerando PDF…'; }
       aviso('Gerando o PDF… pode levar alguns segundos.');
-      return api('pdf', { corpo: { tipo: 'dossies', id: a.id } }).then(function (r) {
+      return api('pdf', { corpo: { tipo: a.tipo, id: a.id } }).then(function (r) {
         a.pdf = 'PDF em dia';
         var url = '../' + r.caminho + '?v=' + Date.now();
         if (janela) janela.location.href = url; else window.open(url, '_blank');
@@ -1256,6 +1283,115 @@
           a.pdf ? h('a', { class: 'botao', href: pdfUrl, target: '_blank', rel: 'noopener' }, 'Abrir o PDF') : null,
           a.id ? h('a', { class: 'botao', href: '../dossie.html?id=' + a.id + '&pdf=previa', target: '_blank', rel: 'noopener' }, 'Ver como fica impresso') : null),
         h('p', { class: 'dica' }, 'O PDF é feito com o Edge (ou o Chrome) deste computador, sem abrir janela, e fica em arquivos/dossies/. Ele tem capa, sumário e cada capítulo começando numa página nova.')));
+  }
+
+  // ---- Meta-dossiê: junta dossiês que já existem, na ordem escolhida (dossie.html?meta=<id>)
+  function formMetaDossie(a) {
+    var m = a.m;
+    var titulo = texto(m, 'titulo', { maxlength: 200, placeholder: 'O tema que reúne os dossiês' });
+    var pdfUrl = a.id ? '../arquivos/metadossies/' + a.id + '.pdf' : '';
+    var situacaoPdf = !a.id ? 'O PDF pode ser gerado depois de criar o meta-dossiê.'
+      : a.pdf === 'PDF em dia' ? 'O PDF está em dia com o que foi salvo. Se você mudar um dos dossiês reunidos, gere de novo.'
+      : a.pdf ? 'O meta-dossiê mudou depois do último PDF. Gere de novo para o arquivo acompanhar o texto.'
+      : 'Ainda não há PDF. Sem ele, a página oferece imprimir em PDF pelo navegador.';
+    // Dossiês reunidos: lista ordenada, com os dossiês que existem para escolher
+    var caixa = h('div', { class: 'linhas' });
+    var disponiveis = [];
+    var tituloDe = function (id) { var d = disponiveis.filter(function (x) { return x.id === id; })[0]; return d ? d.titulo : id + ' (não encontrado)'; };
+    var escolha = h('select', { 'aria-label': 'Dossiê para acrescentar' });
+    function desenharLista() {
+      caixa.innerHTML = '';
+      if (!m.dossies.length) caixa.appendChild(h('p', { class: 'dica' }, 'Nenhum dossiê ainda. Escolha abaixo e clique em "Acrescentar". A ordem da lista é a ordem das partes.'));
+      m.dossies.forEach(function (id, i) {
+        var mover = function (d) { return function () { var j = i + d; if (j < 0 || j >= m.dossies.length) return; m.dossies.splice(j, 0, m.dossies.splice(i, 1)[0]); marcarSujo(); desenharLista(); }; };
+        caixa.appendChild(h('div', { class: 'linha', style: 'grid-template-columns: 2.4em 1fr 34px 34px 34px' },
+          h('span', null, 'Parte ' + (i + 1)), h('span', null, tituloDe(id)),
+          h('button', { type: 'button', class: 'botao-mini', title: 'Subir', 'aria-label': 'Subir', disabled: i === 0 ? true : null, onclick: mover(-1) }, '↑'),
+          h('button', { type: 'button', class: 'botao-mini', title: 'Descer', 'aria-label': 'Descer', disabled: i === m.dossies.length - 1 ? true : null, onclick: mover(1) }, '↓'),
+          h('button', { type: 'button', class: 'botao-mini', title: 'Tirar da lista', 'aria-label': 'Tirar da lista', onclick: function () { m.dossies.splice(i, 1); marcarSujo(); desenharLista(); } }, '×')));
+      });
+      escolha.innerHTML = '';
+      var livres = disponiveis.filter(function (d) { return m.dossies.indexOf(d.id) < 0; });
+      escolha.appendChild(h('option', { value: '' }, livres.length ? 'Escolha um dossiê…' : (disponiveis.length ? 'Todos os dossiês já estão na lista' : 'Carregando os dossiês…')));
+      livres.forEach(function (d) { escolha.appendChild(h('option', { value: d.id }, d.titulo + ' · ' + d.editoria)); });
+    }
+    api('itens?tipo=dossies').then(function (r) { disponiveis = r.itens || []; desenharLista(); }).catch(function (e) { aviso(e.message, true); });
+    desenharLista();
+    var acrescentar = h('button', { type: 'button', class: 'botao-mini', onclick: function () {
+      if (!escolha.value) { aviso('Escolha um dossiê na lista.', true); return; }
+      m.dossies.push(escolha.value); marcarSujo(); desenharLista();
+    } }, '+ Acrescentar');
+    return h('div', { class: 'form' },
+      h('section', { class: 'secao' },
+        h('h2', null, a.id ? 'Meta-dossiê' : 'Novo meta-dossiê'),
+        h('div', { class: 'grade' },
+          campo('Título', titulo, { largo: true, extra: contador(titulo, 120) }),
+          campo('Subtítulo', areaTexto(m, 'linha', 2), { largo: true, dica: 'Uma ou duas frases sobre o que os dossiês reunidos mostram juntos. Aparece na página, na lista e na capa do PDF.' }),
+          campo('Data de publicação', h('input', { type: 'date', value: String(m.data || '').slice(0, 10), oninput: function (e) { m.data = e.target.value; marcarSujo(); } })),
+          campo('Autoria', texto(m, 'autor')),
+          h('div', { class: 'campo' }, h('span', null, 'Página Dossiês'), marcar(m, 'destaque', 'Meta-dossiê em destaque'))),
+        h('p', { class: 'dica' }, a.id ? 'Endereço: ' + enderecoNoSite('metadossies', a.id) : 'O endereço é criado ao clicar em "Criar", a partir do título.')),
+      h('section', { class: 'secao' },
+        h('h2', null, 'Dossiês reunidos'),
+        caixa,
+        h('div', { class: 'linhas-acoes' }, escolha, acrescentar),
+        h('p', { class: 'dica' }, 'Cada dossiê vira uma parte, com o título, o subtítulo, a apresentação e os capítulos dele. Os capítulos seguem numerados do primeiro ao último. O texto continua sendo editado em cada dossiê: o meta-dossiê sempre mostra a versão salva de cada um.')),
+      h('section', { class: 'secao' },
+        h('h2', null, 'Tags'),
+        campoTags(m)),
+      h('section', { class: 'secao' },
+        h('h2', null, 'Capa'),
+        campoFoto(m, 'capa', 'dossies', { maxL: 1800, maxA: 1800, dica: 'Horizontal. Aparece na página, na lista e na capa do PDF.' }),
+        h('div', { class: 'grade' },
+          campo('Legenda', texto(m, 'legenda', { placeholder: 'O que aparece na foto' })),
+          campo('Crédito', texto(m, 'credito', { placeholder: 'Nome / Tempo Continuum' })))),
+      h('section', { class: 'secao' },
+        h('h2', null, 'Apresentação'),
+        h('p', { class: 'dica' }, 'Opcional. Texto em Markdown que abre o meta-dossiê, antes da primeira parte: por que estes dossiês foram reunidos e em que ordem ler.'),
+        campoMarkdown(m, 'corpo', { rotulo: 'Apresentação do meta-dossiê' })),
+      h('section', { class: 'secao' },
+        h('h2', null, 'PDF'),
+        h('p', { class: 'dica' }, situacaoPdf),
+        h('div', { class: 'linhas-acoes' },
+          h('button', { type: 'button', class: 'botao', onclick: gerarPdf }, a.pdf ? 'Gerar o PDF de novo' : 'Gerar PDF'),
+          a.pdf ? h('a', { class: 'botao', href: pdfUrl, target: '_blank', rel: 'noopener' }, 'Abrir o PDF') : null,
+          a.id ? h('a', { class: 'botao', href: '../dossie.html?meta=' + a.id + '&pdf=previa', target: '_blank', rel: 'noopener' }, 'Ver como fica impresso') : null),
+        h('p', { class: 'dica' }, 'O PDF fica em arquivos/metadossies/ e aparece em Publicações › Dossiês impressos. Ele tem capa, sumário com as partes, uma página de abertura para cada dossiê e cada capítulo numa página nova.')));
+  }
+
+  // ---- Caso acompanhado (Dossiês › Casos acompanhados)
+  function formCaso(a) {
+    var m = a.m;
+    var titulo = texto(m, 'titulo', { maxlength: 200, placeholder: 'O caso, em uma linha' });
+    var atualizado = h('input', { type: 'date', value: String(m.atualizado || '').slice(0, 10), oninput: function (e) { m.atualizado = e.target.value; marcarSujo(); } });
+    var envolvidos = h('textarea', { rows: 4, value: (m.envolvidos || []).join('\n'), placeholder: 'Um por linha: pessoas, empresas, órgãos',
+      oninput: function (e) { m.envolvidos = e.target.value.split('\n').map(function (x) { return x.trim(); }).filter(Boolean); marcarSujo(); } });
+    return h('div', { class: 'form' },
+      h('section', { class: 'secao' },
+        h('h2', null, a.id ? 'Caso' : 'Novo caso'),
+        h('div', { class: 'grade' },
+          campo('Título', titulo, { largo: true, extra: contador(titulo, 120) }),
+          campo('Situação', selecao(m, 'status', TCMarkdown.STATUS_CASO)),
+          campo('Aberto em', h('input', { type: 'date', value: String(m.aberto || '').slice(0, 10), oninput: function (e) { m.aberto = e.target.value; marcarSujo(); } }),
+            { dica: 'Quando o caso começou (a denúncia, a investigação, o processo).' }),
+          h('div', { class: 'campo' }, h('span', null, 'Última atualização'), atualizado,
+            h('div', { class: 'linhas-acoes' }, h('button', { type: 'button', class: 'botao-mini', onclick: function () { m.atualizado = hoje(); atualizado.value = m.atualizado; marcarSujo(); } }, 'Hoje')),
+            h('small', null, 'Os casos atualizados mais recentemente aparecem primeiro.')),
+          campo('Última etapa', texto(m, 'etapa', { placeholder: 'Ex.: Denúncia aceita pela Justiça Federal' }), { largo: true }),
+          campo('Resumo', areaTexto(m, 'corpo', 5), { largo: true, dica: 'O que aconteceu e o que está em jogo, em poucas frases. Só fatos verificáveis, com os documentos abaixo.' }),
+          campo('Envolvidos', envolvidos, { largo: true })),
+        h('p', { class: 'dica' }, a.id ? 'Endereço: ' + enderecoNoSite('casos', a.id) : 'O caso aparece em Dossiês › Casos acompanhados.')),
+      h('section', { class: 'secao' },
+        h('h2', null, 'Documentos'),
+        campoLinhas(m.documentos, [
+          { rotulo: 'Documento', chave: 'titulo', largura: '1fr', exemplo: 'Denúncia do MPF, 10/01/2026' },
+          { rotulo: 'Link', chave: 'link', largura: '1.3fr', exemplo: 'https://…' }
+        ], function () { return { titulo: '', link: '' }; }),
+        h('p', { class: 'dica' }, 'Processos, decisões, denúncias, reportagens. Cada documento vira um link no caso; a contagem de documentos é feita sozinha.')),
+      h('section', { class: 'secao' },
+        h('h2', null, 'Tags'),
+        campoTags(m),
+        h('p', { class: 'dica' }, 'Usadas no filtro de casos da página Dossiês. Para uma subtag, use a barra: violência/contra indígenas.')));
   }
 
   // =========================================================================

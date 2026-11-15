@@ -66,6 +66,22 @@ O script só guarda dados de contato do mandato, nada de CPF ou outros dados pes
 
 No editor, abra **Vídeos** e clique em **+ Novo vídeo**. Cole o link do vídeo, escreva o nome do vídeo e o nome do criador, e escolha a capa: **Enviar imagem** (ou arraste uma) ou **Usar a miniatura do YouTube**. Ao salvar, o vídeo aparece em Streaming › Vídeos do YouTube (`streaming.html#youtube`); clicar no cartão abre o vídeo no YouTube, numa aba nova. A antiga página `documentarios.html` agora só redireciona para `streaming.html`.
 
+## Meta-dossiês
+
+Um meta-dossiê junta vários dossiês que já existem num documento só, para ler um tema de ponta a ponta. No editor, abra **Meta-dossiês**, clique em **+ Novo meta-dossiê**, escreva o título e escolha os dossiês em **Dossiês reunidos** (as setas mudam a ordem). Cada dossiê vira uma parte, com página de abertura (título, subtítulo e apresentação dele) e os seus capítulos, numerados do primeiro ao último. O texto continua sendo editado em cada dossiê: o meta-dossiê sempre mostra a versão salva de cada um.
+
+O arquivo fica em `conteudo/metadossies/<id>.md` (o cabeçalho é o do dossiê, mais a lista `dossies`; o texto é a apresentação) e aparece em `dossie.html?meta=<id>` e na parte "Meta-dossiês" da página Dossiês. O botão **Gerar PDF** grava `arquivos/metadossies/<id>.pdf`. O PDF fica desatualizado quando o meta-dossiê ou qualquer dossiê reunido muda; aí é só gerar de novo.
+
+## Casos acompanhados
+
+No editor, abra **Casos** e clique em **+ Novo caso**. Preencha o título, a situação (Em andamento, Em julgamento ou Encerrado), a data de abertura, a última atualização e a última etapa, o resumo, os envolvidos (um por linha), os documentos (título e link de cada um) e as tags. Cada caso é gravado em `conteudo/casos/<id>.md`, indexado em `dados/casos.json` e aparece em Dossiês › Casos acompanhados (`dossies.html#caso-<id>`), com filtro por situação, tags e busca.
+
+## Dossiês impressos
+
+A página Publicações tem a parte **Dossiês impressos** (`publicacoes.html#dossies-impressos`), com todos os dossiês e meta-dossiês na versão para imprimir. Quando o PDF foi gerado pelo editor e está em dia, o botão é **Baixar PDF**; senão, **Imprimir / salvar PDF** abre a versão impressa com a janela de impressão do navegador ("Salvar como PDF").
+
+O PDF é gerado com o Edge, o Chrome, o Chromium ou o Brave do computador. Se o navegador estiver em outro lugar, informe o caminho na variável `TC_NAVEGADOR` antes de iniciar o servidor.
+
 ## Repositório de Vídeos Curtos
 
 A página `curtos.html` (cartão em Recursos) reúne vídeos curtos de qualquer plataforma: YouTube (Shorts), TikTok, Instagram (Reels), Kwai, X, Facebook, Threads, Bluesky ou outra. Quem visita filtra por plataforma, por uma ou mais tags (com subtags, como nas notícias) e por palavra; o botão "Assistir" abre o vídeo na plataforma de origem, numa aba nova.
