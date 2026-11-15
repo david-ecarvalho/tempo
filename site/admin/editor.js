@@ -226,7 +226,7 @@
     var area = $('area'), c = COLECAO[estado.tipo];
     var busca = h('input', { type: 'search', id: 'busca', placeholder: 'Buscar em ' + c.nome.toLowerCase(), 'aria-label': 'Buscar em ' + c.nome, autocomplete: 'off' });
     var grade = h('div', { class: 'cartoes', id: 'cartoes' });
-    var contagem = h('span', { class: 'grade-contagem', role: 'status' });
+    var contagem = h('span', { class: 'colecao-contagem', role: 'status' });
     function desenharCartoes() {
       var q = TCTags.norm(busca.value);
       var itens = estado.itens.filter(function (i) { return !q || TCTags.norm(i.titulo + ' ' + i.editoria + ' ' + metaDe(i)).indexOf(q) >= 0; });
@@ -250,9 +250,9 @@
     }
     busca.addEventListener('input', desenharCartoes);
     area.innerHTML = '';
-    area.appendChild(h('div', { class: 'grade' },
-      h('div', { class: 'grade-topo' },
-        h('div', { class: 'grade-titulo' }, h('h1', null, c.nome), contagem),
+    area.appendChild(h('div', { class: 'colecao' },
+      h('div', { class: 'colecao-topo' },
+        h('div', { class: 'colecao-titulo' }, h('h1', null, c.nome), contagem),
         busca,
         h('button', { type: 'button', id: 'novo', class: 'botao principal', onclick: function () { if (podeSair()) novo(estado.tipo); } }, NOMES[estado.tipo].novo)),
       grade));
