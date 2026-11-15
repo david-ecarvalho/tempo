@@ -105,30 +105,34 @@ footer>div{padding-left:16px !important;padding-right:16px !important}
       </article>
 
       <aside style="flex: 1 1 320px; min-width: 0; display: flex; flex-direction: column; gap: 0;">
-        <p style="margin: 0 0 4px; font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: {{c.muted}};">Também em destaque</p>
-        <sc-for list="{{destaques}}" as="d" hint-placeholder-count="3">
-          <article style="border-top: 1px solid {{c.line}}; padding: 16px 0; display: flex; flex-direction: column; gap: 8px;">
-            <span style="font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: {{c.muted}};">{{d.editoria}} · {{d.dataTexto}}</span>
-            <h3 style="margin: 0; font-size: 1.2rem; line-height: 1.25;"><a href="{{d.link}}" style="text-decoration: none;">{{d.titulo}}</a></h3>
-          </article>
-        </sc-for>
+        <sc-if value="{{temDestaques}}" hint-placeholder-val="{{true}}">
+          <p style="margin: 0 0 4px; font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: {{c.muted}};">Também em destaque</p>
+          <sc-for list="{{destaques}}" as="d" hint-placeholder-count="3">
+            <article style="border-top: 1px solid {{c.line}}; padding: 16px 0; display: flex; flex-direction: column; gap: 8px;">
+              <span style="font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: {{c.muted}};">{{d.editoria}} · {{d.dataTexto}}</span>
+              <h3 style="margin: 0; font-size: 1.2rem; line-height: 1.25;"><a href="{{d.link}}" style="text-decoration: none;">{{d.titulo}}</a></h3>
+            </article>
+          </sc-for>
+        </sc-if>
 
-        <form id="busca" style="margin-top: 12px; background: {{c.surface}}; color: {{c.ink}}; border: 2px solid {{c.ink}}; padding: 20px; display: flex; flex-direction: column; gap: 12px;">
+        <form id="busca" onSubmit="{{enviarBusca}}" style="margin-top: 12px; background: {{c.surface}}; color: {{c.ink}}; border: 2px solid {{c.ink}}; padding: 20px; display: flex; flex-direction: column; gap: 12px;">
           <label for="q" style="font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase;">Pesquise o acervo</label>
           <div style="display: flex; gap: 8px;">
             <input id="q" type="search" value="{{busca}}" onChange="{{onBusca}}" placeholder="Palavra, nome ou tag" autocomplete="off" style="flex: 1; min-width: 0; font: inherit; font-size: 15px; padding: 10px 12px; border: 2px solid {{c.ink}}; background: {{c.bg}}; color: {{c.ink}}; border-radius: 0;">
             <a href="noticias.html" onClick="{{buscar}}" style="display: flex; align-items: center; text-decoration: none; font-size: 14px; padding: 10px 16px; background: #556A2F; color: #FFFAF0; min-height: 44px; box-sizing: border-box;">Buscar</a>
           </div>
-          <div style="display: flex; flex-wrap: wrap; gap: 6px; font-size: 12px;">
-            <a href="noticias.html" onClick="{{tagMarxismo}}" style="text-decoration: none; border: 1.5px solid {{c.ink}}; padding: 4px 10px; border-radius: 999px;">marxismo</a>
-            <a href="noticias.html" onClick="{{tagTrabalho}}" style="text-decoration: none; border: 1.5px solid {{c.ink}}; padding: 4px 10px; border-radius: 999px;">trabalho</a>
-            <a href="noticias.html" onClick="{{tagHistoria}}" style="text-decoration: none; border: 1.5px solid {{c.ink}}; padding: 4px 10px; border-radius: 999px;">história do Brasil</a>
-            <a href="noticias.html" onClick="{{tagReforma}}" style="text-decoration: none; border: 1.5px solid {{c.ink}}; padding: 4px 10px; border-radius: 999px;">reforma agrária</a>
-          </div>
+          <sc-if value="{{temTags}}" hint-placeholder-val="{{true}}">
+            <div style="display: flex; flex-wrap: wrap; gap: 6px; font-size: 12px;">
+              <sc-for list="{{tags}}" as="t" hint-placeholder-count="4">
+                <a href="noticias.html" onClick="{{t.ir}}" style="text-decoration: none; border: 1.5px solid {{c.ink}}; padding: 4px 10px; border-radius: 999px;">{{t.nome}}</a>
+              </sc-for>
+            </div>
+          </sc-if>
         </form>
       </aside>
     </section>
 
+    <sc-if value="{{temUltimas}}" hint-placeholder-val="{{true}}">
     <section id="noticias" aria-labelledby="h-noticias" style="display: flex; flex-direction: column; gap: 24px;">
       <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 12px; border-top: 2px solid {{c.ink}}; padding-top: 16px;">
         <h2 id="h-noticias" style="margin: 0; font-size: 2rem; letter-spacing: -0.01em;"><span style="background: #556A2F; color: #FFFAF0; padding: 0 8px;">Notícias</span></h2>
@@ -146,160 +150,167 @@ footer>div{padding-left:16px !important;padding-right:16px !important}
         </sc-for>
       </div>
     </section>
+    </sc-if>
 
-    <section id="politicos" aria-labelledby="h-politicos" style="display: flex; flex-direction: column; gap: 24px;">
+    <sc-if value="{{temVideos}}" hint-placeholder-val="{{true}}">
+    <section id="streaming" aria-labelledby="h-streaming" style="display: flex; flex-direction: column; gap: 24px;">
       <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 12px; border-top: 2px solid {{c.ink}}; padding-top: 16px;">
         <div style="display: flex; flex-direction: column; gap: 6px;">
-          <h2 id="h-politicos" style="margin: 0; font-size: 2rem; letter-spacing: -0.01em;"><span style="background: #556A2F; color: #FFFAF0; padding: 0 8px;">Wiki</span></h2>
-          <p style="margin: 0; font-size: 0.95rem; color: {{c.muted}};">Perfis com votações, declarações e os casos em que cada um aparece.</p>
+          <h2 id="h-streaming" style="margin: 0; font-size: 2rem; letter-spacing: -0.01em;"><span style="background: #556A2F; color: #FFFAF0; padding: 0 8px;">Streaming</span></h2>
+          <p style="margin: 0; font-size: 0.95rem; color: {{c.muted}};">Documentários e vídeos do YouTube sobre história, trabalho e luta política.</p>
         </div>
-        <a href="politicos.html" style="font-size: 14px; text-underline-offset: 4px;">Todos os perfis</a>
-      </div>
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 20px;">
-        <article style="background: {{c.surface}}; border: 1px solid {{c.line}}; padding: 20px; display: flex; flex-direction: column; gap: 12px;">
-          <div style="width: 64px; height: 64px; border-radius: 50%; background: {{c.line}};"></div>
-          <h3 style="margin: 0; font-size: 1.1rem;">[Nome do político]</h3>
-          <p style="margin: 0; font-size: 0.85rem; color: {{c.muted}};">[Cargo] · [Partido] · [UF]</p>
-          <p style="margin: 0; font-size: 0.85rem;">[N] casos acompanhados</p>
-          <a href="#" style="font-size: 14px; text-underline-offset: 4px; margin-top: auto;">Ver perfil</a>
-        </article>
-        <article style="background: {{c.surface}}; border: 1px solid {{c.line}}; padding: 20px; display: flex; flex-direction: column; gap: 12px;">
-          <div style="width: 64px; height: 64px; border-radius: 50%; background: {{c.line}};"></div>
-          <h3 style="margin: 0; font-size: 1.1rem;">[Nome do político]</h3>
-          <p style="margin: 0; font-size: 0.85rem; color: {{c.muted}};">[Cargo] · [Partido] · [UF]</p>
-          <p style="margin: 0; font-size: 0.85rem;">[N] casos acompanhados</p>
-          <a href="#" style="font-size: 14px; text-underline-offset: 4px; margin-top: auto;">Ver perfil</a>
-        </article>
-        <article style="background: {{c.surface}}; border: 1px solid {{c.line}}; padding: 20px; display: flex; flex-direction: column; gap: 12px;">
-          <div style="width: 64px; height: 64px; border-radius: 50%; background: {{c.line}};"></div>
-          <h3 style="margin: 0; font-size: 1.1rem;">[Nome do político]</h3>
-          <p style="margin: 0; font-size: 0.85rem; color: {{c.muted}};">[Cargo] · [Partido] · [UF]</p>
-          <p style="margin: 0; font-size: 0.85rem;">[N] casos acompanhados</p>
-          <a href="#" style="font-size: 14px; text-underline-offset: 4px; margin-top: auto;">Ver perfil</a>
-        </article>
-        <article style="background: {{c.surface}}; border: 1px solid {{c.line}}; padding: 20px; display: flex; flex-direction: column; gap: 12px;">
-          <div style="width: 64px; height: 64px; border-radius: 50%; background: {{c.line}};"></div>
-          <h3 style="margin: 0; font-size: 1.1rem;">[Nome do político]</h3>
-          <p style="margin: 0; font-size: 0.85rem; color: {{c.muted}};">[Cargo] · [Partido] · [UF]</p>
-          <p style="margin: 0; font-size: 0.85rem;">[N] casos acompanhados</p>
-          <a href="#" style="font-size: 14px; text-underline-offset: 4px; margin-top: auto;">Ver perfil</a>
-        </article>
-      </div>
-    </section>
-
-    <section id="casos" aria-labelledby="h-casos" style="display: flex; flex-direction: column; gap: 24px;">
-      <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 12px; border-top: 2px solid {{c.ink}}; padding-top: 16px;">
-        <div style="display: flex; flex-direction: column; gap: 6px;">
-          <h2 id="h-casos" style="margin: 0; font-size: 2rem; letter-spacing: -0.01em;"><span style="background: #556A2F; color: #FFFAF0; padding: 0 8px;">Casos</span></h2>
-          <p style="margin: 0; font-size: 0.95rem; color: {{c.muted}};">Investigações acompanhadas do início ao fim, com linha do tempo e documentos.</p>
-        </div>
-        <a href="dossies.html#casos" style="font-size: 14px; text-underline-offset: 4px;">Todos os casos</a>
-      </div>
-      <div style="display: flex; flex-direction: column;">
-        <article style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px 24px; padding: 20px 0; border-bottom: 1px solid {{c.line}};">
-          <span style="flex: none; width: 132px; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; border: 1.5px solid {{c.ink}}; padding: 5px 10px; text-align: center; box-sizing: border-box;">Em andamento</span>
-          <h3 style="margin: 0; font-size: 1.25rem; flex: 1 1 380px; min-width: 0;">[Título do caso]</h3>
-          <span style="font-size: 13px; color: {{c.muted}};">Atualizado em [data]</span>
-        </article>
-        <article style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px 24px; padding: 20px 0; border-bottom: 1px solid {{c.line}};">
-          <span style="flex: none; width: 132px; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; background: #556A2F; color: #FFFAF0; border: 1.5px solid #556A2F; padding: 5px 10px; text-align: center; box-sizing: border-box;">Em julgamento</span>
-          <h3 style="margin: 0; font-size: 1.25rem; flex: 1 1 380px; min-width: 0;">[Título do caso]</h3>
-          <span style="font-size: 13px; color: {{c.muted}};">Atualizado em [data]</span>
-        </article>
-        <article style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px 24px; padding: 20px 0; border-bottom: 1px solid {{c.line}};">
-          <span style="flex: none; width: 132px; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; border: 1.5px dashed {{c.muted}}; color: {{c.muted}}; padding: 5px 10px; text-align: center; box-sizing: border-box;">Encerrado</span>
-          <h3 style="margin: 0; font-size: 1.25rem; flex: 1 1 380px; min-width: 0;">[Título do caso]</h3>
-          <span style="font-size: 13px; color: {{c.muted}};">Atualizado em [data]</span>
-        </article>
-      </div>
-    </section>
-
-    <section id="streaming" aria-labelledby="h-docs" style="display: flex; flex-direction: column; gap: 24px;">
-      <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 12px; border-top: 2px solid {{c.ink}}; padding-top: 16px;">
-        <h2 id="h-docs" style="margin: 0; font-size: 2rem; letter-spacing: -0.01em;"><span style="background: #556A2F; color: #FFFAF0; padding: 0 8px;">Streaming</span></h2>
         <a href="streaming.html" style="font-size: 14px; text-underline-offset: 4px;">Ver tudo em Streaming</a>
       </div>
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 28px;">
-        <article style="display: flex; flex-direction: column; gap: 12px;">
-          <div style="aspect-ratio: 16 / 9; background: #101010; position: relative; display: flex; align-items: center; justify-content: center;">
-            <span style="width: 56px; height: 56px; border-radius: 50%; background: #556A2F; display: flex; align-items: center; justify-content: center;"><svg width="20" height="20" viewBox="0 0 24 24" fill="#FFFAF0" aria-hidden="true"><path d="M8 5v14l11-7z"></path></svg></span>
-            <span style="position: absolute; right: 10px; bottom: 10px; background: #FFFAF0; color: #101010; font-size: 12px; padding: 2px 8px;">[00:00]</span>
-          </div>
-          <h3 style="margin: 0; font-size: 1.15rem; line-height: 1.3;">[Título do documentário]</h3>
-          <p style="margin: 0; font-size: 0.9rem; color: {{c.muted}};">[Uma frase sobre o tema do filme.]</p>
-        </article>
-        <article style="display: flex; flex-direction: column; gap: 12px;">
-          <div style="aspect-ratio: 16 / 9; background: #101010; position: relative; display: flex; align-items: center; justify-content: center;">
-            <span style="width: 56px; height: 56px; border-radius: 50%; background: #556A2F; display: flex; align-items: center; justify-content: center;"><svg width="20" height="20" viewBox="0 0 24 24" fill="#FFFAF0" aria-hidden="true"><path d="M8 5v14l11-7z"></path></svg></span>
-            <span style="position: absolute; right: 10px; bottom: 10px; background: #FFFAF0; color: #101010; font-size: 12px; padding: 2px 8px;">[00:00]</span>
-          </div>
-          <h3 style="margin: 0; font-size: 1.15rem; line-height: 1.3;">[Título do documentário]</h3>
-          <p style="margin: 0; font-size: 0.9rem; color: {{c.muted}};">[Uma frase sobre o tema do filme.]</p>
-        </article>
-        <article style="display: flex; flex-direction: column; gap: 12px;">
-          <div style="aspect-ratio: 16 / 9; background: #101010; position: relative; display: flex; align-items: center; justify-content: center;">
-            <span style="width: 56px; height: 56px; border-radius: 50%; background: #556A2F; display: flex; align-items: center; justify-content: center;"><svg width="20" height="20" viewBox="0 0 24 24" fill="#FFFAF0" aria-hidden="true"><path d="M8 5v14l11-7z"></path></svg></span>
-            <span style="position: absolute; right: 10px; bottom: 10px; background: #FFFAF0; color: #101010; font-size: 12px; padding: 2px 8px;">[00:00]</span>
-          </div>
-          <h3 style="margin: 0; font-size: 1.15rem; line-height: 1.3;">[Título do documentário]</h3>
-          <p style="margin: 0; font-size: 0.9rem; color: {{c.muted}};">[Uma frase sobre o tema do filme.]</p>
-        </article>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 28px;">
+        <sc-for list="{{videos}}" as="v" hint-placeholder-count="4">
+          <article style="display: flex; flex-direction: column; gap: 10px;">
+            <a href="{{v.link}}" target="_blank" rel="noopener noreferrer" tabindex="-1" aria-hidden="true" style="position: relative; display: block; aspect-ratio: 16 / 9; background: #101010; overflow: hidden;">
+              <sc-if value="{{v.temCapa}}" hint-placeholder-val="{{true}}"><img src="{{v.capa}}" referrerpolicy="no-referrer" alt="" loading="lazy" style="display: block; width: 100%; height: 100%; object-fit: cover;"></sc-if>
+              <span style="position: absolute; right: 10px; bottom: 10px; width: 44px; height: 44px; border-radius: 50%; background: #556A2F; display: flex; align-items: center; justify-content: center;"><svg width="18" height="18" viewBox="0 0 24 24" fill="#FFFAF0" aria-hidden="true"><path d="M8 5v14l11-7z"></path></svg></span>
+            </a>
+            <h3 style="margin: 0; font-size: 1.05rem; line-height: 1.3;"><a href="{{v.link}}" target="_blank" rel="noopener noreferrer" style="text-decoration: none;">{{v.titulo}}</a></h3>
+            <span style="font-size: 13px; color: {{c.muted}};">{{v.criador}}</span>
+          </article>
+        </sc-for>
       </div>
     </section>
+    </sc-if>
 
-    <section id="dossies" aria-labelledby="h-dossies" style="display: flex; flex-direction: column; gap: 24px;">
+    <section id="recursos" aria-labelledby="h-recursos" style="display: flex; flex-direction: column; gap: 24px;">
       <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 12px; border-top: 2px solid {{c.ink}}; padding-top: 16px;">
         <div style="display: flex; flex-direction: column; gap: 6px;">
-          <h2 id="h-dossies" style="margin: 0; font-size: 2rem; letter-spacing: -0.01em;"><span style="background: #556A2F; color: #FFFAF0; padding: 0 8px;">Dossiês</span></h2>
-          <p style="margin: 0; font-size: 0.95rem; color: {{c.muted}};">Reportagens longas que reúnem pesquisa, documentos e entrevistas sobre um tema.</p>
+          <h2 id="h-recursos" style="margin: 0; font-size: 2rem; letter-spacing: -0.01em;"><span style="background: #556A2F; color: #FFFAF0; padding: 0 8px;">Recursos</span></h2>
+          <p style="margin: 0; font-size: 0.95rem; color: {{c.muted}};">Ferramentas para fiscalizar o poder público, participar e comunicar.</p>
         </div>
-        <a href="dossies.html" style="font-size: 14px; text-underline-offset: 4px;">Todos os dossiês</a>
+        <a href="ferramentas.html" style="font-size: 14px; text-underline-offset: 4px;">Todas as ferramentas</a>
       </div>
-      <div style="display: flex; flex-wrap: wrap; gap: 28px;">
-        <article style="flex: 999 1 520px; min-width: 0; background: #556A2F; color: #FFFAF0; padding: 32px; display: flex; flex-direction: column; gap: 14px; box-sizing: border-box;">
-          <span style="font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase;">Dossiê · [N] capítulos</span>
-          <h3 style="margin: 0; font-size: clamp(1.6rem, 3vw, 2.4rem); line-height: 1.1; letter-spacing: -0.01em; text-wrap: balance;">[Título do dossiê em destaque]</h3>
-          <p style="margin: 0; font-size: 1rem; line-height: 1.55; max-width: 56ch;">[Duas frases que apresentam o dossiê: a pergunta que ele responde e o material que reúne.]</p>
-          <a href="#" style="align-self: flex-start; text-decoration: none; background: #101010; color: #FFFAF0; padding: 12px 20px; font-size: 14px; margin-top: 8px;">Ler o dossiê</a>
-        </article>
-        <div style="flex: 1 1 300px; min-width: 0; display: flex; flex-direction: column; gap: 0;">
-          <article style="border-top: 2px solid {{c.ink}}; padding: 18px 0; display: flex; flex-direction: column; gap: 8px;">
-            <span style="font-size: 12px; color: {{c.muted}};">[N] capítulos</span>
-            <h3 style="margin: 0; font-size: 1.2rem; line-height: 1.25;">[Título do dossiê]</h3>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 20px;">
+        <sc-for list="{{ferramentas}}" as="f" hint-placeholder-count="4">
+          <article style="background: {{c.surface}}; border: 1px solid {{c.line}}; padding: 22px; display: flex; flex-direction: column; gap: 10px;">
+            <span style="font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: {{c.muted}};">{{f.categoria}}</span>
+            <h3 style="margin: 0; font-size: 1.2rem; line-height: 1.2;">{{f.nome}}</h3>
+            <p style="margin: 0; font-size: 0.9rem; line-height: 1.5; color: {{c.muted}};">{{f.descricao}}</p>
+            <a href="{{f.link}}" style="margin-top: auto; align-self: flex-start; text-decoration: none; background: #556A2F; color: #FFFAF0; padding: 10px 16px; font-size: 14px;">Abrir</a>
           </article>
-          <article style="border-top: 1px solid {{c.line}}; padding: 18px 0; display: flex; flex-direction: column; gap: 8px;">
-            <span style="font-size: 12px; color: {{c.muted}};">[N] capítulos</span>
-            <h3 style="margin: 0; font-size: 1.2rem; line-height: 1.25;">[Título do dossiê]</h3>
-          </article>
-          <article style="border-top: 1px solid {{c.line}}; border-bottom: 1px solid {{c.line}}; padding: 18px 0; display: flex; flex-direction: column; gap: 8px;">
-            <span style="font-size: 12px; color: {{c.muted}};">[N] capítulos</span>
-            <h3 style="margin: 0; font-size: 1.2rem; line-height: 1.25;">[Título do dossiê]</h3>
-          </article>
+        </sc-for>
+      </div>
+      <sc-if value="{{temCurtos}}" hint-placeholder-val="{{false}}">
+        <div style="display: flex; flex-direction: column; gap: 14px;">
+          <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 8px;">
+            <h3 style="margin: 0; font-size: 1.3rem;">Vídeos curtos recentes</h3>
+            <a href="curtos.html" style="font-size: 14px; text-underline-offset: 4px;">Todos os vídeos curtos</a>
+          </div>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
+            <sc-for list="{{curtos}}" as="v" hint-placeholder-count="4">
+              <a href="{{v.endereco}}" style="text-decoration: none; border: 1px solid {{c.line}}; padding: 14px 16px; display: flex; flex-direction: column; gap: 6px;">
+                <span style="align-self: flex-start; background: #101010; color: #FFFAF0; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; padding: 2px 8px;">{{v.plataforma}}</span>
+                <span style="font-size: 1rem; line-height: 1.3;">{{v.titulo}}</span>
+                <span style="font-size: 12px; color: {{c.muted}};">{{v.tags}}</span>
+              </a>
+            </sc-for>
+          </div>
         </div>
-      </div>
+      </sc-if>
     </section>
 
     <section id="cursos" aria-labelledby="h-cursos" style="display: flex; flex-direction: column; gap: 24px;">
       <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 12px; border-top: 2px solid {{c.ink}}; padding-top: 16px;">
         <div style="display: flex; flex-direction: column; gap: 6px;">
           <h2 id="h-cursos" style="margin: 0; font-size: 2rem; letter-spacing: -0.01em;"><span style="background: #556A2F; color: #FFFAF0; padding: 0 8px;">Academia</span></h2>
-          <p style="margin: 0; font-size: 0.95rem; color: {{c.muted}};">Formação política em módulos, para estudar no seu ritmo ou em grupo.</p>
+          <p style="margin: 0; font-size: 0.95rem; color: {{c.muted}};">Cursos em módulos, para estudar no seu ritmo ou em grupo, e escolas públicas online gratuitas.</p>
         </div>
         <a href="cursos.html" style="font-size: 14px; text-underline-offset: 4px;">Todos os cursos</a>
       </div>
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 20px;">
-        <article style="border: 2px solid {{c.ink}}; padding: 22px; display: flex; flex-direction: column; gap: 12px;">
-          <span style="font-size: 12px; color: {{c.muted}};">9 módulos · leitura online</span>
-          <h3 style="margin: 0; font-size: 1.25rem; line-height: 1.2;">Marxismo</h3>
-          <a href="curso-marxismo.html" style="margin-top: auto; text-decoration: none; align-self: flex-start; background: #556A2F; color: #FFFAF0; padding: 10px 16px; font-size: 14px;">Ver curso</a>
-        </article>
-        <article style="border: 2px solid {{c.ink}}; padding: 22px; display: flex; flex-direction: column; gap: 12px;">
-          <span style="font-size: 12px; color: {{c.muted}};">[N] aulas · [carga horária]</span>
-          <h3 style="margin: 0; font-size: 1.25rem; line-height: 1.2;">Direitos dos trabalhadores</h3>
-          <a href="#" style="margin-top: auto; text-decoration: none; align-self: flex-start; background: #556A2F; color: #FFFAF0; padding: 10px 16px; font-size: 14px;">Ver curso</a>
-        </article>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px;">
+        <sc-for list="{{cursos}}" as="k" hint-placeholder-count="3">
+          <article style="border: 2px solid {{c.ink}}; padding: 22px; display: flex; flex-direction: column; gap: 12px;">
+            <span style="font-size: 12px; color: {{c.muted}};">{{k.meta}}</span>
+            <h3 style="margin: 0; font-size: 1.25rem; line-height: 1.2;">{{k.nome}}</h3>
+            <p style="margin: 0; font-size: 0.9rem; line-height: 1.5; color: {{c.muted}};">{{k.descricao}}</p>
+            <a href="{{k.link}}" style="margin-top: auto; text-decoration: none; align-self: flex-start; background: #556A2F; color: #FFFAF0; padding: 10px 16px; font-size: 14px;">Ver curso</a>
+          </article>
+        </sc-for>
       </div>
     </section>
+
+    <sc-if value="{{temPerfis}}" hint-placeholder-val="{{true}}">
+    <section id="politicos" aria-labelledby="h-politicos" style="display: flex; flex-direction: column; gap: 24px;">
+      <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 12px; border-top: 2px solid {{c.ink}}; padding-top: 16px;">
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <h2 id="h-politicos" style="margin: 0; font-size: 2rem; letter-spacing: -0.01em;"><span style="background: #556A2F; color: #FFFAF0; padding: 0 8px;">Wiki</span></h2>
+          <p style="margin: 0; font-size: 0.95rem; color: {{c.muted}};">Fichas de atores políticos: trajetória, eleições, atuação, posições e processos, com as fontes.</p>
+        </div>
+        <a href="politicos.html" style="font-size: 14px; text-underline-offset: 4px;">Todos os perfis</a>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 20px;">
+        <sc-for list="{{perfis}}" as="p" hint-placeholder-count="4">
+          <article style="background: {{c.surface}}; border: 1px solid {{c.line}}; padding: 20px; display: flex; flex-direction: column; gap: 10px;">
+            <sc-if value="{{p.temFoto}}" hint-placeholder-val="{{false}}"><img src="{{p.foto}}" referrerpolicy="no-referrer" alt="" loading="lazy" style="width: 64px; height: 64px; border-radius: 50%; object-fit: cover; display: block;"></sc-if>
+            <sc-if value="{{p.semFoto}}" hint-placeholder-val="{{true}}"><div aria-hidden="true" style="width: 64px; height: 64px; border-radius: 50%; background: #556A2F; color: #FFFAF0; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; letter-spacing: 0.04em;">{{p.iniciais}}</div></sc-if>
+            <h3 style="margin: 0; font-size: 1.1rem;">{{p.nome}}</h3>
+            <p style="margin: 0; font-size: 0.85rem; color: {{c.muted}};">{{p.detalhe}}</p>
+            <sc-if value="{{p.temChamada}}" hint-placeholder-val="{{true}}"><p style="margin: 0; font-size: 0.85rem;">{{p.chamada}}</p></sc-if>
+            <a href="{{p.link}}" style="font-size: 14px; text-underline-offset: 4px; margin-top: auto;">Ver perfil</a>
+          </article>
+        </sc-for>
+      </div>
+    </section>
+    </sc-if>
+
+    <sc-if value="{{temDossies}}" hint-placeholder-val="{{true}}">
+    <section id="dossies" aria-labelledby="h-dossies" style="display: flex; flex-direction: column; gap: 24px;">
+      <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 12px; border-top: 2px solid {{c.ink}}; padding-top: 16px;">
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <h2 id="h-dossies" style="margin: 0; font-size: 2rem; letter-spacing: -0.01em;"><span style="background: #556A2F; color: #FFFAF0; padding: 0 8px;">Dossiês</span></h2>
+          <p style="margin: 0; font-size: 0.95rem; color: {{c.muted}};">Reportagens longas, divididas em capítulos, e os casos que acompanhamos do início ao fim.</p>
+        </div>
+        <div style="display: flex; flex-wrap: wrap; gap: 8px 20px; font-size: 14px;">
+          <a href="dossies.html#casos" style="text-underline-offset: 4px;">Casos acompanhados</a>
+          <a href="dossies.html" style="text-underline-offset: 4px;">Todos os dossiês</a>
+        </div>
+      </div>
+      <div style="display: flex; flex-wrap: wrap; gap: 28px;">
+        <article style="flex: 999 1 520px; min-width: 0; background: #556A2F; color: #FFFAF0; padding: 32px; display: flex; flex-direction: column; gap: 14px; box-sizing: border-box;">
+          <span style="font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase;">Dossiê · {{dossie.capitulosTexto}}</span>
+          <h3 style="margin: 0; font-size: clamp(1.6rem, 3vw, 2.4rem); line-height: 1.1; letter-spacing: -0.01em; text-wrap: balance;">{{dossie.titulo}}</h3>
+          <sc-if value="{{dossie.temLinha}}" hint-placeholder-val="{{true}}"><p style="margin: 0; font-size: 1rem; line-height: 1.55; max-width: 56ch;">{{dossie.linha}}</p></sc-if>
+          <a href="{{dossie.link}}" style="align-self: flex-start; text-decoration: none; background: #101010; color: #FFFAF0; padding: 12px 20px; font-size: 14px; margin-top: 8px;">Ler o dossiê</a>
+        </article>
+        <sc-if value="{{temOutrosDossies}}" hint-placeholder-val="{{true}}">
+          <div style="flex: 1 1 300px; min-width: 0; display: flex; flex-direction: column; gap: 0; border-bottom: 1px solid {{c.line}};">
+            <sc-for list="{{outrosDossies}}" as="d" hint-placeholder-count="3">
+              <article style="border-top: 1px solid {{c.line}}; padding: 18px 0; display: flex; flex-direction: column; gap: 8px;">
+                <span style="font-size: 12px; color: {{c.muted}};">{{d.capitulosTexto}}</span>
+                <h3 style="margin: 0; font-size: 1.2rem; line-height: 1.25;"><a href="{{d.link}}" style="text-decoration: none;">{{d.titulo}}</a></h3>
+              </article>
+            </sc-for>
+          </div>
+        </sc-if>
+      </div>
+    </section>
+    </sc-if>
+
+    <sc-if value="{{temPublicacoes}}" hint-placeholder-val="{{false}}">
+    <section id="publicacoes" aria-labelledby="h-publicacoes" style="display: flex; flex-direction: column; gap: 24px;">
+      <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 12px; border-top: 2px solid {{c.ink}}; padding-top: 16px;">
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <h2 id="h-publicacoes" style="margin: 0; font-size: 2rem; letter-spacing: -0.01em;"><span style="background: #556A2F; color: #FFFAF0; padding: 0 8px;">Publicações</span></h2>
+          <p style="margin: 0; font-size: 0.95rem; color: {{c.muted}};">Livros e revistas para ler e estudar.</p>
+        </div>
+        <a href="publicacoes.html" style="font-size: 14px; text-underline-offset: 4px;">Todas as publicações</a>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 24px;">
+        <sc-for list="{{publicacoes}}" as="p" hint-placeholder-count="4">
+          <a href="{{p.endereco}}" style="text-decoration: none; display: flex; flex-direction: column; gap: 8px;">
+            <sc-if value="{{p.temCapa}}" hint-placeholder-val="{{true}}"><img src="{{p.capa}}" referrerpolicy="no-referrer" alt="" loading="lazy" style="display: block; width: 100%; aspect-ratio: 2 / 3; object-fit: cover; border: 1px solid {{c.line}}; box-sizing: border-box;"></sc-if>
+            <sc-if value="{{p.semCapa}}" hint-placeholder-val="{{false}}"><div style="aspect-ratio: 2 / 3; background: {{c.surface}}; border: 1px solid {{c.line}}; display: flex; align-items: flex-end; padding: 12px; box-sizing: border-box; font-size: 0.95rem;">{{p.titulo}}</div></sc-if>
+            <span style="font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: {{c.muted}};">{{p.tipo}}</span>
+            <span style="font-size: 1rem; line-height: 1.3;">{{p.titulo}}</span>
+          </a>
+        </sc-for>
+      </div>
+    </section>
+    </sc-if>
   </main>
 
   <footer style="background: #101010; color: #FFFAF0; border-top: 1px solid {{c.line}};">
@@ -317,8 +328,6 @@ footer>div{padding-left:16px !important;padding-right:16px !important}
         <a href="politicos.html" style="text-decoration: none;">Wiki</a>
         <a href="dossies.html" style="text-decoration: none;">Dossiês</a>
         <a href="publicacoes.html" style="text-decoration: none;">Publicações</a>
-        <a href="#" style="text-decoration: none;">Quem somos</a>
-        <a href="#" style="text-decoration: none;">Contato</a>
       </nav>
       <div style="display: flex; flex-direction: column; gap: 12px; align-content: start;">
         <p style="margin: 0; font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: #DDD5CA;">Siga o Tempo Continuum</p>
@@ -342,55 +351,122 @@ class Component extends DCLogic {
     super(props);
     this.state = { escuro: null };
   }
-  exemplos() {
-    return [];   // enquanto dados/noticias.json não carrega
-  }
   componentDidMount() {
     var eu = this;
-    try {
-      fetch('dados/noticias.json', { cache: 'no-cache' })
-        .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
-        .then(function (lista) { if (Array.isArray(lista)) eu.setState({ remoto: lista }); })
-        .catch(function () {});
-    } catch (e) {}
+    // Cada seção lê o seu índice em dados/; enquanto um índice não chega (ou se faltar), a seção fica escondida
+    [['noticias', 'remoto'], ['videos', 'videos'], ['curtos', 'curtos'], ['dossies', 'dossies'], ['politicos', 'politicos'], ['publicacoes', 'publicacoes']].forEach(function (x) {
+      try {
+        fetch('dados/' + x[0] + '.json', { cache: 'no-cache' })
+          .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+          .then(function (dados) { var p = {}; p[x[1]] = dados; eu.setState(p); })
+          .catch(function () {});
+      } catch (e) {}
+    });
     try {
       var v = window.localStorage.getItem('tc-tema');
       if (v === 'escuro' || v === 'claro') this.setState({ escuro: v === 'escuro' });
     } catch (e) {}
   }
+  // Os cursos da Academia (os mesmos de cursos.html)
+  cursos() {
+    return [
+      { nome: 'Marxismo', meta: '9 módulos · leitura online', link: 'curso-marxismo.html',
+        descricao: 'Uma introdução às ideias de Marx e Engels: o método materialista, as classes sociais, o capitalismo, o Estado e a revolução, e como o marxismo pensou o Brasil.' },
+      { nome: 'Como construir o movimento estudantil na sua cidade', meta: '7 módulos · leitura online', link: 'curso-movimento-estudantil.html',
+        descricao: 'Do grêmio da escola à entidade municipal: como fundar ou reativar uma UMES, a lei que protege a organização estudantil e a relação com a UBES e a UNE.' },
+      { nome: 'Musculação gastando o mínimo', meta: '8 módulos · leitura online', link: 'curso-musculacao.html',
+        descricao: 'Força e massa muscular com o peso do corpo, uma mochila e no máximo R$ 150 em equipamento: exercícios, programas prontos e alimentação barata.' }
+    ];
+  }
+  // Ferramentas em destaque (a lista completa fica em ferramentas.html)
+  ferramentas() {
+    return [
+      { nome: 'Votações no e-Cidadania', categoria: 'Participação', link: 'votacoes.html', descricao: 'Consultas públicas do Senado explicadas, com a nossa recomendação de voto e o link para votar.' },
+      { nome: 'Contatos de parlamentares', categoria: 'Participação', link: 'contatos.html', descricao: 'E-mail, telefone e redes de deputados e senadores, com filtro por casa, estado e partido.' },
+      { nome: 'Repositório de Vídeos Curtos', categoria: 'Comunicação', link: 'curtos.html', descricao: 'Vídeos curtos de várias plataformas, organizados por tags.' },
+      { nome: 'Gerador de imagens', categoria: 'Comunicação', link: 'gerador-de-imagens.html', descricao: 'Posts e prévias de link com título que se ajusta sozinho, suas logos e QR code.' }
+    ];
+  }
   renderVals() {
-    var escuro = (this.state && this.state.escuro !== null && this.state.escuro !== undefined)
-      ? this.state.escuro
-      : (this.props.tema ?? 'claro') === 'escuro';
+    var st = this.state || {};
+    var escuro = (st.escuro !== null && st.escuro !== undefined) ? st.escuro : (this.props.tema ?? 'claro') === 'escuro';
     var self = this;
     var c = escuro
       ? { bg: '#101010', surface: '#2F2E25', ink: '#FFFAF0', muted: '#DDD5CA', line: 'rgba(221, 213, 202, 0.3)' }
       : { bg: '#FFFAF0', surface: '#DDD5CA', ink: '#101010', muted: '#2F2E25', line: 'rgba(47, 46, 37, 0.28)' };
+    var lista = function (v) { return Array.isArray(v) ? v : []; };
     var guardar = function (chave, valor) { try { if (valor) window.localStorage.setItem(chave, valor); } catch (e) {} };
-    var irTag = function (tag) { return function () { guardar('tc-busca-tag', tag); }; };
     var meses = ['jan.', 'fev.', 'mar.', 'abr.', 'maio', 'jun.', 'jul.', 'ago.', 'set.', 'out.', 'nov.', 'dez.'];
     var fmtData = function (iso) { var p = String(iso || '').slice(0, 10).split('-'); return p.length === 3 ? Number(p[2]) + ' ' + meses[Number(p[1]) - 1] + ' ' + p[0] : ''; };
-    var noticias = ((this.state && this.state.remoto) || this.exemplos()).slice().sort(function (x, y) { return String(x.data) < String(y.data) ? 1 : -1; }).map(function (n) {
+    var porData = function (x, y) { return String(x.data || '') < String(y.data || '') ? 1 : -1; };
+
+    // Notícias: manchete (a mais recente marcada como destaque), mais 3 em destaque e as 4 seguintes
+    var materias = lista(st.remoto).slice().sort(porData);
+    var noticias = materias.map(function (n) {
       return { titulo: n.titulo, linha: n.linha || '', editoria: n.editoria || 'Notícia', dataTexto: fmtData(n.data), tagPrincipal: (n.tags || [])[0] ? TCTags.rotulo(n.tags[0]) : (n.editoria || '').toLowerCase(),
         link: 'materia.html?id=' + encodeURIComponent(n.id), foto: n.foto || '', temFoto: !!n.foto, semFoto: !n.foto, destaque: !!n.destaque };
     });
     var iPrincipal = Math.max(0, noticias.findIndex(function (n) { return n.destaque; }));
-    var principal = noticias[iPrincipal] || { titulo: 'Nenhuma matéria publicada ainda', linha: '', editoria: 'Notícias', dataTexto: '', link: 'noticias.html', temFoto: false };
+    var principal = noticias[iPrincipal] || { titulo: st.remoto ? 'Nenhuma matéria publicada ainda' : 'Carregando…', linha: '', editoria: 'Notícias', dataTexto: '', link: 'noticias.html', temFoto: false };
     var resto = noticias.filter(function (n, i) { return i !== iPrincipal; });
+    // Tags mais usadas nas matérias, para atalhos da busca
+    var tags = TCTags.contar(materias.map(function (n) { return n.tags || []; })).filter(function (t) { return !t.sub; }).slice(0, 5).map(function (t) {
+      return { nome: t.rotulo, ir: function () { guardar('tc-busca-tag', t.tag); } };
+    });
+
+    // Streaming: os 4 vídeos do YouTube mais recentes
+    var videos = lista(st.videos).slice().sort(porData).slice(0, 4).map(function (v) {
+      return { titulo: v.titulo, criador: v.criador || '', link: v.link, capa: v.capa || '', temCapa: !!v.capa };
+    });
+
+    // Vídeos curtos: os 4 mais recentes (só aparecem quando houver algum)
+    var curtos = lista(st.curtos).slice().sort(porData).slice(0, 4).map(function (v) {
+      return { titulo: v.titulo, plataforma: v.plataforma || 'Vídeo', endereco: 'curtos.html#' + encodeURIComponent(v.id),
+        tags: (v.tags || []).slice(0, 3).map(TCTags.rotulo).join(' · ') };
+    });
+
+    // Dossiês: o marcado como destaque (ou o mais recente) em evidência, mais 3
+    var nCap = function (d) { var n = lista(d.capitulos).length; return n + (n === 1 ? ' capítulo' : ' capítulos'); };
+    var dossies = lista(st.dossies).slice().sort(porData).map(function (d) {
+      return { titulo: d.titulo, linha: d.linha || '', temLinha: !!d.linha, capitulosTexto: nCap(d), link: 'dossie.html?id=' + encodeURIComponent(d.id), destaque: !!d.destaque };
+    });
+    var iDossie = Math.max(0, dossies.findIndex(function (d) { return d.destaque; }));
+    var outrosDossies = dossies.filter(function (d, i) { return i !== iDossie; }).slice(0, 3);
+
+    // Wiki: até 4 fichas
+    var perfis = lista(st.politicos).slice(0, 4).map(function (p) {
+      return { nome: p.nome, iniciais: p.iniciais || String(p.nome || '').split(/\s+/).map(function (x) { return x[0] || ''; }).join('').slice(0, 2).toUpperCase(),
+        foto: p.foto || '', temFoto: !!p.foto, semFoto: !p.foto,
+        detalhe: [p.cargo_curto || p.categoria, p.partido, p.uf].filter(Boolean).join(' · '),
+        chamada: p.chamada || '', temChamada: !!p.chamada, link: 'ficha.html?id=' + encodeURIComponent(p.id) };
+    });
+
+    // Publicações: os 4 livros e revistas mais recentes (só aparecem quando houver algum)
+    var pubs = st.publicacoes || {};
+    var publicacoes = lista(pubs.livros).map(function (p) { return Object.assign({ grupo: 'livros', tipo: 'Livro' }, p); })
+      .concat(lista(pubs.revistas).map(function (p) { return Object.assign({ grupo: 'revistas', tipo: 'Revista' }, p); }))
+      .sort(function (x, y) { return String(x.data || x.ano || '') < String(y.data || y.ano || '') ? 1 : -1; }).slice(0, 4)
+      .map(function (p) { return { titulo: p.titulo, tipo: p.tipo, capa: p.capa || '', temCapa: !!p.capa, semCapa: !p.capa, endereco: 'publicacoes.html#' + p.grupo }; });
+
     return {
-      principal: principal, destaques: resto.slice(0, 3), ultimas: resto.slice(3, 7),
-      menuAberto: !!(this.state && this.state.menuAberto),
-      menuFechado: !(this.state && this.state.menuAberto),
-      menuAbertoTxt: (this.state && this.state.menuAberto) ? 'true' : 'false',
-      alternarMenu: (function (eu) { return function () { eu.setState({ menuAberto: !(eu.state && eu.state.menuAberto) }); }; })(this),
-      fecharMenu: (function (eu) { return function () { eu.setState({ menuAberto: false }); }; })(this),
-      busca: (this.state && this.state.busca) || '',
+      principal: principal, destaques: resto.slice(0, 3), temDestaques: resto.length > 0,
+      ultimas: resto.slice(3, 7), temUltimas: resto.length > 3,
+      tags: tags, temTags: tags.length > 0,
+      videos: videos, temVideos: videos.length > 0,
+      curtos: curtos, temCurtos: curtos.length > 0,
+      ferramentas: this.ferramentas(), cursos: this.cursos(),
+      dossie: dossies[iDossie] || {}, temDossies: dossies.length > 0, outrosDossies: outrosDossies, temOutrosDossies: outrosDossies.length > 0,
+      perfis: perfis, temPerfis: perfis.length > 0,
+      publicacoes: publicacoes, temPublicacoes: publicacoes.length > 0,
+      menuAberto: !!st.menuAberto,
+      menuFechado: !st.menuAberto,
+      menuAbertoTxt: st.menuAberto ? 'true' : 'false',
+      alternarMenu: function () { self.setState({ menuAberto: !self.state.menuAberto }); },
+      fecharMenu: function () { self.setState({ menuAberto: false }); },
+      busca: st.busca || '',
       onBusca: function (e) { self.setState({ busca: e.target.value }); },
-      buscar: function () { guardar('tc-busca-q', ((self.state && self.state.busca) || '').trim()); },
-      tagMarxismo: irTag('marxismo'),
-      tagTrabalho: irTag('trabalho'),
-      tagHistoria: irTag('história do Brasil'),
-      tagReforma: irTag('reforma agrária'),
+      buscar: function () { guardar('tc-busca-q', (self.state.busca || '').trim()); },
+      enviarBusca: function (e) { e.preventDefault(); guardar('tc-busca-q', (self.state.busca || '').trim()); window.location.href = 'noticias.html'; },
       c: c,
       escuro: escuro,
       claro: !escuro,
