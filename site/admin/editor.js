@@ -262,6 +262,7 @@
   // Volta do editor para a grade da coleção
   function voltarParaGrade() {
     if (!podeSair()) return;
+    estado.redesenharLigacoes = null;
     estado.atual = null;
     marcarSujo(false);
     desenharLista();
@@ -454,6 +455,7 @@
       history.replaceState(null, '', '#' + a.tipo + '/' + a.id);
       carregarLista();
       if (a.tipo === 'noticias' || a.tipo === 'curtos' || a.tipo === 'casos') carregarTags();
+      carregarIndices();
       if (a.tipo === 'dossies' || a.tipo === 'metadossies') a.pdf = a.pdf ? 'PDF desatualizado' : '';
       return true;
     }).catch(function (e) { aviso('Não salvou: ' + e.message, true); return false; })
@@ -536,6 +538,7 @@
       caixa.appendChild(entrada);
       entrada.disabled = m.tags.length >= MAX_TAGS;
       entrada.placeholder = m.tags.length >= MAX_TAGS ? 'Máximo de ' + MAX_TAGS + ' tags' : (m.tags.length ? 'Outra tag' : 'Digite e aperte Enter. Subtag: violência/contra indígenas');
+      estado.redesenharTags = desenhar;
     }
     function adicionar(t) {
       t = TCTags.limpa(String(t || '').replace(/,/g, ' ').trim());
@@ -882,10 +885,13 @@
         ta));
       return;
     }
-    area.appendChild(a.tipo === 'noticias' ? formMateria(a) : a.tipo === 'votacoes' ? formVotacao(a)
+    estado.redesenharTags = null;
+    var form = a.tipo === 'noticias' ? formMateria(a) : a.tipo === 'votacoes' ? formVotacao(a)
       : a.tipo === 'videos' ? formVideo(a) : a.tipo === 'publicacoes' ? formPublicacao(a)
       : a.tipo === 'dossies' ? formDossie(a) : a.tipo === 'curtos' ? formCurto(a)
-      : a.tipo === 'metadossies' ? formMetaDossie(a) : a.tipo === 'casos' ? formCaso(a) : formFicha(a));
+      : a.tipo === 'metadossies' ? formMetaDossie(a) : a.tipo === 'casos' ? formCaso(a) : formFicha(a);
+    if (TCLigacoes.TIPOS[a.tipo]) form.appendChild(secaoLigacoes(a));
+    area.appendChild(form);
   }
 
   function trocarModo(modo) {
@@ -1472,6 +1478,119 @@
   }
 
   // =========================================================================
+  // Ligações entre matérias, dossiês, meta-dossiês e casos (regras em js/ligacoes.js)
+  // =========================================================================
+  // Os índices publicados (dados/*.json) dizem o que está salvo; o item aberto entra com o que está na tela
+  function carregarIndices() {
+    TCLigacoes.carregarIndices('../', function (indices) { estado.indices = indices; if (estado.redesenharLigacoes) estado.redesenharLigacoes(); });
+  }
+  // Abre outro item no editor (trocando de coleção, se preciso)
+  function abrirOutro(tipo, id) {
+    if (!podeSair()) return;
+    marcarSujo(false);
+    estado.atual = null;
+    if (tipo !== estado.tipo) { estado.tipo = tipo; estado.itens = []; estado.carregado = false; desenharColecoes(); carregarTags(); }
+    carregarLista().then(function () { abrir(tipo, id); });
+  }
+  // Muda e salva na hora outro item (ex.: tirar a tag dele, ou pôr um dossiê na lista de um meta-dossiê)
+  function editarOutro(tipo, id, mudar) {
+    return api('item?tipo=' + tipo + '&id=' + encodeURIComponent(id)).then(function (r) {
+      var m = modeloDeArquivo(tipo, r);
+      mudar(m);
+      return api('salvar', { corpo: { tipo: tipo, id: id, texto: escreverArquivo({ tipo: tipo, m: m }) } });
+    }).then(function () { carregarIndices(); carregarContagens(); });
+  }
+  var NOME_TIPO = { noticias: 'Matéria', dossies: 'Dossiê', metadossies: 'Meta-dossiê', casos: 'Caso' };
+  function secaoLigacoes(a) {
+    var m = a.m, caixa = h('div', { class: 'ligacoes' });
+    var tipoSel = h('select', { 'aria-label': 'Tipo do item a ligar' }), itemSel = h('select', { 'aria-label': 'Item a ligar' });
+    var tirarTag = function (titulo) {
+      var k = TCLigacoes.chave(titulo);
+      m.tags = (m.tags || []).filter(function (t) { return !String(t).split('/').some(function (p) { return TCLigacoes.chave(p) === k; }); });
+    };
+    function atual() { return { tipo: a.tipo, id: a.id, titulo: m.titulo, tags: m.tags, dossies: m.dossies }; }
+    function opcoesItens() {
+      var idx = estado.indices || {}, tipo = tipoSel.value, ligados = {};
+      TCLigacoes.calcular(atual(), idx).forEach(function (l) { ligados[l.tipo + '/' + l.id] = true; });
+      var livres = (idx[tipo] || []).filter(function (x) { return x && x.id && x.titulo && !(tipo === a.tipo && x.id === a.id) && !ligados[tipo + '/' + x.id]; })
+        .sort(function (x, y) { return String(x.titulo).localeCompare(String(y.titulo), 'pt'); });
+      itemSel.innerHTML = '';
+      itemSel.appendChild(h('option', { value: '' }, livres.length ? 'Escolha…' : 'Nada para ligar aqui'));
+      livres.forEach(function (x) { itemSel.appendChild(h('option', { value: x.id }, x.titulo)); });
+    }
+    function desenhar() {
+      caixa.innerHTML = '';
+      if (!estado.indices) { caixa.appendChild(h('p', { class: 'dica' }, 'Carregando as ligações…')); return; }
+      var lista = TCLigacoes.calcular(atual(), estado.indices);
+      if (!lista.length) caixa.appendChild(h('p', { class: 'dica' }, 'Nenhuma ligação ainda.'));
+      lista.forEach(function (l) {
+        var onde = l.como === 'tag' ? 'pela tag deste item'
+          : l.como === 'lista' ? 'pela lista de dossiês do meta-dossiê'
+          : 'pela tag d' + l.artigo + ' ' + l.nome;
+        var desligar = null;
+        if (l.como === 'tag') {
+          desligar = function () { tirarTag(l.titulo); marcarSujo(); if (estado.redesenharTags) estado.redesenharTags(); desenhar(); aviso('Ligação desfeita. Salve para valer no site.'); };
+        } else if (l.como === 'outro') {
+          desligar = function () {
+            if (!confirm('Desfazer a ligação? Isso tira a tag "' + m.titulo + '" d' + l.artigo + ' ' + l.nome + ' "' + l.titulo + '" e salva ' + l.artigo + ' ' + l.nome + ' agora.')) return;
+            editarOutro(l.tipo, l.id, function (o) { o.tags = (o.tags || []).filter(function (t) { return !String(t).split('/').some(function (p) { return TCLigacoes.chave(p) === TCLigacoes.chave(m.titulo); }); }); })
+              .then(function () { aviso('Ligação desfeita.'); }, function (e) { aviso('Não desfez: ' + e.message, true); });
+          };
+        } else if (a.tipo === 'dossies') {
+          desligar = function () {
+            if (!confirm('Tirar este dossiê do meta-dossiê "' + l.titulo + '"? O meta-dossiê é salvo agora.')) return;
+            // Tira também a tag com o título do meta-dossiê, se este dossiê tiver (senão a ligação continuaria pela tag)
+            var tinhaTag = (m.tags || []).length;
+            tirarTag(l.titulo);
+            if ((m.tags || []).length !== tinhaTag) { marcarSujo(); if (estado.redesenharTags) estado.redesenharTags(); }
+            editarOutro('metadossies', l.id, function (o) { o.dossies = (o.dossies || []).filter(function (x) { return x !== a.id; }); })
+              .then(function () { aviso('Dossiê tirado do meta-dossiê.' + ((m.tags || []).length !== tinhaTag ? ' Salve este dossiê para tirar também a tag.' : '')); }, function (e) { aviso('Não tirou: ' + e.message, true); });
+          };
+        }
+        caixa.appendChild(h('div', { class: 'ligacao' },
+          h('span', { class: 'ligacao-tipo' }, NOME_TIPO[l.tipo]),
+          h('span', { class: 'ligacao-titulo' }, l.titulo, h('small', null, 'Ligado ' + onde)),
+          h('div', { class: 'linhas-acoes' },
+            h('button', { type: 'button', class: 'botao-mini', onclick: function () { abrirOutro(l.tipo, l.id); } }, 'Abrir'),
+            desligar ? h('button', { type: 'button', class: 'botao-mini', onclick: desligar }, 'Desligar')
+              : h('small', { class: 'ligacao-nota' }, 'Para desfazer, tire o dossiê em "Dossiês reunidos".'))));
+      });
+      opcoesItens();
+    }
+    TCLigacoes.ORDEM.forEach(function (t) { tipoSel.appendChild(h('option', { value: t }, NOME_TIPO[t])); });
+    tipoSel.addEventListener('change', opcoesItens);
+    var ligar = h('button', { type: 'button', class: 'botao-mini', onclick: function () {
+      var idx = estado.indices || {}, x = (idx[tipoSel.value] || []).filter(function (i) { return i.id === itemSel.value; })[0];
+      if (!x) { aviso('Escolha o item a ligar.', true); return; }
+      if (a.tipo === 'metadossies' && tipoSel.value === 'dossies') {
+        // No meta-dossiê, um dossiê ligado entra na lista de dossiês reunidos
+        if ((m.dossies || []).indexOf(x.id) < 0) m.dossies.push(x.id);
+        marcarSujo(); desenharEditor(); aviso('Dossiê acrescentado em "Dossiês reunidos". Salve para valer no site.');
+        return;
+      }
+      if (a.tipo === 'dossies' && tipoSel.value === 'metadossies') {
+        // Do dossiê, a ligação com um meta-dossiê põe o dossiê na lista do meta-dossiê
+        if (!a.id) { aviso('Crie o dossiê antes de pô-lo num meta-dossiê.', true); return; }
+        editarOutro('metadossies', x.id, function (o) { if ((o.dossies || []).indexOf(a.id) < 0) o.dossies.push(a.id); })
+          .then(function () { aviso('Dossiê incluído no meta-dossiê "' + x.titulo + '".'); }, function (e) { aviso('Não incluiu: ' + e.message, true); });
+        return;
+      }
+      if (!(m.tags || []).some(function (t) { return TCLigacoes.chave(t) === TCLigacoes.chave(x.titulo); })) m.tags.push(x.titulo);
+      marcarSujo();
+      if (estado.redesenharTags) estado.redesenharTags();
+      desenhar();
+      aviso('Ligado. Salve para valer no site.');
+    } }, '+ Ligar');
+    estado.redesenharLigacoes = desenhar;
+    desenhar();
+    return h('section', { class: 'secao' },
+      h('h2', null, 'Ligações'),
+      h('p', { class: 'dica' }, 'Matérias, dossiês, meta-dossiês e casos ligados a este item. Cada página do site mostra os itens ligados a ela, nos dois sentidos. A ligação é uma tag com o título do outro item; ligar daqui acrescenta essa tag (aparece também em Tags). Se o título de um item mudar, as tags que apontam para ele precisam ser refeitas.'),
+      caixa,
+      h('div', { class: 'linhas-acoes ligar' }, tipoSel, itemSel, ligar));
+  }
+
+  // =========================================================================
   // Início
   // =========================================================================
   var hash = location.hash.replace(/^#/, '').split('/');
@@ -1479,6 +1598,7 @@
   desenharColecoes();
   desenharLista();
   carregarContagens();
+  carregarIndices();
   Promise.all([carregarLista(), carregarTags()]).then(function () {
     if (hash[1]) abrir(estado.tipo, hash[1]);
   });
