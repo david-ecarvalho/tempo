@@ -266,7 +266,7 @@ class Component extends DCLogic {
     }).map(function (p) { return { nome: p.nome, href: 'ficha.html?id=' + encodeURIComponent(p.id) }; });
     var casosLigados = (st.casos || []).filter(function (k) {
       return k && k.id && k.titulo && partesTags[TCTags.norm(k.titulo).trim()];
-    }).map(function (k) { return { titulo: k.titulo, status: String(k.status || '').toLowerCase(), href: 'dossies.html#caso-' + encodeURIComponent(k.id) }; });
+    }).map(function (k) { return { titulo: k.titulo, status: String(k.status || '').toLowerCase(), href: 'caso.html?id=' + encodeURIComponent(k.id) }; });
     return {
       fichas: fichas, casosLigados: casosLigados,
       menuAberto: !!st.menuAberto,

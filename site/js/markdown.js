@@ -504,7 +504,7 @@
   }
 
   // =========================================================================
-  // Caso acompanhado (conteudo/casos/<id>.md), na parte "Casos acompanhados" de dossies.html.
+  // Caso acompanhado (conteudo/casos/<id>.md): página caso.html?id=<id> e lista em Wiki › Casos acompanhados (politicos.html#casos).
   // Cabeçalho: titulo, status ("Em andamento", "Em julgamento" ou "Encerrado"), aberto e atualizado (AAAA-MM-DD),
   // etapa (a última etapa do caso), envolvidos (lista), tags (lista) e documentos (lista de titulo + link).
   // Texto: o resumo do caso.

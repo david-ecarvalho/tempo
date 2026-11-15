@@ -21,7 +21,8 @@ Matérias e fichas são arquivos Markdown (.md) com um cabeçalho de dados entre
   escolhida, num documento só (dossie.html?meta=<id>). Traz os dossiês que existem, o total de capítulos e, se
   estiver em dia, o PDF em arquivos/metadossies/<id>.pdf. As páginas dossies.html e publicacoes.html leem este índice.
 - dados/casos.json, com os casos acompanhados de conteudo/casos/ (situação, datas, etapa, envolvidos, documentos,
-  tags e resumo). A parte "Casos acompanhados" de dossies.html lê só este índice.
+  tags e resumo). A página de cada caso (caso.html?id=<id>) e a lista "Casos acompanhados" da Wiki
+  (politicos.html#casos) leem este índice.
 
 Uso: python3 scripts/gerar-indice.py
 """

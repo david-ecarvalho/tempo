@@ -423,7 +423,7 @@ class Component extends DCLogic {
     var tituloDossie = dos ? TCTags.norm(dos.titulo).trim() : '';
     var casosLigados = ehMeta || !dos ? [] : (st.casos || []).filter(function (k) {
       return k && k.id && (k.tags || []).some(function (t) { return String(t).split('/').some(function (p) { return TCTags.norm(p).trim() === tituloDossie; }); });
-    }).map(function (k) { return { titulo: k.titulo, status: String(k.status || '').toLowerCase(), href: 'dossies.html#caso-' + encodeURIComponent(k.id) }; });
+    }).map(function (k) { return { titulo: k.titulo, status: String(k.status || '').toLowerCase(), href: 'caso.html?id=' + encodeURIComponent(k.id) }; });
     var tags = (dos && dos.tags || []).map(function (t) {
       return { nome: TCTags.rotulo(t), ir: function () { try { window.localStorage.setItem('tc-busca-tag', TCTags.limpa(t)); } catch (e) {} } };
     });

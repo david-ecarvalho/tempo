@@ -17,7 +17,7 @@
     publicacoes: { novo: '+ Nova publicação', vazio: 'Escolha um livro ou uma revista na lista, ou crie uma publicação nova.', pasta: 'publicacoes', pagina: 'publicacoes.html' },
     dossies: { novo: '+ Novo dossiê', vazio: 'Escolha um dossiê na lista ou crie um novo.', pasta: 'dossies', pagina: 'dossie.html' },
     metadossies: { novo: '+ Novo meta-dossiê', vazio: 'Escolha um meta-dossiê na lista ou crie um novo, juntando dossiês que já existem.', pasta: 'dossies', pagina: 'dossie.html' },
-    casos: { novo: '+ Novo caso', vazio: 'Escolha um caso na lista ou crie um novo.', pasta: 'casos', pagina: 'dossies.html' },
+    casos: { novo: '+ Novo caso', vazio: 'Escolha um caso na lista ou crie um novo.', pasta: 'casos', pagina: 'caso.html' },
     curtos: { novo: '+ Novo vídeo curto', vazio: 'Escolha um vídeo curto na lista ou adicione um novo, de qualquer plataforma.', pasta: 'curtos', pagina: 'curtos.html' }
   };
   var PLATAFORMAS = ['YouTube', 'TikTok', 'Instagram', 'Kwai', 'X', 'Facebook', 'Threads', 'Bluesky', 'Outra'];
@@ -38,7 +38,7 @@
     if (tipo === 'videos') return NOMES.videos.pagina + '#youtube';
     if (tipo === 'curtos') return NOMES.curtos.pagina + '#' + id;
     if (tipo === 'metadossies') return NOMES.metadossies.pagina + '?meta=' + id;
-    if (tipo === 'casos') return NOMES.casos.pagina + '#caso-' + id;
+    if (tipo === 'casos') return NOMES.casos.pagina + '?id=' + id;
     if (tipo === 'publicacoes') {
       var pub = estado.atual && estado.atual.tipo === 'publicacoes' ? estado.atual.m : null;
       return NOMES.publicacoes.pagina + (pub ? (pub.tipo === 'revista' ? '#revistas' : '#livros') : '');
@@ -1359,7 +1359,7 @@
         h('p', { class: 'dica' }, 'O PDF fica em arquivos/metadossies/ e aparece em Publicações › Dossiês impressos. Ele tem capa, sumário com as partes, uma página de abertura para cada dossiê e cada capítulo numa página nova.')));
   }
 
-  // ---- Caso acompanhado (Dossiês › Casos acompanhados)
+  // ---- Caso acompanhado (página caso.html?id=<id>; lista em Wiki › Casos acompanhados)
   function formCaso(a) {
     var m = a.m;
     var titulo = texto(m, 'titulo', { maxlength: 200, placeholder: 'O caso, em uma linha' });
@@ -1380,7 +1380,7 @@
           campo('Última etapa', texto(m, 'etapa', { placeholder: 'Ex.: Denúncia aceita pela Justiça Federal' }), { largo: true }),
           campo('Resumo', areaTexto(m, 'corpo', 5), { largo: true, dica: 'O que aconteceu e o que está em jogo, em poucas frases. Só fatos verificáveis, com os documentos abaixo.' }),
           campo('Envolvidos', envolvidos, { largo: true })),
-        h('p', { class: 'dica' }, a.id ? 'Endereço: ' + enderecoNoSite('casos', a.id) : 'O caso aparece em Dossiês › Casos acompanhados.')),
+        h('p', { class: 'dica' }, a.id ? 'Endereço: ' + enderecoNoSite('casos', a.id) : 'Cada caso tem a sua página (caso.html?id=…) e entra na lista de Wiki › Casos acompanhados.')),
       h('section', { class: 'secao' },
         h('h2', null, 'Documentos'),
         campoLinhas(m.documentos, [
@@ -1391,7 +1391,7 @@
       h('section', { class: 'secao' },
         h('h2', null, 'Tags'),
         campoTags(m),
-        h('p', { class: 'dica' }, 'Usadas no filtro de casos da página Dossiês. Para uma subtag, use a barra: violência/contra indígenas.')));
+        h('p', { class: 'dica' }, 'Usadas no filtro de casos da Wiki. Para ligar o caso a um dossiê, use o título do dossiê como tag (ex.: ICE: A nova Gestapo). Para uma subtag, use a barra: violência/contra indígenas.')));
   }
 
   // =========================================================================

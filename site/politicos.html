@@ -92,10 +92,14 @@ footer>div{padding-left:16px !important;padding-right:16px !important}
     <div style="display: flex; flex-direction: column; gap: 14px;">
       <p style="margin: 0; font-size: 13px; color: {{c.muted}};"><a href="index.html" style="text-underline-offset: 3px;">Início</a> / Wiki</p>
       <h1 style="margin: 0; font-size: clamp(2.4rem, 5vw, 3.6rem); line-height: 1; letter-spacing: -0.02em;"><span style="background: #556A2F; color: #FFFAF0; padding: 0 10px;">Wiki</span></h1>
-      <p style="margin: 0; font-size: 1.1rem; line-height: 1.55; color: {{c.muted}}; max-width: 60ch;">Perfis com votações, declarações públicas e os casos em que cada político aparece.</p>
+      <p style="margin: 0; font-size: 1.1rem; line-height: 1.55; color: {{c.muted}}; max-width: 60ch;">Fichas de atores políticos, com trajetória, eleições, atuação e processos, e os casos que acompanhamos do início ao fim.</p>
+      <div style="display: flex; flex-wrap: wrap; gap: 8px; font-size: 14px;">
+        <a href="#fichas" style="text-decoration: none; padding: 8px 14px; border-radius: 999px; border: 1.5px solid {{c.line}};">Fichas · {{nFichas}}</a>
+        <a href="#casos" style="text-decoration: none; padding: 8px 14px; border-radius: 999px; border: 1.5px solid {{c.line}};">Casos acompanhados · {{nCasos}}</a>
+      </div>
     </div>
 
-    <form onSubmit="{{evitarEnvio}}" style="display: flex; flex-direction: column; gap: 14px; border-top: 2px solid {{c.ink}}; border-bottom: 1px solid {{c.line}}; padding: 20px 0;">
+    <form id="fichas" onSubmit="{{evitarEnvio}}" style="scroll-margin-top: 110px; display: flex; flex-direction: column; gap: 14px; border-top: 2px solid {{c.ink}}; border-bottom: 1px solid {{c.line}}; padding: 20px 0;">
       <label for="pq" style="font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: {{c.muted}};">Buscar por nome</label>
       <input id="pq" type="search" value="{{q}}" onInput="{{onQ}}" placeholder="Nome, partido ou estado" autocomplete="off" style="max-width: 520px; font: inherit; font-size: 16px; padding: 12px 14px; border: 2px solid {{c.ink}}; background: {{c.surface}}; color: {{c.ink}}; border-radius: 0;">
       <div class="tc-chips" role="group" aria-label="Filtrar por cargo" style="display: flex; flex-wrap: wrap; gap: 8px; font-size: 13px;">
@@ -128,6 +132,97 @@ footer>div{padding-left:16px !important;padding-right:16px !important}
     </div>
     <sc-if value="{{temMais}}"><button type="button" onClick="{{mostrarMais}}" style="align-self: center; font: inherit; cursor: pointer; background: transparent; color: {{c.ink}}; border: 2px solid {{c.ink}}; padding: 12px 24px; font-size: 14px;">Carregar mais perfis ({{restantes}})</button></sc-if>
     </sc-if>
+
+    <div id="casos" style="display: flex; flex-direction: column; gap: 10px; scroll-margin-top: 110px; padding-top: 24px; border-top: 6px solid #556A2F;">
+      <h2 style="margin: 0; font-size: clamp(1.8rem, 3.4vw, 2.4rem); line-height: 1.1; letter-spacing: -0.01em;">Casos acompanhados</h2>
+      <p style="margin: 0; font-size: 1rem; line-height: 1.55; color: {{c.muted}}; max-width: 60ch;">Investigações acompanhadas do início ao fim, com a situação atual, os envolvidos, a última etapa e os documentos reunidos.</p>
+    </div>
+
+    <section aria-label="Filtros" style="display: flex; flex-direction: column; gap: 16px; border-top: 2px solid {{c.ink}}; border-bottom: 1px solid {{c.line}}; padding: 20px 0;">
+      <div style="display: flex; flex-direction: column; gap: 6px; max-width: 640px;">
+        <label for="cq" style="font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: {{c.muted}};">Buscar</label>
+        <input id="cq" type="search" value="{{cq}}" onChange="{{onCq}}" placeholder="Palavra no título, no resumo, nos envolvidos ou nas tags" autocomplete="off" style="font: inherit; font-size: 16px; padding: 12px 14px; border: 2px solid {{c.ink}}; background: {{c.bg}}; color: {{c.ink}}; border-radius: 0; min-width: 0;">
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 8px;">
+        <span style="font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: {{c.muted}};">Situação</span>
+        <div class="tc-chips" style="display: flex; flex-wrap: wrap; gap: 8px;">
+          <sc-for list="{{situacoes}}" as="s" hint-placeholder-count="4">
+            <sc-if value="{{s.ativa}}" hint-placeholder-val="{{false}}">
+              <button type="button" onClick="{{s.escolher}}" aria-pressed="true" style="font: inherit; font-size: 13px; padding: 6px 12px; border-radius: 999px; background: #556A2F; color: #FFFAF0; border: 1.5px solid #556A2F; cursor: pointer;">{{s.nome}} · {{s.n}}</button>
+            </sc-if>
+            <sc-if value="{{s.inativa}}" hint-placeholder-val="{{true}}">
+              <button type="button" onClick="{{s.escolher}}" aria-pressed="false" style="font: inherit; font-size: 13px; padding: 6px 12px; border-radius: 999px; background: transparent; color: {{c.ink}}; border: 1.5px solid {{c.line}}; cursor: pointer;">{{s.nome}} · {{s.n}}</button>
+            </sc-if>
+          </sc-for>
+        </div>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 8px;">
+        <span style="font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: {{c.muted}};">Tags</span>
+        <div class="tc-chips" style="display: flex; flex-wrap: wrap; gap: 8px;">
+          <sc-for list="{{todasTags}}" as="t" hint-placeholder-count="12">
+            <sc-if value="{{t.ativa}}" hint-placeholder-val="{{false}}">
+              <button type="button" onClick="{{t.toggle}}" aria-pressed="true" style="font: inherit; font-size: 13px; padding: 6px 12px; border-radius: 999px; background: #556A2F; color: #FFFAF0; border: 1.5px solid #556A2F; cursor: pointer;">{{t.nome}} · {{t.n}} ✕</button>
+            </sc-if>
+            <sc-if value="{{t.inativa}}" hint-placeholder-val="{{true}}">
+              <button type="button" onClick="{{t.toggle}}" aria-pressed="false" style="font: inherit; font-size: 13px; padding: 6px 12px; border-radius: 999px; background: transparent; color: {{c.ink}}; border: 1.5px solid {{c.line}}; cursor: pointer;">{{t.nome}} · {{t.n}}</button>
+            </sc-if>
+          </sc-for>
+        </div>
+      </div>
+      <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px 16px; font-size: 13px; color: {{c.muted}};">
+        <span role="status">{{contagemCasos}}</span>
+        <sc-if value="{{temFiltrosCasos}}" hint-placeholder-val="{{false}}">
+          <button type="button" onClick="{{limparCasos}}" style="font: inherit; font-size: 13px; background: none; border: 0; padding: 4px 0; color: {{c.ink}}; text-decoration: underline; text-underline-offset: 3px; cursor: pointer;">Limpar filtros</button>
+        </sc-if>
+      </div>
+    </section>
+
+    <sc-if value="{{semCasos}}" hint-placeholder-val="{{false}}">
+      <div style="border: 1.5px dashed {{c.line}}; padding: 28px 24px; display: flex; flex-direction: column; gap: 6px;">
+        <strong style="font-size: 1.2rem; font-weight: 500;">Nenhum caso publicado ainda</strong>
+        <span style="color: {{c.muted}};">Os casos acompanhados pela redação aparecem aqui assim que forem publicados.</span>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{vazioCasos}}" hint-placeholder-val="{{false}}">
+      <div style="border: 1.5px dashed {{c.line}}; padding: 28px 24px; display: flex; flex-direction: column; gap: 6px;">
+        <strong style="font-size: 1.2rem; font-weight: 500;">Nenhum caso com esses filtros</strong>
+        <span style="color: {{c.muted}};">Escolha outra situação, desmarque uma tag ou use menos palavras na busca.</span>
+      </div>
+    </sc-if>
+
+    <div style="display: flex; flex-direction: column;">
+      <sc-for list="{{itens}}" as="k" hint-placeholder-count="5">
+        <article style="display: flex; flex-wrap: wrap; gap: 16px 28px; padding: 26px 0; border-bottom: 1px solid {{c.line}}; scroll-margin-top: 110px;">
+          <div style="flex: none; width: 150px; display: flex; flex-direction: column; gap: 8px;">
+            <sc-if value="{{k.andamento}}" hint-placeholder-val="{{true}}"><span style="display: block; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; border: 1.5px solid {{c.ink}}; padding: 5px 10px; text-align: center;">Em andamento</span></sc-if>
+            <sc-if value="{{k.julgamento}}" hint-placeholder-val="{{false}}"><span style="display: block; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; background: #556A2F; color: #FFFAF0; border: 1.5px solid #556A2F; padding: 5px 10px; text-align: center;">Em julgamento</span></sc-if>
+            <sc-if value="{{k.encerrado}}" hint-placeholder-val="{{false}}"><span style="display: block; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; border: 1.5px dashed {{c.muted}}; color: {{c.muted}}; padding: 5px 10px; text-align: center;">Encerrado</span></sc-if>
+            <span style="font-size: 12px; color: {{c.muted}};">Aberto em {{k.abertoTexto}}</span>
+          </div>
+          <div style="flex: 1 1 420px; min-width: 0; display: flex; flex-direction: column; gap: 10px;">
+            <h3 style="margin: 0; font-size: 1.35rem; line-height: 1.2;"><a href="{{k.href}}" style="text-decoration: none;">{{k.titulo}}</a></h3>
+            <p style="margin: 0; font-size: 0.95rem; line-height: 1.55; color: {{c.muted}}; max-width: 66ch;">{{k.resumo}}</p>
+            <dl style="margin: 0; display: flex; flex-wrap: wrap; gap: 8px 28px; font-size: 0.85rem;">
+              <sc-if value="{{k.temEnvolvidos}}" hint-placeholder-val="{{true}}"><div><dt style="font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: {{c.muted}};">Envolvidos</dt><dd style="margin: 2px 0 0;">{{k.envolvidosTexto}}</dd></div></sc-if>
+              <div><dt style="font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: {{c.muted}};">Última etapa</dt><dd style="margin: 2px 0 0;">{{k.etapaTexto}}</dd></div>
+              <div><dt style="font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: {{c.muted}};">Documentos</dt><dd style="margin: 2px 0 0;">{{k.docs}}</dd></div>
+            </dl>
+            <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+              <sc-for list="{{k.tags}}" as="t" hint-placeholder-count="3">
+                <sc-if value="{{t.ativa}}" hint-placeholder-val="{{false}}">
+                  <button type="button" onClick="{{t.toggle}}" aria-pressed="true" style="font: inherit; font-size: 12px; padding: 3px 9px; border-radius: 999px; background: #556A2F; color: #FFFAF0; border: 1.5px solid #556A2F; cursor: pointer;">{{t.nome}}</button>
+                </sc-if>
+                <sc-if value="{{t.inativa}}" hint-placeholder-val="{{true}}">
+                  <button type="button" onClick="{{t.toggle}}" aria-pressed="false" style="font: inherit; font-size: 12px; padding: 3px 9px; border-radius: 999px; background: transparent; color: {{c.ink}}; border: 1.5px solid {{c.line}}; cursor: pointer;">{{t.nome}}</button>
+                </sc-if>
+              </sc-for>
+            </div>
+            <a href="{{k.href}}" style="align-self: flex-start; text-decoration: none; border: 2px solid {{c.ink}}; padding: 8px 14px; font-size: 14px;">Ver o caso →</a>
+          </div>
+        </article>
+      </sc-for>
+    </div>
   </main>
 
   <footer style="background: #101010; color: #FFFAF0; border-top: 1px solid {{c.line}};">
@@ -161,11 +256,12 @@ footer>div{padding-left:16px !important;padding-right:16px !important}
 </div>
 </template>
 <script src="js/runtime.js"></script>
+<script src="js/tags.js"></script>
 <script>
 class Component extends DCLogic {
   constructor(props) {
     super(props);
-    this.state = { escuro: null, status: 'carregando', fichas: [], q: '', filtro: 'todos', limite: 12 };
+    this.state = { escuro: null, status: 'carregando', fichas: [], q: '', filtro: 'todos', limite: 12, casos: [], cq: '', ctags: [], csit: 'Todos' };
   }
   componentDidMount() {
     var self = this;
@@ -177,6 +273,70 @@ class Component extends DCLogic {
       .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
       .then(function (l) { self.setState({ fichas: Array.isArray(l) ? l : [], status: 'ok' }); })
       .catch(function () { self.setState({ status: 'erro' }); });
+    // Casos acompanhados (conteudo/casos/, lançados pelo editor); cada um tem a sua página, caso.html?id=<id>
+    fetch('dados/casos.json', { cache: 'no-cache' })
+      .then(function (r) { return r.ok ? r.json() : []; })
+      .then(function (lista) {
+        self.setState({ casos: Array.isArray(lista) ? lista : [] });
+        if (location.hash === '#casos') setTimeout(function () { var el = document.getElementById('casos'); if (el) el.scrollIntoView({ block: 'start' }); }, 60);
+      })
+      .catch(function () {});
+  }
+  // Lista e filtros dos casos (situação, tags com subtag e busca)
+  casosVals() {
+    var self = this, st = this.state || {};
+    var norm = function (s) { return String(s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim(); };
+    var meses = ['jan.', 'fev.', 'mar.', 'abr.', 'maio', 'jun.', 'jul.', 'ago.', 'set.', 'out.', 'nov.', 'dez.'];
+    var fmt = function (iso) { var p = String(iso || '').slice(0, 10).split('-'); return p.length === 3 ? Number(p[2]) + ' ' + meses[Number(p[1]) - 1] + ' ' + p[0] : ''; };
+    var sel = st.ctags || [], selN = sel.map(TCTags.norm), situacao = st.csit || 'Todos';
+    var toggle = function (nome) {
+      return function () {
+        var atual = (self.state.ctags || []).slice(), i = atual.map(TCTags.norm).indexOf(TCTags.norm(nome));
+        if (i >= 0) atual.splice(i, 1); else atual.push(nome);
+        self.setState({ ctags: atual });
+      };
+    };
+    var dados = (st.casos || []).map(function (k) {
+      return Object.assign({ envolvidos: [], tags: [], documentos: [], resumo: '', etapa: '' }, k, { atualizado: k.atualizado || k.aberto || '', aberto: k.aberto || '' });
+    }).sort(function (a, b) { return a.atualizado < b.atualizado ? 1 : -1; });
+    var palavras = norm(st.cq).split(/\s+/).filter(Boolean);
+    var base = dados.filter(function (k) {
+      if (!TCTags.atendeTodos(k.tags, sel)) return false;
+      var texto = norm([k.titulo, k.resumo, k.etapa, k.envolvidos.join(' '), k.tags.join(' ')].join(' '));
+      return palavras.every(function (w) { return texto.indexOf(w) >= 0; });
+    });
+    var filtrados = base.filter(function (k) { return situacao === 'Todos' || k.status === situacao; });
+    var situacoes = ['Todos', 'Em andamento', 'Em julgamento', 'Encerrado'].map(function (s) {
+      var n = s === 'Todos' ? base.length : base.filter(function (k) { return k.status === s; }).length, ativa = s === situacao;
+      return { nome: s, n: n, ativa: ativa, inativa: !ativa, escolher: function () { self.setState({ csit: s }); } };
+    });
+    var todasTags = TCTags.contar(dados.map(function (k) { return k.tags; })).map(function (t) {
+      var ativa = selN.indexOf(TCTags.norm(t.tag)) >= 0;
+      return { nome: t.rotulo, n: t.n, ativa: ativa, inativa: !ativa, toggle: toggle(t.tag) };
+    });
+    var itens = filtrados.map(function (k) {
+      var resumo = String(k.resumo || '').split(/\n\s*\n/)[0];
+      return {
+        id: k.id, href: 'caso.html?id=' + encodeURIComponent(k.id), titulo: k.titulo,
+        resumo: resumo.length > 320 ? resumo.slice(0, 300).replace(/\s+\S*$/, '') + '…' : resumo,
+        etapa: k.etapa, etapaTexto: [k.etapa, fmt(k.atualizado)].filter(Boolean).join(' · '),
+        docs: k.documentos.length ? k.documentos.length : 'Nenhum ainda', temEnvolvidos: k.envolvidos.length > 0,
+        andamento: k.status === 'Em andamento', julgamento: k.status === 'Em julgamento', encerrado: k.status === 'Encerrado',
+        abertoTexto: fmt(k.aberto), atualizadoTexto: fmt(k.atualizado),
+        envolvidosTexto: k.envolvidos.slice(0, 4).join(' · ') + (k.envolvidos.length > 4 ? ' e mais ' + (k.envolvidos.length - 4) : ''),
+        tags: k.tags.map(function (t) { var a = selN.indexOf(TCTags.norm(t)) >= 0; return { nome: TCTags.rotulo(t), ativa: a, inativa: !a, toggle: toggle(TCTags.limpa(t)) }; })
+      };
+    });
+    var temFiltros = !!(palavras.length || sel.length || situacao !== 'Todos');
+    return {
+      cq: st.cq || '', onCq: function (e) { self.setState({ cq: e.target.value }); },
+      limparCasos: function () { self.setState({ cq: '', ctags: [], csit: 'Todos' }); },
+      situacoes: situacoes, todasTags: todasTags, itens: itens, nCasos: dados.length,
+      semCasos: dados.length === 0, vazioCasos: dados.length > 0 && itens.length === 0, temFiltrosCasos: temFiltros,
+      contagemCasos: temFiltros
+        ? itens.length + ' de ' + dados.length + (dados.length === 1 ? ' caso' : ' casos') + (sel.length ? ' com ' + (sel.length === 1 ? 'a tag ' : 'as tags ') + sel.map(TCTags.rotulo).join(' + ') : '')
+        : dados.length + (dados.length === 1 ? ' caso' : ' casos')
+    };
   }
   filtros() {
     return [['todos', 'Todos os cargos'], ['Presidente', 'Presidente'], ['Senador', 'Senadores'], ['Deputado federal', 'Deputados federais'], ['Governador', 'Governadores'], ['Prefeito', 'Prefeitos'], ['outros', 'Outros cargos']];
@@ -223,7 +383,8 @@ class Component extends DCLogic {
       };
     });
     var ok = st.status === 'ok';
-    return {
+    return Object.assign(this.casosVals(), {
+      nFichas: fichas.length,
       carregando: st.status === 'carregando', erro: st.status === 'erro',
       vazio: ok && filtrados.length === 0, temLista: ok && filtrados.length > 0,
       contagem: filtrados.length === 1 ? '1 ficha' : filtrados.length + ' fichas',
@@ -248,7 +409,7 @@ class Component extends DCLogic {
         self.setState({ escuro: novo });
         try { window.localStorage.setItem('tc-tema', novo ? 'escuro' : 'claro'); } catch (e) {}
       }
-    };
+    });
   }
 }
 iniciarPagina(Component, {"tema": "claro"});

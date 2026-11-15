@@ -92,7 +92,7 @@ footer>div{padding-left:16px !important;padding-right:16px !important}
     <div style="display: flex; flex-direction: column; gap: 14px;">
       <p style="margin: 0; font-size: 13px; color: {{c.muted}};"><a href="index.html" style="text-underline-offset: 3px;">Início</a> / Dossiês</p>
       <h1 style="margin: 0; font-size: clamp(2.4rem, 5vw, 3.6rem); line-height: 1; letter-spacing: -0.02em;"><span style="background: #556A2F; color: #FFFAF0; padding: 0 10px;">Dossiês</span></h1>
-      <p style="margin: 0; font-size: 1.1rem; line-height: 1.55; color: {{c.muted}}; max-width: 60ch;">Reportagens longas, divididas em capítulos, e os casos que acompanhamos do início ao fim, com a situação atual, os envolvidos e os documentos reunidos.</p>
+      <p style="margin: 0; font-size: 1.1rem; line-height: 1.55; color: {{c.muted}}; max-width: 60ch;">Reportagens longas, divididas em capítulos, e meta-dossiês que reúnem vários dossiês num documento só. Os casos que acompanhamos ficam na <a href="politicos.html#casos" style="text-underline-offset: 3px;">Wiki</a>.</p>
     </div>
 
     <sc-if value="{{semDossies}}" hint-placeholder-val="{{false}}">
@@ -163,106 +163,6 @@ footer>div{padding-left:16px !important;padding-right:16px !important}
       </section>
     </sc-if>
 
-    <div id="casos" style="display: flex; flex-direction: column; gap: 10px; scroll-margin-top: 110px;">
-      <h2 style="margin: 0; font-size: clamp(1.6rem, 3vw, 2.2rem); line-height: 1.1; letter-spacing: -0.01em;">Casos acompanhados</h2>
-      <p style="margin: 0; font-size: 1rem; line-height: 1.55; color: {{c.muted}}; max-width: 60ch;">Investigações acompanhadas do início ao fim, com a situação atual, os envolvidos, a última etapa e os documentos reunidos.</p>
-    </div>
-
-    <section aria-label="Filtros" style="display: flex; flex-direction: column; gap: 16px; border-top: 2px solid {{c.ink}}; border-bottom: 1px solid {{c.line}}; padding: 20px 0;">
-      <div style="display: flex; flex-direction: column; gap: 6px; max-width: 640px;">
-        <label for="cq" style="font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: {{c.muted}};">Buscar</label>
-        <input id="cq" type="search" value="{{q}}" onChange="{{onQ}}" placeholder="Palavra no título, no resumo, nos envolvidos ou nas tags" autocomplete="off" style="font: inherit; font-size: 16px; padding: 12px 14px; border: 2px solid {{c.ink}}; background: {{c.bg}}; color: {{c.ink}}; border-radius: 0; min-width: 0;">
-      </div>
-      <div style="display: flex; flex-direction: column; gap: 8px;">
-        <span style="font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: {{c.muted}};">Situação</span>
-        <div class="tc-chips" style="display: flex; flex-wrap: wrap; gap: 8px;">
-          <sc-for list="{{situacoes}}" as="s" hint-placeholder-count="4">
-            <sc-if value="{{s.ativa}}" hint-placeholder-val="{{false}}">
-              <button type="button" onClick="{{s.escolher}}" aria-pressed="true" style="font: inherit; font-size: 13px; padding: 6px 12px; border-radius: 999px; background: #556A2F; color: #FFFAF0; border: 1.5px solid #556A2F; cursor: pointer;">{{s.nome}} · {{s.n}}</button>
-            </sc-if>
-            <sc-if value="{{s.inativa}}" hint-placeholder-val="{{true}}">
-              <button type="button" onClick="{{s.escolher}}" aria-pressed="false" style="font: inherit; font-size: 13px; padding: 6px 12px; border-radius: 999px; background: transparent; color: {{c.ink}}; border: 1.5px solid {{c.line}}; cursor: pointer;">{{s.nome}} · {{s.n}}</button>
-            </sc-if>
-          </sc-for>
-        </div>
-      </div>
-      <div style="display: flex; flex-direction: column; gap: 8px;">
-        <span style="font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: {{c.muted}};">Tags</span>
-        <div class="tc-chips" style="display: flex; flex-wrap: wrap; gap: 8px;">
-          <sc-for list="{{todasTags}}" as="t" hint-placeholder-count="12">
-            <sc-if value="{{t.ativa}}" hint-placeholder-val="{{false}}">
-              <button type="button" onClick="{{t.toggle}}" aria-pressed="true" style="font: inherit; font-size: 13px; padding: 6px 12px; border-radius: 999px; background: #556A2F; color: #FFFAF0; border: 1.5px solid #556A2F; cursor: pointer;">{{t.nome}} · {{t.n}} ✕</button>
-            </sc-if>
-            <sc-if value="{{t.inativa}}" hint-placeholder-val="{{true}}">
-              <button type="button" onClick="{{t.toggle}}" aria-pressed="false" style="font: inherit; font-size: 13px; padding: 6px 12px; border-radius: 999px; background: transparent; color: {{c.ink}}; border: 1.5px solid {{c.line}}; cursor: pointer;">{{t.nome}} · {{t.n}}</button>
-            </sc-if>
-          </sc-for>
-        </div>
-      </div>
-      <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px 16px; font-size: 13px; color: {{c.muted}};">
-        <span role="status">{{contagem}}</span>
-        <sc-if value="{{temFiltros}}" hint-placeholder-val="{{false}}">
-          <button type="button" onClick="{{limpar}}" style="font: inherit; font-size: 13px; background: none; border: 0; padding: 4px 0; color: {{c.ink}}; text-decoration: underline; text-underline-offset: 3px; cursor: pointer;">Limpar filtros</button>
-        </sc-if>
-      </div>
-    </section>
-
-    <sc-if value="{{semCasos}}" hint-placeholder-val="{{false}}">
-      <div style="border: 1.5px dashed {{c.line}}; padding: 28px 24px; display: flex; flex-direction: column; gap: 6px;">
-        <strong style="font-size: 1.2rem; font-weight: 500;">Nenhum caso publicado ainda</strong>
-        <span style="color: {{c.muted}};">Os casos acompanhados pela redação aparecem aqui assim que forem publicados.</span>
-      </div>
-    </sc-if>
-
-    <sc-if value="{{vazio}}" hint-placeholder-val="{{false}}">
-      <div style="border: 1.5px dashed {{c.line}}; padding: 28px 24px; display: flex; flex-direction: column; gap: 6px;">
-        <strong style="font-size: 1.2rem; font-weight: 500;">Nenhum caso com esses filtros</strong>
-        <span style="color: {{c.muted}};">Escolha outra situação, desmarque uma tag ou use menos palavras na busca.</span>
-      </div>
-    </sc-if>
-
-    <div style="display: flex; flex-direction: column;">
-      <sc-for list="{{itens}}" as="k" hint-placeholder-count="5">
-        <article id="{{k.ancora}}" style="display: flex; flex-wrap: wrap; gap: 16px 28px; padding: 26px 0; border-bottom: 1px solid {{c.line}}; scroll-margin-top: 110px;">
-          <div style="flex: none; width: 150px; display: flex; flex-direction: column; gap: 8px;">
-            <sc-if value="{{k.andamento}}" hint-placeholder-val="{{true}}"><span style="display: block; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; border: 1.5px solid {{c.ink}}; padding: 5px 10px; text-align: center;">Em andamento</span></sc-if>
-            <sc-if value="{{k.julgamento}}" hint-placeholder-val="{{false}}"><span style="display: block; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; background: #556A2F; color: #FFFAF0; border: 1.5px solid #556A2F; padding: 5px 10px; text-align: center;">Em julgamento</span></sc-if>
-            <sc-if value="{{k.encerrado}}" hint-placeholder-val="{{false}}"><span style="display: block; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; border: 1.5px dashed {{c.muted}}; color: {{c.muted}}; padding: 5px 10px; text-align: center;">Encerrado</span></sc-if>
-            <span style="font-size: 12px; color: {{c.muted}};">Aberto em {{k.abertoTexto}}</span>
-          </div>
-          <div style="flex: 1 1 420px; min-width: 0; display: flex; flex-direction: column; gap: 10px;">
-            <h2 style="margin: 0; font-size: 1.35rem; line-height: 1.2;">{{k.titulo}}</h2>
-            <p style="margin: 0; font-size: 0.95rem; line-height: 1.55; color: {{c.muted}}; max-width: 66ch;">{{k.resumo}}</p>
-            <dl style="margin: 0; display: flex; flex-wrap: wrap; gap: 8px 28px; font-size: 0.85rem;">
-              <sc-if value="{{k.temEnvolvidos}}" hint-placeholder-val="{{true}}"><div><dt style="font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: {{c.muted}};">Envolvidos</dt><dd style="margin: 2px 0 0;">{{k.envolvidosTexto}}</dd></div></sc-if>
-              <div><dt style="font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: {{c.muted}};">Última etapa</dt><dd style="margin: 2px 0 0;">{{k.etapaTexto}}</dd></div>
-              <div><dt style="font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: {{c.muted}};">Documentos</dt><dd style="margin: 2px 0 0;">{{k.docs}}</dd></div>
-            </dl>
-            <sc-for list="{{k.dossiesLigados}}" as="dl" hint-placeholder-count="0">
-              <aside style="display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; justify-content: space-between; padding: 12px 14px; background: {{c.surface}}; border-left: 4px solid #556A2F; font-size: 14px; line-height: 1.45;">
-                <p style="margin: 0; flex: 1 1 260px;">Este caso faz parte do {{dl.tipo}} <strong style="font-weight: 600;">{{dl.titulo}}</strong>. Leia a investigação completa, com o contexto e as fontes.</p>
-                <a href="{{dl.href}}" style="text-decoration: none; border: 2px solid {{c.ink}}; padding: 6px 12px; font-size: 13px; white-space: nowrap;">Ver o {{dl.tipo}} →</a>
-              </aside>
-            </sc-for>
-            <sc-if value="{{k.temDocumentos}}" hint-placeholder-val="{{false}}">
-              <ul style="margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 4px; font-size: 0.88rem;">
-                <sc-for list="{{k.documentos}}" as="dc" hint-placeholder-count="2"><li><a href="{{dc.link}}" target="{{dc.alvo}}" rel="noopener noreferrer" style="text-underline-offset: 3px;">{{dc.titulo}}</a></li></sc-for>
-              </ul>
-            </sc-if>
-            <div style="display: flex; flex-wrap: wrap; gap: 6px;">
-              <sc-for list="{{k.tags}}" as="t" hint-placeholder-count="3">
-                <sc-if value="{{t.ativa}}" hint-placeholder-val="{{false}}">
-                  <button type="button" onClick="{{t.toggle}}" aria-pressed="true" style="font: inherit; font-size: 12px; padding: 3px 9px; border-radius: 999px; background: #556A2F; color: #FFFAF0; border: 1.5px solid #556A2F; cursor: pointer;">{{t.nome}}</button>
-                </sc-if>
-                <sc-if value="{{t.inativa}}" hint-placeholder-val="{{true}}">
-                  <button type="button" onClick="{{t.toggle}}" aria-pressed="false" style="font: inherit; font-size: 12px; padding: 3px 9px; border-radius: 999px; background: transparent; color: {{c.ink}}; border: 1.5px solid {{c.line}}; cursor: pointer;">{{t.nome}}</button>
-                </sc-if>
-              </sc-for>
-            </div>
-          </div>
-        </article>
-      </sc-for>
-    </div>
   </main>
 
   <footer style="background: #101010; color: #FFFAF0; border-top: 1px solid {{c.line}};">
@@ -298,10 +198,15 @@ footer>div{padding-left:16px !important;padding-right:16px !important}
 <script src="js/runtime.js"></script>
 <script src="js/tags.js"></script>
 <script>
+(function () {
+  var h = decodeURIComponent((location.hash || '').slice(1));
+  if (h === 'casos') location.replace('politicos.html#casos');
+  else if (h.indexOf('caso-') === 0) location.replace('caso.html?id=' + encodeURIComponent(h.slice(5)));
+})();
 class Component extends DCLogic {
   constructor(props) {
     super(props);
-    this.state = { escuro: null, q: '', tags: [], situacao: 'Todos', dossies: [], metas: [], casos: [] };
+    this.state = { escuro: null, dossies: [], metas: [] };
   }
   componentDidMount() {
     var self = this;
@@ -310,29 +215,15 @@ class Component extends DCLogic {
       .then(function (r) { return r.ok ? r.json() : []; })
       .then(function (lista) { self.setState({ dossies: Array.isArray(lista) ? lista : [] }); })
       .catch(function () {});
-    // Meta-dossiês (conteudo/metadossies/) e casos acompanhados (conteudo/casos/), lançados pelo editor
-    [['metadossies', 'metas'], ['casos', 'casos']].forEach(function (x) {
-      fetch('dados/' + x[0] + '.json', { cache: 'no-cache' })
-        .then(function (r) { return r.ok ? r.json() : []; })
-        .then(function (lista) {
-          var p = {}; p[x[1]] = Array.isArray(lista) ? lista : []; self.setState(p);
-          // dossies.html#caso-<id> ou #meta-<id>: rola até o item
-          var alvo = decodeURIComponent((location.hash || '').slice(1));
-          if (alvo && alvo !== 'casos') setTimeout(function () { var el = document.getElementById(alvo); if (el) el.scrollIntoView({ block: 'start' }); }, 60);
-        })
-        .catch(function () {});
-    });
+    // Meta-dossiês (conteudo/metadossies/), lançados pelo editor
+    fetch('dados/metadossies.json', { cache: 'no-cache' })
+      .then(function (r) { return r.ok ? r.json() : []; })
+      .then(function (lista) { self.setState({ metas: Array.isArray(lista) ? lista : [] }); })
+      .catch(function () {});
     try {
       var v = window.localStorage.getItem('tc-tema');
       if (v === 'escuro' || v === 'claro') this.setState({ escuro: v === 'escuro' });
     } catch (e) {}
-  }
-  dados() {
-    // Casos de dados/casos.json: { id, status ('Em andamento' | 'Em julgamento' | 'Encerrado'), titulo, resumo, aberto: 'AAAA-MM-DD',
-    //   atualizado: 'AAAA-MM-DD', etapa, envolvidos: [..], documentos: [{ titulo, link }], tags: [..] }. Subtag com barra: 'violência/contra indígenas'.
-    return ((this.state && this.state.casos) || []).map(function (k) {
-      return Object.assign({ envolvidos: [], tags: [], documentos: [], resumo: '', etapa: '' }, k, { atualizado: k.atualizado || k.aberto || '', aberto: k.aberto || '' });
-    });
   }
   renderVals() {
     var self = this;
@@ -341,63 +232,8 @@ class Component extends DCLogic {
     var c = escuro
       ? { bg: '#101010', surface: '#2F2E25', ink: '#FFFAF0', muted: '#DDD5CA', line: 'rgba(221, 213, 202, 0.3)' }
       : { bg: '#FFFAF0', surface: '#DDD5CA', ink: '#101010', muted: '#2F2E25', line: 'rgba(47, 46, 37, 0.28)' };
-    var norm = function (s) { return String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim(); };
     var meses = ['jan.', 'fev.', 'mar.', 'abr.', 'maio', 'jun.', 'jul.', 'ago.', 'set.', 'out.', 'nov.', 'dez.'];
     var fmt = function (iso) { var p = String(iso || '').slice(0, 10).split('-'); return p.length === 3 ? Number(p[2]) + ' ' + meses[Number(p[1]) - 1] + ' ' + p[0] : ''; };
-    var caminho = function (u) { u = String(u || '').trim(); return /^https?:/i.test(u) ? u : u.replace(/^\/+/, ''); };
-    var sel = st.tags || [];
-    var selN = sel.map(TCTags.norm);
-    var situacao = st.situacao || 'Todos';
-    var toggle = function (nome) {
-      return function () {
-        var k = TCTags.norm(nome);
-        var atual = (self.state.tags || []).slice();
-        var i = atual.map(TCTags.norm).indexOf(k);
-        if (i >= 0) atual.splice(i, 1); else atual.push(nome);
-        self.setState({ tags: atual });
-      };
-    };
-    // Uma tag do caso com o título de um dossiê (ou meta-dossiê) gera o convite para ler o dossiê
-    var ligadosPorTag = function (tagsDoItem) {
-      var partes = {};
-      (tagsDoItem || []).forEach(function (t) { String(t).split('/').forEach(function (p) { var k = TCTags.norm(p).trim(); if (k) partes[k] = true; }); });
-      var achar = function (lista, tipo, param) {
-        return (lista || []).filter(function (x) { return x && x.id && x.titulo && partes[TCTags.norm(x.titulo).trim()]; })
-          .map(function (x) { return { tipo: tipo, titulo: x.titulo, href: 'dossie.html?' + param + '=' + encodeURIComponent(x.id) }; });
-      };
-      return achar(st.dossies, 'dossiê', 'id').concat(achar(st.metas, 'meta-dossiê', 'meta'));
-    };
-    var dados = this.dados().slice().sort(function (a, b) { return a.atualizado < b.atualizado ? 1 : -1; });
-    var palavras = norm(st.q).split(/\s+/).filter(Boolean);
-    var passaTextoETags = function (k) {
-      if (!TCTags.atendeTodos(k.tags, sel)) return false;
-      var texto = norm([k.titulo, k.resumo, k.etapa, k.envolvidos.join(' '), k.tags.join(' ')].join(' '));
-      return palavras.every(function (w) { return texto.indexOf(w) >= 0; });
-    };
-    var base = dados.filter(passaTextoETags);
-    var filtrados = base.filter(function (k) { return situacao === 'Todos' || k.status === situacao; });
-    var situacoes = ['Todos', 'Em andamento', 'Em julgamento', 'Encerrado'].map(function (s) {
-      var n = s === 'Todos' ? base.length : base.filter(function (k) { return k.status === s; }).length;
-      var ativa = s === situacao;
-      return { nome: s, n: n, ativa: ativa, inativa: !ativa, escolher: function () { self.setState({ situacao: s }); } };
-    });
-    var todasTags = TCTags.contar(dados.map(function (k) { return k.tags; })).map(function (t) {
-      var ativa = selN.indexOf(TCTags.norm(t.tag)) >= 0;
-      return { nome: t.rotulo, n: t.n, ativa: ativa, inativa: !ativa, toggle: toggle(t.tag) };
-    });
-    var itens = filtrados.map(function (k) {
-      return {
-        id: k.id, ancora: 'caso-' + k.id, titulo: k.titulo, resumo: k.resumo, etapa: k.etapa,
-        etapaTexto: [k.etapa, fmt(k.atualizado)].filter(Boolean).join(' · '),
-        docs: k.documentos.length ? k.documentos.length : 'Nenhum ainda',
-        documentos: k.documentos.map(function (d) { var l = caminho(d.link); return { titulo: d.titulo || l, link: l || '#', alvo: /^https?:/i.test(l) ? '_blank' : '_self' }; }),
-        temDocumentos: k.documentos.length > 0, temEnvolvidos: k.envolvidos.length > 0,
-        dossiesLigados: ligadosPorTag(k.tags),
-        andamento: k.status === 'Em andamento', julgamento: k.status === 'Em julgamento', encerrado: k.status === 'Encerrado',
-        abertoTexto: fmt(k.aberto), atualizadoTexto: fmt(k.atualizado), envolvidosTexto: k.envolvidos.join(' · '),
-        tags: k.tags.map(function (t) { var a = selN.indexOf(TCTags.norm(t)) >= 0; return { nome: TCTags.rotulo(t), ativa: a, inativa: !a, toggle: toggle(TCTags.limpa(t)) }; })
-      };
-    });
     // Dossiês: o destaque é o mais recente marcado como destaque (ou o mais recente de todos)
     var listaD = (st.dossies || []).slice().sort(function (a, b) { return String(a.data) < String(b.data) ? 1 : -1; });
     var principal = listaD.filter(function (x) { return x.destaque; })[0] || listaD[0] || null;
@@ -421,10 +257,6 @@ class Component extends DCLogic {
         pdf: x.pdf || '', temPdf: !!x.pdf, pdfNome: x.id + '.pdf'
       };
     });
-    var temFiltros = !!(palavras.length || sel.length || situacao !== 'Todos');
-    var contagem = temFiltros
-      ? itens.length + ' de ' + dados.length + (dados.length === 1 ? ' caso' : ' casos') + (sel.length ? ' com ' + (sel.length === 1 ? 'a tag ' : 'as tags ') + sel.map(TCTags.rotulo).join(' + ') : '')
-      : dados.length + (dados.length === 1 ? ' caso' : ' casos');
     return {
       menuAberto: !!(this.state && this.state.menuAberto),
       menuFechado: !(this.state && this.state.menuAberto),
@@ -439,13 +271,8 @@ class Component extends DCLogic {
         self.setState({ escuro: novo });
         try { window.localStorage.setItem('tc-tema', novo ? 'escuro' : 'claro'); } catch (e) {}
       },
-      q: st.q || '',
-      onQ: function (e) { self.setState({ q: e.target.value }); },
-      limpar: function () { self.setState({ q: '', tags: [], situacao: 'Todos' }); },
-      situacoes: situacoes, todasTags: todasTags, itens: itens,
       semDossies: listaD.length === 0, temDestaque: !!principal, destaque: principal ? cartao(principal) : {},
-      outros: outros, temOutros: outros.length > 0, metas: metas, temMetas: metas.length > 0,
-      semCasos: dados.length === 0, vazio: dados.length > 0 && itens.length === 0, temFiltros: temFiltros, contagem: contagem
+      outros: outros, temOutros: outros.length > 0, metas: metas, temMetas: metas.length > 0
     };
   }
 }

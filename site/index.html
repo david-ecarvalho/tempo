@@ -238,9 +238,12 @@ footer>div{padding-left:16px !important;padding-right:16px !important}
       <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 12px; border-top: 2px solid {{c.ink}}; padding-top: 16px;">
         <div style="display: flex; flex-direction: column; gap: 6px;">
           <h2 id="h-politicos" style="margin: 0; font-size: 2rem; letter-spacing: -0.01em;"><span style="background: #556A2F; color: #FFFAF0; padding: 0 8px;">Wiki</span></h2>
-          <p style="margin: 0; font-size: 0.95rem; color: {{c.muted}};">Fichas de atores políticos: trajetória, eleições, atuação, posições e processos, com as fontes.</p>
+          <p style="margin: 0; font-size: 0.95rem; color: {{c.muted}};">Fichas de atores políticos, com as fontes, e os casos que acompanhamos do início ao fim.</p>
         </div>
-        <a href="politicos.html" style="font-size: 14px; text-underline-offset: 4px;">Todos os perfis</a>
+        <div style="display: flex; flex-wrap: wrap; gap: 8px 20px; font-size: 14px;">
+          <a href="politicos.html#casos" style="text-underline-offset: 4px;">Casos acompanhados</a>
+          <a href="politicos.html" style="text-underline-offset: 4px;">Todos os perfis</a>
+        </div>
       </div>
       <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 20px;">
         <sc-for list="{{perfis}}" as="p" hint-placeholder-count="4">
@@ -262,12 +265,9 @@ footer>div{padding-left:16px !important;padding-right:16px !important}
       <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 12px; border-top: 2px solid {{c.ink}}; padding-top: 16px;">
         <div style="display: flex; flex-direction: column; gap: 6px;">
           <h2 id="h-dossies" style="margin: 0; font-size: 2rem; letter-spacing: -0.01em;"><span style="background: #556A2F; color: #FFFAF0; padding: 0 8px;">Dossiês</span></h2>
-          <p style="margin: 0; font-size: 0.95rem; color: {{c.muted}};">Reportagens longas, divididas em capítulos, e os casos que acompanhamos do início ao fim.</p>
+          <p style="margin: 0; font-size: 0.95rem; color: {{c.muted}};">Reportagens longas, divididas em capítulos, e meta-dossiês que reúnem vários dossiês num documento só.</p>
         </div>
-        <div style="display: flex; flex-wrap: wrap; gap: 8px 20px; font-size: 14px;">
-          <a href="dossies.html#casos" style="text-underline-offset: 4px;">Casos acompanhados</a>
-          <a href="dossies.html" style="text-underline-offset: 4px;">Todos os dossiês</a>
-        </div>
+        <a href="dossies.html" style="font-size: 14px; text-underline-offset: 4px;">Todos os dossiês</a>
       </div>
       <div style="display: flex; flex-wrap: wrap; gap: 28px;">
         <article style="flex: 999 1 520px; min-width: 0; background: #556A2F; color: #FFFAF0; padding: 32px; display: flex; flex-direction: column; gap: 14px; box-sizing: border-box;">

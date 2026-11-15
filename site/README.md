@@ -74,7 +74,9 @@ O arquivo fica em `conteudo/metadossies/<id>.md` (o cabeçalho é o do dossiê, 
 
 ## Casos acompanhados
 
-No editor, abra **Casos** e clique em **+ Novo caso**. Preencha o título, a situação (Em andamento, Em julgamento ou Encerrado), a data de abertura, a última atualização e a última etapa, o resumo, os envolvidos (um por linha), os documentos (título e link de cada um) e as tags. Cada caso é gravado em `conteudo/casos/<id>.md`, indexado em `dados/casos.json` e aparece em Dossiês › Casos acompanhados (`dossies.html#caso-<id>`), com filtro por situação, tags e busca.
+No editor, abra **Casos** e clique em **+ Novo caso**. Preencha o título, a situação (Em andamento, Em julgamento ou Encerrado), a data de abertura, a última atualização e a última etapa, o resumo, os envolvidos (um por linha), os documentos (título e link de cada um) e as tags. Cada caso é gravado em `conteudo/casos/<id>.md` e indexado em `dados/casos.json`. Ele tem a sua página, `caso.html?id=<id>`, com a situação, a última etapa, o resumo, os envolvidos (com link para a ficha da Wiki quando o nome antes da vírgula for o de uma ficha), os documentos, as matérias sobre o caso e o dossiê de que faz parte. A lista de casos fica na Wiki (`politicos.html#casos`), com filtro por situação, tags e busca. Os endereços antigos (`casos.html` e `dossies.html#caso-<id>`) redirecionam.
+
+As ligações são feitas por tag, como a de uma matéria com a ficha de um político: uma matéria com o título do caso entre as tags convida a ver o caso (e aparece em "Matérias sobre o caso"); um caso com o título de um dossiê ou meta-dossiê entre as tags convida a ler o dossiê; um dossiê com o título de um meta-dossiê entre as tags (ou que esteja na lista do meta-dossiê) convida a ver o meta-dossiê.
 
 ## Dossiês impressos
 
