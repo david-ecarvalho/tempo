@@ -5,7 +5,7 @@
 - Refaz os índices (dados/noticias.json, dados/politicos.json, dados/votacoes.json e dados/videos.json)
   sozinho quando uma matéria, ficha, votação ou vídeo em conteudo/ é criado, alterado ou apagado.
 - Atende o editor do site (/admin/): rotas /api/... para listar, abrir, salvar e apagar matérias,
-  fichas, votações, vídeos, publicações e dossiês (arquivos .md), enviar imagens, importar consultas do
+  fichas, votações, vídeos, vídeos curtos, publicações e dossiês (arquivos .md), enviar imagens, importar consultas do
   e-Cidadania e gerar o PDF de um dossiê (com o Edge ou o Chrome, sem abrir janela). Por segurança, só aceita pedidos do próprio computador.
 
 Uso:  python scripts/servidor.py            (só neste computador)
@@ -35,14 +35,16 @@ from urllib.parse import parse_qs, urlparse
 
 RAIZ = Path(__file__).resolve().parent.parent
 PASTAS_CONTEUDO = [RAIZ / "conteudo" / "noticias", RAIZ / "conteudo" / "politicos", RAIZ / "conteudo" / "votacoes",
-                   RAIZ / "conteudo" / "videos", RAIZ / "conteudo" / "publicacoes", RAIZ / "conteudo" / "dossies"]
+                   RAIZ / "conteudo" / "videos", RAIZ / "conteudo" / "publicacoes", RAIZ / "conteudo" / "dossies",
+                   RAIZ / "conteudo" / "curtos"]
 PASTA_TIPO = {"noticias": PASTAS_CONTEUDO[0], "politicos": PASTAS_CONTEUDO[1], "votacoes": PASTAS_CONTEUDO[2],
-              "videos": PASTAS_CONTEUDO[3], "publicacoes": PASTAS_CONTEUDO[4], "dossies": PASTAS_CONTEUDO[5]}
+              "videos": PASTAS_CONTEUDO[3], "publicacoes": PASTAS_CONTEUDO[4], "dossies": PASTAS_CONTEUDO[5],
+              "curtos": PASTAS_CONTEUDO[6]}
 INDICES = ("/dados/noticias.json", "/dados/politicos.json", "/dados/votacoes.json", "/dados/videos.json",
-           "/dados/publicacoes.json", "/dados/dossies.json")
+           "/dados/publicacoes.json", "/dados/dossies.json", "/dados/curtos.json")
 PASTA_IMAGENS = {"materias": RAIZ / "imagens" / "materias", "politicos": RAIZ / "imagens" / "politicos",
                  "videos": RAIZ / "imagens" / "videos", "publicacoes": RAIZ / "imagens" / "publicacoes",
-                 "dossies": RAIZ / "imagens" / "dossies"}
+                 "dossies": RAIZ / "imagens" / "dossies", "curtos": RAIZ / "imagens" / "curtos"}
 PASTA_PDF_DOSSIES = RAIZ / "arquivos" / "dossies"
 ID_VALIDO = re.compile(r"^[a-z0-9][a-z0-9-]{0,120}$")
 TIPOS_IMAGEM = {"image/jpeg": ".jpg", "image/png": ".png", "image/webp": ".webp", "image/gif": ".gif"}
@@ -118,6 +120,11 @@ def resumo_item(tipo, arquivo):
     if tipo == "videos":
         return {"id": arquivo.stem, "titulo": str(dados.get("titulo") or "(sem título)"), "data": str(dados.get("data") or ""),
                 "editoria": str(dados.get("criador") or ""), "formato": arquivo.suffix[1:], "modificado": st.st_mtime}
+    if tipo == "curtos":
+        plataforma = str(dados.get("plataforma") or "") or gerar_indice.plataforma_do_link(str(dados.get("link") or ""))
+        detalhe = [x for x in (plataforma, str(dados.get("criador") or "")) if x]
+        return {"id": arquivo.stem, "titulo": str(dados.get("titulo") or "(sem título)"), "data": str(dados.get("data") or ""),
+                "editoria": " · ".join(detalhe), "formato": arquivo.suffix[1:], "modificado": st.st_mtime}
     if tipo == "publicacoes":
         livro = dados.get("tipo") == "livro"
         detalhe = [x for x in (str(dados.get("autoria") or ""), str(dados.get("ano") or "")) if x] if livro \
@@ -152,7 +159,7 @@ def api_itens(tipo):
     for arq in gerar_indice.arquivos(PASTA_TIPO[tipo]):
         with contextlib.suppress(OSError, ValueError):
             itens.append(resumo_item(tipo, arq))
-    if tipo in ("noticias", "votacoes", "videos", "publicacoes", "dossies"):
+    if tipo in ("noticias", "votacoes", "videos", "publicacoes", "dossies", "curtos"):
         itens.sort(key=lambda i: i["data"], reverse=True)
     else:
         itens.sort(key=lambda i: i["titulo"].casefold())
@@ -184,6 +191,9 @@ def api_salvar(pedido):
     if tipo == "videos" and (not dados.get("titulo") or not dados.get("criador")
                              or not re.match(r"^https?://", str(dados.get("link") or "").strip(), re.I)):
         raise ErroApi("o vídeo precisa de nome, criador e um link que comece com https://")
+    if tipo == "curtos" and (not dados.get("titulo")
+                             or not re.match(r"^https?://", str(dados.get("link") or "").strip(), re.I)):
+        raise ErroApi("o vídeo curto precisa de título e de um link que comece com https://")
     if tipo == "dossies" and (not dados.get("titulo") or not dados.get("data")):
         raise ErroApi("o dossiê precisa de título e data")
     if tipo == "publicacoes" and (not dados.get("titulo") or dados.get("tipo") not in ("livro", "revista")):
@@ -194,7 +204,7 @@ def api_salvar(pedido):
             base = f"{str(dados['data'])[:10]}-{slug(dados['titulo'], 60)}"
         elif tipo == "dossies":
             base = slug(dados["titulo"], 70)
-        elif tipo == "videos":
+        elif tipo in ("videos", "curtos"):
             base = slug(dados["titulo"], 60)
         elif tipo == "publicacoes":
             # revistas: título + edição ("revista-continuum-n-3"); livros: título

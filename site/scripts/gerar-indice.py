@@ -15,6 +15,8 @@ Matérias e fichas são arquivos Markdown (.md) com um cabeçalho de dados entre
   A parte "Vídeos do YouTube" da página streaming.html lê este índice.
 - dados/dossies.json, com os dossiês de conteudo/dossies/ (título, capa, número de capítulos e, se já foi
   gerado, o PDF em arquivos/dossies/<id>.pdf). A página dossies.html lê este índice; o texto é lido em dossie.html.
+- dados/curtos.json, com os vídeos curtos de conteudo/curtos/ (título, link, plataforma, criador, data, capa,
+  tags e descrição). A página curtos.html (Repositório de Vídeos Curtos, em Recursos) lê só este índice.
 
 Uso: python3 scripts/gerar-indice.py
 """
@@ -45,6 +47,9 @@ PASTA_DOSSIES = RAIZ / "conteudo" / "dossies"
 SAIDA_DOSSIES = RAIZ / "dados" / "dossies.json"
 CAMPOS_DOSSIES = ("titulo", "linha", "data", "editado", "autor", "capa")
 PASTA_PDF_DOSSIES = RAIZ / "arquivos" / "dossies"
+PASTA_CURTOS = RAIZ / "conteudo" / "curtos"
+SAIDA_CURTOS = RAIZ / "dados" / "curtos.json"
+CAMPOS_CURTOS = ("titulo", "link", "plataforma", "criador", "data", "capa")
 CAMPOS = ("titulo", "linha", "data", "editoria", "tags", "autor", "foto", "destaque")
 
 
@@ -110,6 +115,7 @@ def main():
     problemas += gerar_videos()
     problemas += gerar_publicacoes()
     problemas += gerar_dossies()
+    problemas += gerar_curtos()
     for problema in problemas:
         print(f"Aviso: {problema}", file=sys.stderr)
 
@@ -271,6 +277,55 @@ def gerar_dossies():
     dossies.sort(key=lambda d: d["data"], reverse=True)
     SAIDA_DOSSIES.write_text(json.dumps(dossies, ensure_ascii=False, indent=1) + "\n", encoding="utf-8", newline="\n")
     print(f"{len(dossies)} dossiês em {SAIDA_DOSSIES.relative_to(RAIZ)}")
+    return problemas
+
+
+# Plataforma pelo endereço do vídeo, quando o arquivo não diz qual é (a mesma regra de admin/editor.js e curtos.html)
+PLATAFORMAS = (
+    (r"(^|\.)(youtube\.com|youtu\.be)$", "YouTube"),
+    (r"(^|\.)tiktok\.com$", "TikTok"),
+    (r"(^|\.)(instagram\.com|instagr\.am)$", "Instagram"),
+    (r"(^|\.)(kwai\.com|kw\.ai)$", "Kwai"),
+    (r"(^|\.)(x\.com|twitter\.com)$", "X"),
+    (r"(^|\.)(facebook\.com|fb\.watch)$", "Facebook"),
+    (r"(^|\.)threads\.(net|com)$", "Threads"),
+    (r"(^|\.)bsky\.app$", "Bluesky"),
+)
+
+
+def plataforma_do_link(link):
+    m = re.match(r"^https?://([^/:?#]+)", link, re.I)
+    host = m.group(1).lower().removeprefix("www.") if m else ""
+    return next((nome for padrao, nome in PLATAFORMAS if re.search(padrao, host)), "Outra")
+
+
+def gerar_curtos():
+    """Grava dados/curtos.json e devolve a lista de avisos."""
+    curtos, problemas = [], []
+    for arquivo in sorted(PASTA_CURTOS.glob("*.md")) if PASTA_CURTOS.exists() else []:
+        try:
+            dados, corpo = cabecalho.ler(arquivo.read_text(encoding="utf-8"))
+        except (OSError, ValueError) as erro:
+            problemas.append(f"{arquivo.name}: arquivo inválido ({erro})")
+            continue
+        link = str(dados.get("link") or "").strip()
+        if not dados.get("titulo") or not re.match(r"^https?://", link, re.I):
+            problemas.append(f"{arquivo.name}: sem título ou sem link, ficou de fora")
+            continue
+        item = {"id": arquivo.stem}
+        for campo in CAMPOS_CURTOS:
+            item[campo] = str(dados.get(campo) or "").strip()
+        item["plataforma"] = item["plataforma"] or plataforma_do_link(link)
+        item["capa"] = caminho_relativo(item["capa"])
+        tags = dados.get("tags")
+        tags = tags if isinstance(tags, list) else ([tags] if tags else [])
+        item["tags"] = [limpar_tag(t) for t in tags if str(t).strip()]
+        item["descricao"] = texto_simples(corpo)
+        curtos.append(item)
+
+    curtos.sort(key=lambda c: (c["data"], c["titulo"]), reverse=True)
+    SAIDA_CURTOS.write_text(json.dumps(curtos, ensure_ascii=False, indent=1) + "\n", encoding="utf-8", newline="\n")
+    print(f"{len(curtos)} vídeos curtos em {SAIDA_CURTOS.relative_to(RAIZ)}")
     return problemas
 
 

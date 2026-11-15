@@ -20,7 +20,8 @@ O botão **Arquivo Markdown** mostra e permite editar o arquivo inteiro, como el
 - `conteudo/votacoes/*.md`: uma votação do e-Cidadania por arquivo. O cabeçalho guarda os dados da consulta, o placar e a `recomendacao` (`sim` ou `nao`); o texto é a nossa descrição.
 - `scripts/ecidadania.py`: lê uma consulta pública do e-Cidadania (o editor usa pelo servidor local).
 - `conteudo/videos/*.md`: um vídeo do YouTube por arquivo (só cabeçalho: `titulo`, `criador`, `link`, `capa`, `data`). Indexado em `dados/videos.json`, que a parte "Vídeos do YouTube" de `streaming.html` lê.
-- `imagens/materias/`, `imagens/politicos/` e `imagens/videos/`: fotos e capas enviadas pelo editor.
+- `conteudo/curtos/*.md`: um vídeo curto por arquivo (cabeçalho com `titulo`, `link`, `plataforma`, `criador`, `data`, `capa` e `tags`; o texto, opcional, é a descrição). Indexado em `dados/curtos.json`, que `curtos.html` (Recursos › Repositório de Vídeos Curtos) lê.
+- `imagens/materias/`, `imagens/politicos/` `imagens/videos/` e `imagens/curtos/`: fotos e capas enviadas pelo editor.
 - `admin/`: o editor de matérias e fichas (`index.html`, `editor.js`, `editor.css`). Ele grava pelos endereços `/api/...` do servidor local, que só aceitam pedidos do próprio computador.
 - `gerador-de-imagens.html` e `js/gerador-imagens.js`: o Gerador de imagens (Ferramentas). Monta a imagem num canvas no navegador de quem usa; nada é enviado ao site. Os formatos e as áreas de cada um ficam em `dados/layouts-imagens.json`. O desenho é feito por um motor em Rust compilado para WebAssembly (`js/motor/`; o código-fonte fica fora do site, em `../motor-imagens/`).
 - `js/tags.js`: tags com subtag ("violência/contra indígenas"), usadas por Home, Notícias, Matéria e Casos.
@@ -64,6 +65,12 @@ O script só guarda dados de contato do mandato, nada de CPF ou outros dados pes
 ## Como adicionar vídeos do YouTube
 
 No editor, abra **Vídeos** e clique em **+ Novo vídeo**. Cole o link do vídeo, escreva o nome do vídeo e o nome do criador, e escolha a capa: **Enviar imagem** (ou arraste uma) ou **Usar a miniatura do YouTube**. Ao salvar, o vídeo aparece em Streaming › Vídeos do YouTube (`streaming.html#youtube`); clicar no cartão abre o vídeo no YouTube, numa aba nova. A antiga página `documentarios.html` agora só redireciona para `streaming.html`.
+
+## Repositório de Vídeos Curtos
+
+A página `curtos.html` (cartão em Recursos) reúne vídeos curtos de qualquer plataforma: YouTube (Shorts), TikTok, Instagram (Reels), Kwai, X, Facebook, Threads, Bluesky ou outra. Quem visita filtra por plataforma, por uma ou mais tags (com subtags, como nas notícias) e por palavra; o botão "Assistir" abre o vídeo na plataforma de origem, numa aba nova.
+
+Para adicionar: no editor, abra **Curtos** e clique em **+ Novo vídeo curto**. Cole o link (a plataforma é reconhecida sozinha, mas dá para trocar), escreva o título e, se quiser, o criador e uma descrição curta, e coloque de 1 a 8 tags. O editor sugere as tags que já existem nos vídeos curtos. A capa é opcional: para YouTube há o botão **Usar a miniatura do YouTube**; nas outras plataformas, envie um print. Sem capa, o cartão mostra o nome da plataforma numa cor própria. O endereço `curtos.html#<id>` leva direto ao vídeo.
 
 ## Rodar no computador
 

@@ -452,7 +452,34 @@
     };
   }
 
+  // =========================================================================
+  // Vídeo curto (conteudo/curtos/<id>.md), do Repositório de Vídeos Curtos (curtos.html).
+  // Cabeçalho: titulo, link (do vídeo em qualquer plataforma), plataforma (YouTube, TikTok, Instagram, Kwai, X,
+  // Facebook, Threads, Bluesky ou Outra), criador, data, capa (opcional) e tags (lista, como nas matérias).
+  // Texto: uma descrição curta, opcional.
+  // =========================================================================
+  var ORDEM_CURTO = ['titulo', 'link', 'plataforma', 'criador', 'data', 'capa', 'tags'];
+
+  function lerCurto(texto) {
+    var r = ler(texto), c = {};
+    ORDEM_CURTO.forEach(function (k) { c[k] = r.dados[k] == null ? '' : r.dados[k]; });
+    c.tags = Array.isArray(c.tags) ? c.tags.map(String) : (c.tags ? [String(c.tags)] : []);
+    ORDEM_CURTO.forEach(function (k) { if (k !== 'tags') c[k] = String(c[k]); });
+    c.corpo = r.corpo;
+    return c;
+  }
+
+  function escreverCurto(c) {
+    var dados = {};
+    ORDEM_CURTO.forEach(function (k) {
+      dados[k] = k === 'tags' ? (c.tags || []).map(function (t) { return String(t).trim(); }).filter(Boolean)
+        : (c[k] == null ? '' : String(c[k]).trim());
+    });
+    return escrever(dados, c.corpo || '', ORDEM_CURTO);
+  }
+
   window.TCMarkdown = {
+    lerCurto: lerCurto, escreverCurto: escreverCurto,
     lerDossie: lerDossie, escreverDossie: escreverDossie, capitulosDossie: capitulosDossie, textoSimples: textoSimples,
     lerPublicacao: lerPublicacao, escreverPublicacao: escreverPublicacao,
     ler: ler, escrever: escrever, inline: inline, blocos: blocos, html: html, caminhoImagem: caminhoImagem,

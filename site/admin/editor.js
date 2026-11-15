@@ -1,4 +1,4 @@
-/* Tempo Continuum — editor de matérias, fichas, votações, vídeos, publicações e dossiês.
+/* Tempo Continuum — editor de matérias, fichas, votações, vídeos, vídeos curtos, publicações e dossiês.
    Grava arquivos Markdown (.md) em conteudo/noticias, conteudo/politicos, conteudo/votacoes, conteudo/videos, conteudo/publicacoes
    e conteudo/dossies pelo servidor local
    (scripts/servidor.py). O formato dos arquivos está descrito em js/markdown.js. */
@@ -15,12 +15,26 @@
     votacoes: { novo: '+ Nova votação', vazio: 'Escolha uma votação na lista ou traga uma nova do e-Cidadania.', pasta: 'materias', pagina: 'votacoes.html' },
     videos: { novo: '+ Novo vídeo', vazio: 'Escolha um vídeo na lista ou adicione um novo do YouTube.', pasta: 'videos', pagina: 'streaming.html' },
     publicacoes: { novo: '+ Nova publicação', vazio: 'Escolha um livro ou uma revista na lista, ou crie uma publicação nova.', pasta: 'publicacoes', pagina: 'publicacoes.html' },
-    dossies: { novo: '+ Novo dossiê', vazio: 'Escolha um dossiê na lista ou crie um novo.', pasta: 'dossies', pagina: 'dossie.html' }
+    dossies: { novo: '+ Novo dossiê', vazio: 'Escolha um dossiê na lista ou crie um novo.', pasta: 'dossies', pagina: 'dossie.html' },
+    curtos: { novo: '+ Novo vídeo curto', vazio: 'Escolha um vídeo curto na lista ou adicione um novo, de qualquer plataforma.', pasta: 'curtos', pagina: 'curtos.html' }
   };
+  var PLATAFORMAS = ['YouTube', 'TikTok', 'Instagram', 'Kwai', 'X', 'Facebook', 'Threads', 'Bluesky', 'Outra'];
+  // Plataforma pelo endereço do vídeo (a mesma regra de scripts/gerar-indice.py e curtos.html)
+  function plataformaDoLink(link) {
+    var m = /^https?:\/\/([^\/:?#]+)/i.exec(String(link || '').trim());
+    var host = m ? m[1].toLowerCase().replace(/^www\./, '') : '';
+    var regras = [[/(^|\.)(youtube\.com|youtu\.be)$/, 'YouTube'], [/(^|\.)tiktok\.com$/, 'TikTok'],
+      [/(^|\.)(instagram\.com|instagr\.am)$/, 'Instagram'], [/(^|\.)(kwai\.com|kw\.ai)$/, 'Kwai'],
+      [/(^|\.)(x\.com|twitter\.com)$/, 'X'], [/(^|\.)(facebook\.com|fb\.watch)$/, 'Facebook'],
+      [/(^|\.)threads\.(net|com)$/, 'Threads'], [/(^|\.)bsky\.app$/, 'Bluesky']];
+    for (var i = 0; i < regras.length; i++) if (regras[i][0].test(host)) return regras[i][1];
+    return host ? 'Outra' : '';
+  }
   // Endereço do item no site (votações ficam todas numa página, cada uma com uma âncora;
   // os vídeos ficam na parte "Vídeos do YouTube" da página Streaming)
   function enderecoNoSite(tipo, id) {
     if (tipo === 'videos') return NOMES.videos.pagina + '#youtube';
+    if (tipo === 'curtos') return NOMES.curtos.pagina + '#' + id;
     if (tipo === 'publicacoes') {
       var pub = estado.atual && estado.atual.tipo === 'publicacoes' ? estado.atual.m : null;
       return NOMES.publicacoes.pagina + (pub ? (pub.tipo === 'revista' ? '#revistas' : '#livros') : '');
@@ -133,8 +147,11 @@
     }).catch(function (e) { aviso(e.message, true); });
   }
 
+  // Tags sugeridas no campo de tags: as das matérias ou, na aba Curtos, as dos vídeos curtos
   function carregarTags() {
-    return fetch('../dados/noticias.json', { cache: 'no-store' }).then(function (r) { return r.json(); }).then(function (lista) {
+    var tipo = estado.tipo === 'curtos' ? 'curtos' : 'noticias';
+    return fetch('../dados/' + tipo + '.json', { cache: 'no-store' }).then(function (r) { return r.json(); }).then(function (lista) {
+      if ((estado.tipo === 'curtos' ? 'curtos' : 'noticias') !== tipo) return;
       estado.tags = TCTags.contar(lista.map(function (n) { return n.tags || []; }));
     }).catch(function () { estado.tags = []; });
   }
@@ -154,7 +171,7 @@
         ? [dataCurta(i.data), i.editoria, i.destaque ? 'Manchete' : ''].filter(Boolean).join(' · ')
         : estado.tipo === 'dossies'
           ? [dataCurta(i.data), i.editoria].filter(Boolean).join(' · ')
-        : estado.tipo === 'votacoes' || estado.tipo === 'videos' || estado.tipo === 'publicacoes'
+        : estado.tipo === 'votacoes' || estado.tipo === 'videos' || estado.tipo === 'publicacoes' || estado.tipo === 'curtos'
           ? [i.editoria, dataCurta(i.data)].filter(Boolean).join(' · ')
           : [i.editoria, i.data ? 'revisada em ' + dataCurta(i.data) : ''].filter(Boolean).join(' · ');
       lista.appendChild(h('li', null, h('button', {
@@ -175,6 +192,7 @@
     $('area').innerHTML = '';
     $('area').appendChild(h('div', { class: 'vazio' }, h('p', null, NOMES[tipo].vazio)));
     carregarLista();
+    carregarTags();
     history.replaceState(null, '', '#' + tipo);
   }
   document.querySelectorAll('.abas button').forEach(function (b) { b.addEventListener('click', function () { trocarTipo(b.dataset.tipo); }); });
@@ -192,6 +210,7 @@
     }
     if (tipo === 'votacoes') return TCMarkdown.lerVotacao(r.texto);
     if (tipo === 'videos') return TCMarkdown.lerVideo(r.texto);
+    if (tipo === 'curtos') return TCMarkdown.lerCurto(r.texto);
     if (tipo === 'publicacoes') return TCMarkdown.lerPublicacao(r.texto);
     if (tipo === 'dossies') return TCMarkdown.lerDossie(r.texto);
     if (r.formato === 'md') {
@@ -226,6 +245,8 @@
           capa: '', link: '', rotulo_link: '', assuntos: [], corpo: '' }
       : tipo === 'videos'
       ? { titulo: '', criador: '', foto_criador: '', link: '', capa: '', data: hoje() }
+      : tipo === 'curtos'
+      ? { titulo: '', link: '', plataforma: '', criador: '', data: hoje(), capa: '', tags: [], corpo: '' }
       : tipo === 'votacoes'
       ? { titulo: '', sigla: '', identificacao: '', autoria: '', ementa: '', ecidadania_id: '', recomendacao: '',
           votos_sim: '', votos_nao: '', apurado_em: '', data: hoje(), corpo: '' }
@@ -260,6 +281,7 @@
   function escreverArquivo(a) {
     if (a.tipo === 'votacoes') return TCMarkdown.escreverVotacao(a.m);
     if (a.tipo === 'videos') return TCMarkdown.escreverVideo(a.m);
+    if (a.tipo === 'curtos') return TCMarkdown.escreverCurto(a.m);
     if (a.tipo === 'publicacoes') return TCMarkdown.escreverPublicacao(a.m);
     if (a.tipo === 'dossies') return TCMarkdown.escreverDossie(a.m);
     return a.tipo === 'noticias' ? TCMarkdown.escreverMateria(a.m) : TCMarkdown.escreverFicha(a.m, a.m.corpo);
@@ -281,6 +303,10 @@
       if (!/^https?:\/\//i.test(String(m.link || '').trim())) erros.push('o link do vídeo (começando com https://)');
       if (!String(m.titulo || '').trim()) erros.push('o nome do vídeo');
       if (!String(m.criador || '').trim()) erros.push('o nome do criador');
+    } else if (a.tipo === 'curtos') {
+      if (!/^https?:\/\//i.test(String(m.link || '').trim())) erros.push('o link do vídeo (começando com https://)');
+      if (!String(m.titulo || '').trim()) erros.push('o título');
+      if (!(m.tags || []).length) erros.push('pelo menos uma tag');
     } else if (a.tipo === 'dossies') {
       if (!String(m.titulo || '').trim()) erros.push('o título');
       if (!String(m.data || '').trim()) erros.push('a data');
@@ -326,7 +352,7 @@
       if (novoItem) desenharEditor();
       history.replaceState(null, '', '#' + a.tipo + '/' + a.id);
       carregarLista();
-      if (a.tipo === 'noticias') carregarTags();
+      if (a.tipo === 'noticias' || a.tipo === 'curtos') carregarTags();
       if (a.tipo === 'dossies') a.pdf = a.pdf ? 'PDF desatualizado' : '';
       return true;
     }).catch(function (e) { aviso('Não salvou: ' + e.message, true); return false; })
@@ -339,6 +365,7 @@
     var nome = a.tipo === 'noticias' ? 'a matéria "' + (a.m.titulo || a.id) + '"'
       : a.tipo === 'votacoes' ? 'a votação "' + (a.m.titulo || a.id) + '"'
       : a.tipo === 'videos' ? 'o vídeo "' + (a.m.titulo || a.id) + '"'
+      : a.tipo === 'curtos' ? 'o vídeo curto "' + (a.m.titulo || a.id) + '"'
       : a.tipo === 'dossies' ? 'o dossiê "' + (a.m.titulo || a.id) + '" (e o PDF dele, se houver)'
       : a.tipo === 'publicacoes' ? (a.m.tipo === 'revista' ? 'a revista "' : 'o livro "') + (a.m.titulo || a.id) + '"' : 'a ficha de ' + (a.m.nome || a.id);
     if (!confirm('Apagar ' + nome + '? O arquivo será removido da pasta conteudo e sai do site. Links já compartilhados param de funcionar.')) return;
@@ -438,7 +465,7 @@
       if (!opcoes.length) return;
       listaSug.appendChild(h('ul', { role: 'listbox' }, opcoes.map(function (x, i) {
         return h('li', { role: 'option', class: x.sub ? 'sub' : '', 'aria-selected': 'false',
-          onmousedown: function (e) { e.preventDefault(); adicionar(x.tag); } }, x.rotulo, h('small', null, x.n + (x.n === 1 ? ' matéria' : ' matérias')));
+          onmousedown: function (e) { e.preventDefault(); adicionar(x.tag); } }, x.rotulo, h('small', null, x.n + (estado.tipo === 'curtos' ? (x.n === 1 ? ' vídeo' : ' vídeos') : (x.n === 1 ? ' matéria' : ' matérias'))));
       })));
     }
     function destacar(i) {
@@ -754,7 +781,7 @@
     }
     area.appendChild(a.tipo === 'noticias' ? formMateria(a) : a.tipo === 'votacoes' ? formVotacao(a)
       : a.tipo === 'videos' ? formVideo(a) : a.tipo === 'publicacoes' ? formPublicacao(a)
-      : a.tipo === 'dossies' ? formDossie(a) : formFicha(a));
+      : a.tipo === 'dossies' ? formDossie(a) : a.tipo === 'curtos' ? formCurto(a) : formFicha(a));
   }
 
   function trocarModo(modo) {
@@ -1025,6 +1052,72 @@
         h('h2', null, 'Foto do canal'),
         fotoCanal,
         h('p', { class: 'dica' }, 'No YouTube, abra o canal, clique com o botão direito na foto dele, escolha "Salvar imagem como…" e envie aqui.')));
+  }
+
+  // ---- Vídeo curto (qualquer plataforma), Recursos › Repositório de Vídeos Curtos
+  function formCurto(a) {
+    var m = a.m;
+    var titulo = texto(m, 'titulo', { maxlength: 200, placeholder: 'Do que trata o vídeo, em uma linha' });
+    var link = texto(m, 'link', { type: 'url', placeholder: 'https://www.tiktok.com/@… · https://www.instagram.com/reel/… · https://youtube.com/shorts/…' });
+    var plataforma = h('select', { onchange: function (e) {
+      m.plataformaManual = !!e.target.value;
+      m.plataforma = e.target.value || plataformaDoLink(m.link);
+      if (!e.target.value) desenharPlataformas();
+      marcarSujo();
+    } });
+    var avisoLink = h('small');
+    function desenharPlataformas() {
+      plataforma.innerHTML = '';
+      plataforma.appendChild(h('option', { value: '' }, '(escolher pelo link)'));
+      PLATAFORMAS.forEach(function (p) { plataforma.appendChild(h('option', { value: p, selected: p === m.plataforma ? 'selected' : null }, p)); });
+    }
+    function conferirLink() {
+      var v = String(m.link || '').trim(), p = plataformaDoLink(v);
+      if (p && !m.plataformaManual) { m.plataforma = p; desenharPlataformas(); }
+      avisoLink.textContent = !v ? 'Cole o endereço do vídeo. No site, o botão "Assistir" abre o vídeo na plataforma, numa aba nova.'
+        : !/^https?:\/\//i.test(v) ? 'O link precisa começar com https://'
+        : p === 'Outra' ? 'Plataforma não reconhecida: escolha ao lado ou deixe "Outra".' : 'Link do ' + p + ' reconhecido.';
+    }
+    if (m.plataforma) m.plataformaManual = m.plataforma !== plataformaDoLink(m.link);
+    desenharPlataformas();
+    link.addEventListener('input', conferirLink);
+    conferirLink();
+    var fotoCaixa = h('div');
+    function desenharFoto() {
+      fotoCaixa.innerHTML = '';
+      fotoCaixa.appendChild(campoFoto(m, 'capa', 'curtos', { maxL: 720, maxA: 1280,
+        dica: 'Vertical (9:16), como os vídeos curtos. Imagens grandes são reduzidas ao enviar. Opcional.' }));
+    }
+    desenharFoto();
+    var usarCapaYoutube = h('button', { type: 'button', class: 'botao-mini', onclick: function () {
+      var id = idYoutube(m.link);
+      if (!id) { aviso('Esse botão só funciona com links do YouTube.', true); link.focus(); return; }
+      m.capa = 'https://i.ytimg.com/vi/' + id + '/hqdefault.jpg';
+      marcarSujo();
+      desenharFoto();
+    } }, 'Usar a miniatura do YouTube');
+    return h('div', { class: 'form' },
+      h('section', { class: 'secao' },
+        h('h2', null, a.id ? 'Vídeo curto' : 'Novo vídeo curto'),
+        h('div', { class: 'grade' },
+          campo('Link do vídeo', link, { largo: true }),
+          h('div', { class: 'campo largo' }, avisoLink),
+          campo('Plataforma', plataforma),
+          campo('Criador', texto(m, 'criador', { placeholder: 'Perfil ou pessoa que fez o vídeo' })),
+          campo('Título', titulo, { largo: true, extra: contador(titulo, 100) }),
+          campo('Descrição', areaTexto(m, 'corpo', 3), { largo: true, dica: 'Opcional. Uma ou duas frases sobre o vídeo; aparecem no cartão.' }),
+          campo('Data', h('input', { type: 'date', value: String(m.data || '').slice(0, 10), oninput: function (e) { m.data = e.target.value; marcarSujo(); } }),
+            { dica: 'Os mais recentes aparecem primeiro.' })),
+        h('p', { class: 'dica' }, 'Aparece em Recursos › Repositório de Vídeos Curtos (' + NOMES.curtos.pagina + ').')),
+      h('section', { class: 'secao' },
+        h('h2', null, 'Tags'),
+        campoTags(m),
+        h('p', { class: 'dica' }, 'De 1 a 8, em minúsculas, como nas matérias. Reaproveite as sugeridas. Para uma subtag, use a barra: violência/contra indígenas. Tags com borda tracejada são novas.')),
+      h('section', { class: 'secao' },
+        h('h2', null, 'Capa'),
+        fotoCaixa,
+        h('div', { class: 'linhas-acoes' }, usarCapaYoutube),
+        h('p', { class: 'dica' }, 'Sem capa, o cartão mostra o nome da plataforma. TikTok, Instagram e outras não deixam usar a miniatura delas direto; tire um print e envie aqui, se quiser.')));
   }
 
   // ---- Publicação (livro ou revista), página Publicações
