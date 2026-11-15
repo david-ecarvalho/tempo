@@ -125,6 +125,12 @@ footer>div{padding-left:16px !important;padding-right:16px !important}
               <a href="{{f.href}}" style="text-decoration: none; border: 2px solid {{c.ink}}; padding: 8px 14px; font-size: 14px; white-space: nowrap;">Ver a ficha →</a>
             </aside>
           </sc-for>
+          <sc-for list="{{casosLigados}}" as="k" hint-placeholder-count="0">
+            <aside style="display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center; justify-content: space-between; padding: 14px 16px; background: {{c.surface}}; border-left: 4px solid #556A2F; font-size: 15px; line-height: 1.45;">
+              <p style="margin: 0; flex: 1 1 280px;">Esta matéria faz parte do caso <strong style="font-weight: 600;">{{k.titulo}}</strong>, acompanhado pelo Tempo Continuum ({{k.status}}). Veja a situação atual, os envolvidos e os documentos reunidos.</p>
+              <a href="{{k.href}}" style="text-decoration: none; border: 2px solid {{c.ink}}; padding: 8px 14px; font-size: 14px; white-space: nowrap;">Ver o caso →</a>
+            </aside>
+          </sc-for>
         </header>
 
         <sc-if value="{{m.temFoto}}" hint-placeholder-val="{{false}}">
@@ -212,6 +218,11 @@ class Component extends DCLogic {
       .then(function (r) { return r.ok ? r.json() : []; })
       .then(function (lista) { self.setState({ politicos: Array.isArray(lista) ? lista : [] }); })
       .catch(function () {});
+    // Casos acompanhados: uma tag com o título de um caso gera o convite para ver o caso
+    fetch('dados/casos.json', { cache: 'no-cache' })
+      .then(function (r) { return r.ok ? r.json() : []; })
+      .then(function (lista) { self.setState({ casos: Array.isArray(lista) ? lista : [] }); })
+      .catch(function () {});
   }
   // Lê conteudo/<pasta>/<id>.md; se não existir, o .json antigo
   carregar(pasta, id, lerMd) {
@@ -253,8 +264,11 @@ class Component extends DCLogic {
     var fichas = (st.politicos || []).filter(function (p) {
       return p && p.id && p.nome && partesTags[TCTags.norm(p.nome).trim()];
     }).map(function (p) { return { nome: p.nome, href: 'ficha.html?id=' + encodeURIComponent(p.id) }; });
+    var casosLigados = (st.casos || []).filter(function (k) {
+      return k && k.id && k.titulo && partesTags[TCTags.norm(k.titulo).trim()];
+    }).map(function (k) { return { titulo: k.titulo, status: String(k.status || '').toLowerCase(), href: 'dossies.html#caso-' + encodeURIComponent(k.id) }; });
     return {
-      fichas: fichas,
+      fichas: fichas, casosLigados: casosLigados,
       menuAberto: !!st.menuAberto,
       menuFechado: !st.menuAberto,
       menuAbertoTxt: st.menuAberto ? 'true' : 'false',

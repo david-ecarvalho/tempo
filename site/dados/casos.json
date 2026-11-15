@@ -1,1 +1,57 @@
-[]
+[
+ {
+  "id": "morte-de-renee-good",
+  "titulo": "Morte de Renée Good",
+  "status": "Em andamento",
+  "aberto": "2026-01-07",
+  "atualizado": "2026-11-08",
+  "etapa": "Sem denúncia: investigação estadual aberta e família processa o governo federal",
+  "envolvidos": [
+   "Jonathan Ross, agente do ICE",
+   "ICE e Departamento de Segurança Interna (DHS)",
+   "Kristi Noem, ex-secretária de Segurança Interna",
+   "Stephen Miller",
+   "Tom Homan",
+   "Todd Lyons",
+   "Gregory Bovino",
+   "Corey Lewandowski",
+   "Departamento de Justiça dos EUA",
+   "Promotoria do Condado de Hennepin",
+   "BCA, polícia estadual de Minnesota"
+  ],
+  "tags": [
+   "ICE: A nova Gestapo",
+   "ICE",
+   "Estados Unidos",
+   "imigração",
+   "violência policial"
+  ],
+  "documentos": [
+   {
+    "titulo": "Ação civil da família contra Ross e funcionários do governo (Ganger et al. v. Ross et al.)",
+    "link": "https://www.courthousenews.com/wp-content/uploads/2026/10/Renee-Good-family-suit-against-Ross.pdf"
+   },
+   {
+    "titulo": "A morte: Renee Good killed by ICE agent in Minneapolis — MPR News, 7 jan. 2026",
+    "link": "https://www.mprnews.org/story/2026/01/07/shooting-south-minneapolis-ice-agents-federal-operation"
+   },
+   {
+    "titulo": "As ações da família na Justiça federal — MPR News, 1º out. 2026",
+    "link": "https://www.mprnews.org/story/2026/10/01/renee-good-lawsuit-minneapolis-ice-shooting-operation-metro-surge"
+   },
+   {
+    "titulo": "Investigações sem denúncia e provas retidas — Fox 9, 8 nov. 2026",
+    "link": "https://www.fox9.com/news/ice-shootings-continue-renee-good-alex-pretti-investigations-stall"
+   },
+   {
+    "titulo": "Checagem: Ross não foi 'inocentado' — Snopes, abr. 2026",
+    "link": "https://www.snopes.com/fact-check/ice-agent-renee-good/"
+   },
+   {
+    "titulo": "Cobertura completa do caso — MPR News",
+    "link": "https://www.mprnews.org/renee-macklin-good-shooting"
+   }
+  ],
+  "resumo": "Renée Nicole Macklin Good, cidadã americana de 37 anos, poeta e mãe de três filhos, foi morta em 7 de janeiro de 2026 pelo agente do ICE Jonathan Ross, que disparou contra o carro dela numa rua residencial de Minneapolis, um dia depois do início da Operação Metro Surge. O governo Trump declarou legítima defesa, versão contestada por vídeos e testemunhas, recusou-se a investigar o agente e reteve provas até ser processado pelo estado de Minnesota. Ross não foi denunciado. Em 1º de outubro, a família entrou com duas ações na Justiça federal, uma por indenização e outra por conspiração contra direitos civis, contra Ross e altos funcionários do governo."
+ }
+]

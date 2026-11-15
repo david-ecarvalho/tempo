@@ -178,6 +178,19 @@ footer>div{padding-left:16px !important;padding-right:16px !important}
           </figure>
         </sc-if>
 
+        <sc-for list="{{metasLigados}}" as="ml" hint-placeholder-count="0">
+          <aside class="tc-nao-imprimir" style="display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center; justify-content: space-between; padding: 14px 16px; background: {{c.surface}}; border-left: 4px solid #556A2F; font-size: 15px; line-height: 1.45;">
+            <p style="margin: 0; flex: 1 1 280px;">Este dossiê faz parte do meta-dossiê <strong style="font-weight: 600;">{{ml.titulo}}</strong>, que reúne {{ml.contagem}} sobre o tema num documento só.</p>
+            <a href="{{ml.href}}" style="text-decoration: none; border: 2px solid {{c.ink}}; padding: 8px 14px; font-size: 14px; white-space: nowrap;">Ver o meta-dossiê →</a>
+          </aside>
+        </sc-for>
+        <sc-for list="{{casosLigados}}" as="kl" hint-placeholder-count="0">
+          <aside class="tc-nao-imprimir" style="display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center; justify-content: space-between; padding: 14px 16px; background: {{c.surface}}; border-left: 4px solid #556A2F; font-size: 15px; line-height: 1.45;">
+            <p style="margin: 0; flex: 1 1 280px;">O caso <strong style="font-weight: 600;">{{kl.titulo}}</strong> ({{kl.status}}) faz parte deste dossiê. Acompanhe a situação, os envolvidos e os documentos.</p>
+            <a href="{{kl.href}}" style="text-decoration: none; border: 2px solid {{c.ink}}; padding: 8px 14px; font-size: 14px; white-space: nowrap;">Ver o caso →</a>
+          </aside>
+        </sc-for>
+
         <nav id="sumario" class="tc-sumario" aria-label="Sumário" style="border-top: 2px solid {{c.ink}}; border-bottom: 1px solid {{c.line}}; padding: 18px 0; scroll-margin-top: 110px; display: flex; flex-direction: column; gap: 10px;">
           <span style="font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: {{c.muted}};">Sumário</span>
           <ol style="margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 2px; font-size: 1.05rem;">
@@ -321,6 +334,15 @@ class Component extends DCLogic {
         .then(function (t) { pronto(TCMarkdown.lerDossie(t), null); })
         .catch(function () { self.setState({ status: 'erro' }); });
     }
+    if (modoPdf !== 'arquivo' && !meta) {
+      // Ligações do dossiê: meta-dossiês que o reúnem (ou que estão nas tags dele) e casos que têm o título dele como tag
+      [['metadossies', 'metas'], ['casos', 'casos']].forEach(function (x) {
+        fetch('dados/' + x[0] + '.json', { cache: 'no-cache' })
+          .then(function (r) { return r.ok ? r.json() : []; })
+          .then(function (lista) { var p = {}; p[x[1]] = Array.isArray(lista) ? lista : []; self.setState(p); })
+          .catch(function () {});
+      });
+    }
     if (modoPdf !== 'arquivo') {
       fetch(meta ? 'dados/metadossies.json' : 'dados/dossies.json', { cache: 'no-cache' })
         .then(function (r) { return r.ok ? r.json() : []; })
@@ -390,6 +412,18 @@ class Component extends DCLogic {
       rotulo: ehMeta ? 'Meta-dossiê' : 'Dossiê',
       capitulosTexto: (ehMeta ? st.partes.length + (st.partes.length === 1 ? ' dossiê · ' : ' dossiês · ') : '') + nCap(n)
     } : {};
+    var partesTags = {};
+    (dos && dos.tags || []).forEach(function (t) { String(t).split('/').forEach(function (p) { var k = TCTags.norm(p).trim(); if (k) partesTags[k] = true; }); });
+    var metasLigados = ehMeta || !dos ? [] : (st.metas || []).filter(function (x) {
+      return x && x.id && ((x.dossies || []).some(function (p) { return p.id === dos.id; }) || partesTags[TCTags.norm(x.titulo).trim()]);
+    }).map(function (x) {
+      var nd = (x.dossies || []).length;
+      return { titulo: x.titulo, href: 'dossie.html?meta=' + encodeURIComponent(x.id), contagem: nd + (nd === 1 ? ' dossiê' : ' dossiês') };
+    });
+    var tituloDossie = dos ? TCTags.norm(dos.titulo).trim() : '';
+    var casosLigados = ehMeta || !dos ? [] : (st.casos || []).filter(function (k) {
+      return k && k.id && (k.tags || []).some(function (t) { return String(t).split('/').some(function (p) { return TCTags.norm(p).trim() === tituloDossie; }); });
+    }).map(function (k) { return { titulo: k.titulo, status: String(k.status || '').toLowerCase(), href: 'dossies.html#caso-' + encodeURIComponent(k.id) }; });
     var tags = (dos && dos.tags || []).map(function (t) {
       return { nome: TCTags.rotulo(t), ir: function () { try { window.localStorage.setItem('tc-busca-tag', TCTags.limpa(t)); } catch (e) {} } };
     });
@@ -409,7 +443,7 @@ class Component extends DCLogic {
       },
       carregando: st.status === 'carregando', naoEncontrado: st.status === 'erro', temDossie: st.status === 'ok' && !!dos,
       d: d, capitulos: capitulos, apresentacao: TCMarkdown.blocos(partes.apresentacao), temApresentacao: !!partes.apresentacao,
-      tags: tags, temTags: tags.length > 0,
+      tags: tags, temTags: tags.length > 0, metasLigados: metasLigados, casosLigados: casosLigados,
       pdf: st.pdf || '', temPdf: !!st.pdf, semPdf: !st.pdf, pdfNome: (dos ? dos.id : 'dossie') + '.pdf',
       imprimir: function () { self.imprimirQuandoPronto(); }
     };

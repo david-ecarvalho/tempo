@@ -1,1 +1,25 @@
-[]
+[
+ {
+  "id": "a-segunda-volta-de-trump",
+  "titulo": "A segunda volta de Trump",
+  "linha": "Os dossiês do Tempo Continuum sobre o segundo mandato de Donald Trump, da caçada a imigrantes à repressão de quem resiste",
+  "data": "2026-11-15",
+  "editado": "",
+  "autor": "Redação",
+  "capa": "",
+  "tags": [
+   "Estados Unidos",
+   "Donald Trump"
+  ],
+  "destaque": true,
+  "dossies": [
+   {
+    "id": "ice-a-nova-gestapo",
+    "titulo": "ICE: A nova Gestapo",
+    "capitulos": 3
+   }
+  ],
+  "capitulos": 3,
+  "pdf": ""
+ }
+]

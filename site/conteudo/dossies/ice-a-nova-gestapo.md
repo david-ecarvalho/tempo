@@ -6,7 +6,7 @@ autor: "Redação"
 capa: ""
 legenda: ""
 credito: ""
-tags: []
+tags: ["A segunda volta de Trump"]
 destaque: false
 ---
 
