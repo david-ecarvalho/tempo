@@ -15,17 +15,6 @@
       <img src="../logos/logo-claro.svg" alt="" class="logo-claro"><img src="../logos/logo-escuro.svg" alt="" class="logo-escuro">
       <span>Tempo Continuum <b>Editor</b></span>
     </a>
-    <nav class="abas" aria-label="Coleções">
-      <button type="button" data-tipo="noticias" aria-pressed="true">Matérias</button>
-      <button type="button" data-tipo="politicos" aria-pressed="false">Políticos</button>
-      <button type="button" data-tipo="votacoes" aria-pressed="false">Votações</button>
-      <button type="button" data-tipo="videos" aria-pressed="false">Vídeos</button>
-      <button type="button" data-tipo="publicacoes" aria-pressed="false">Publicações</button>
-      <button type="button" data-tipo="dossies" aria-pressed="false">Dossiês</button>
-      <button type="button" data-tipo="metadossies" aria-pressed="false">Meta-dossiês</button>
-      <button type="button" data-tipo="casos" aria-pressed="false">Casos</button>
-      <button type="button" data-tipo="curtos" aria-pressed="false">Curtos</button>
-    </nav>
     <div class="topo-acoes">
       <a href="../" target="_blank" rel="noopener">Ver site</a>
       <button type="button" id="tema" class="botao-texto">Escuro</button>
@@ -33,19 +22,11 @@
   </header>
 
   <div class="corpo">
-    <aside class="lateral" aria-label="Lista">
-      <div class="lateral-topo">
-        <button type="button" id="novo" class="botao principal">+ Nova matéria</button>
-        <input type="search" id="busca" placeholder="Buscar" aria-label="Buscar na lista">
-      </div>
-      <ul id="lista" class="lista"></ul>
+    <aside class="lateral" aria-label="O que editar">
+      <nav id="colecoes" class="colecoes" aria-label="Coleções"></nav>
     </aside>
 
-    <main id="area" class="area">
-      <div class="vazio">
-        <p>Escolha uma matéria na lista ou crie uma nova.</p>
-      </div>
-    </main>
+    <main id="area" class="area"></main>
   </div>
 
   <div id="aviso" class="aviso" role="status" aria-live="polite" hidden></div>

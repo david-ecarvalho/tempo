@@ -171,13 +171,21 @@ def resumo_item(tipo, arquivo):
             "formato": arquivo.suffix[1:], "modificado": st.st_mtime}
 
 
+# Campo com a foto ou a capa de cada tipo: o editor mostra essa imagem no cartão do item
+CAMPO_IMAGEM = {"noticias": "foto", "politicos": "foto", "videos": "capa", "curtos": "capa", "publicacoes": "capa",
+                "dossies": "capa", "metadossies": "capa"}
+
+
 def api_itens(tipo):
     if tipo not in PASTA_TIPO:
         raise ErroApi("tipo inválido")
     itens = []
     for arq in gerar_indice.arquivos(PASTA_TIPO[tipo]):
         with contextlib.suppress(OSError, ValueError):
-            itens.append(resumo_item(tipo, arq))
+            item = resumo_item(tipo, arq)
+            if tipo in CAMPO_IMAGEM:
+                item["imagem"] = gerar_indice.caminho_relativo(str(gerar_indice.ler(arq).get(CAMPO_IMAGEM[tipo]) or ""))
+            itens.append(item)
     if tipo in ("noticias", "votacoes", "videos", "publicacoes", "dossies", "curtos", "metadossies", "casos"):
         itens.sort(key=lambda i: i["data"], reverse=True)
     else:

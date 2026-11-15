@@ -20,6 +20,17 @@
     casos: { novo: '+ Novo caso', vazio: 'Escolha um caso na lista ou crie um novo.', pasta: 'casos', pagina: 'caso.html' },
     curtos: { novo: '+ Novo vídeo curto', vazio: 'Escolha um vídeo curto na lista ou adicione um novo, de qualquer plataforma.', pasta: 'curtos', pagina: 'curtos.html' }
   };
+  // Coleções da lateral, em grupos: nome, descrição curta e o que diz a contagem
+  var GRUPOS = [
+    { nome: 'Conteúdo', tipos: [['noticias', 'Matérias', 'matéria', 'matérias'], ['dossies', 'Dossiês', 'dossiê', 'dossiês'],
+      ['metadossies', 'Meta-dossiês', 'meta-dossiê', 'meta-dossiês'], ['publicacoes', 'Publicações', 'publicação', 'publicações']] },
+    { nome: 'Wiki', tipos: [['politicos', 'Políticos', 'ficha', 'fichas'], ['casos', 'Casos', 'caso', 'casos']] },
+    { nome: 'Streaming', tipos: [['videos', 'Vídeos', 'vídeo', 'vídeos'], ['curtos', 'Curtos', 'vídeo curto', 'vídeos curtos']] },
+    { nome: 'Participação', tipos: [['votacoes', 'Votações', 'votação', 'votações']] }
+  ];
+  var COLECAO = {};
+  GRUPOS.forEach(function (g) { g.tipos.forEach(function (x) { COLECAO[x[0]] = { nome: x[1], um: x[2], varios: x[3] }; }); });
+  function contagemTexto(tipo, n) { var c = COLECAO[tipo]; return n == null ? '…' : n + ' ' + (n === 1 ? c.um : c.varios); }
   var PLATAFORMAS = ['YouTube', 'TikTok', 'Instagram', 'Kwai', 'X', 'Facebook', 'Threads', 'Bluesky', 'Outra'];
   // Plataforma pelo endereço do vídeo (a mesma regra de scripts/gerar-indice.py e curtos.html)
   function plataformaDoLink(link) {
@@ -52,7 +63,7 @@
   }
 
   var $ = function (id) { return document.getElementById(id); };
-  var estado = { tipo: 'noticias', itens: [], tags: [], atual: null, sujo: false };
+  var estado = { tipo: 'noticias', itens: [], tags: [], atual: null, sujo: false, contagens: {}, carregado: false };
 
   // =========================================================================
   // Utilidades
@@ -145,10 +156,21 @@
   // Lista
   // =========================================================================
   function carregarLista() {
-    return api('itens?tipo=' + estado.tipo).then(function (r) {
+    var tipo = estado.tipo;
+    return api('itens?tipo=' + tipo).then(function (r) {
+      if (tipo !== estado.tipo) return;
       estado.itens = r.itens;
+      estado.carregado = true;
+      estado.contagens[tipo] = r.itens.length;
+      desenharColecoes();
       desenharLista();
     }).catch(function (e) { aviso(e.message, true); });
+  }
+  // Contagem de todas as coleções, para a lateral
+  function carregarContagens() {
+    Object.keys(COLECAO).forEach(function (tipo) {
+      api('itens?tipo=' + tipo).then(function (r) { estado.contagens[tipo] = r.itens.length; desenharColecoes(); }).catch(function () {});
+    });
   }
 
   // Tags sugeridas no campo de tags: as das matérias ou, nas abas Curtos e Casos, as dos vídeos curtos e dos casos
@@ -161,50 +183,105 @@
     }).catch(function () { estado.tags = []; });
   }
 
-  function desenharLista() {
-    var q = TCTags.norm($('busca').value);
-    var lista = $('lista');
-    lista.innerHTML = '';
-    var itens = estado.itens.filter(function (i) { return !q || TCTags.norm(i.titulo + ' ' + i.editoria).indexOf(q) >= 0; });
-    if (!itens.length) {
-      lista.appendChild(h('li', { class: 'vazia' }, estado.itens.length ? 'Nada encontrado.' : 'Nenhum item ainda.'));
-      return;
-    }
-    itens.forEach(function (i) {
-      var atual = estado.atual && estado.atual.tipo === estado.tipo && estado.atual.id === i.id;
-      var meta = estado.tipo === 'noticias'
-        ? [dataCurta(i.data), i.editoria, i.destaque ? 'Manchete' : ''].filter(Boolean).join(' · ')
-        : estado.tipo === 'dossies' || estado.tipo === 'metadossies'
-          ? [dataCurta(i.data), i.editoria].filter(Boolean).join(' · ')
-        : estado.tipo === 'casos'
-          ? [i.editoria, i.data ? 'atualizado em ' + dataCurta(i.data) : ''].filter(Boolean).join(' · ')
-        : estado.tipo === 'votacoes' || estado.tipo === 'videos' || estado.tipo === 'publicacoes' || estado.tipo === 'curtos'
-          ? [i.editoria, dataCurta(i.data)].filter(Boolean).join(' · ')
-          : [i.editoria, i.data ? 'revisada em ' + dataCurta(i.data) : ''].filter(Boolean).join(' · ');
-      lista.appendChild(h('li', null, h('button', {
-        type: 'button', 'aria-current': atual ? 'true' : 'false',
-        onclick: function () { abrir(estado.tipo, i.id); }
-      }, h('span', { class: 't' }, i.titulo), h('span', { class: 'm' }, meta + (i.formato === 'json' ? ' · formato antigo' : '')))));
+  // ---- Lateral: as coleções, agrupadas, com a contagem de cada uma
+  function desenharColecoes() {
+    var nav = $('colecoes');
+    nav.innerHTML = '';
+    GRUPOS.forEach(function (g) {
+      nav.appendChild(h('p', { class: 'colecoes-grupo' }, g.nome));
+      nav.appendChild(h('ul', { class: 'lista' }, g.tipos.map(function (x) {
+        var tipo = x[0];
+        return h('li', null, h('button', { type: 'button', 'aria-current': tipo === estado.tipo ? 'true' : 'false', onclick: function () { trocarTipo(tipo); } },
+          h('span', { class: 't' }, x[1]), h('span', { class: 'm' }, contagemTexto(tipo, estado.contagens[tipo]))));
+      })));
     });
   }
 
+  // Linha de detalhes do item (data, editoria, situação…), igual para o cartão e para a busca
+  function metaDe(i) {
+    var t = estado.tipo;
+    var meta = t === 'noticias'
+      ? [dataCurta(i.data), i.editoria, i.destaque ? 'Manchete' : ''].filter(Boolean).join(' · ')
+      : t === 'dossies' || t === 'metadossies'
+        ? [dataCurta(i.data), i.editoria].filter(Boolean).join(' · ')
+      : t === 'casos'
+        ? [i.editoria, i.data ? 'atualizado em ' + dataCurta(i.data) : ''].filter(Boolean).join(' · ')
+      : t === 'votacoes' || t === 'videos' || t === 'publicacoes' || t === 'curtos'
+        ? [i.editoria, dataCurta(i.data)].filter(Boolean).join(' · ')
+        : [i.editoria, i.data ? 'revisada em ' + dataCurta(i.data) : ''].filter(Boolean).join(' · ');
+    return meta + (i.formato === 'json' ? ' · formato antigo' : '');
+  }
+  function enderecoImagem(src) {
+    src = String(src || '').trim();
+    return !src ? '' : /^https?:/i.test(src) ? src : '../' + src.replace(/^\/+/, '');
+  }
+  function iniciais(texto) {
+    return String(texto || '').split(/\s+/).filter(function (p) { return p.length > 2 || /^[A-ZÀ-Ú]/.test(p); }).slice(0, 2)
+      .map(function (p) { return p[0]; }).join('').toUpperCase() || '·';
+  }
+
+  // ---- Área principal sem item aberto: título da coleção, busca, "+ Novo" e a grade de cartões
+  function desenharLista() {
+    if (estado.atual) return;   // com um item aberto, a área mostra o editor
+    var area = $('area'), c = COLECAO[estado.tipo];
+    var busca = h('input', { type: 'search', id: 'busca', placeholder: 'Buscar em ' + c.nome.toLowerCase(), 'aria-label': 'Buscar em ' + c.nome, autocomplete: 'off' });
+    var grade = h('div', { class: 'cartoes', id: 'cartoes' });
+    var contagem = h('span', { class: 'grade-contagem', role: 'status' });
+    function desenharCartoes() {
+      var q = TCTags.norm(busca.value);
+      var itens = estado.itens.filter(function (i) { return !q || TCTags.norm(i.titulo + ' ' + i.editoria + ' ' + metaDe(i)).indexOf(q) >= 0; });
+      grade.innerHTML = '';
+      contagem.textContent = !estado.carregado ? 'Carregando…' : q ? itens.length + ' de ' + contagemTexto(estado.tipo, estado.itens.length) : contagemTexto(estado.tipo, estado.itens.length);
+      if (!estado.carregado) return;
+      if (!itens.length) {
+        grade.appendChild(h('div', { class: 'cartoes-vazio' }, h('p', null, estado.itens.length ? 'Nada encontrado com essa busca.' : NOMES[estado.tipo].vazio)));
+        return;
+      }
+      itens.forEach(function (i) {
+        var img = enderecoImagem(i.imagem);
+        grade.appendChild(h('button', { type: 'button', class: 'cartao', title: 'Editar: ' + i.titulo, onclick: function () { abrir(estado.tipo, i.id); } },
+          img ? h('span', { class: 'cartao-img' }, h('img', { src: img, alt: '', loading: 'lazy', referrerpolicy: 'no-referrer' }))
+            : h('span', { class: 'cartao-img sem' }, h('span', { class: 'cartao-tipo' }, c.um), h('span', { class: 'cartao-iniciais' }, iniciais(i.titulo))),
+          h('span', { class: 'cartao-corpo' },
+            h('span', { class: 'm' }, metaDe(i)),
+            h('span', { class: 't' }, i.titulo),
+            h('span', { class: 'cartao-acao' }, 'Editar →'))));
+      });
+    }
+    busca.addEventListener('input', desenharCartoes);
+    area.innerHTML = '';
+    area.appendChild(h('div', { class: 'grade' },
+      h('div', { class: 'grade-topo' },
+        h('div', { class: 'grade-titulo' }, h('h1', null, c.nome), contagem),
+        busca,
+        h('button', { type: 'button', id: 'novo', class: 'botao principal', onclick: function () { if (podeSair()) novo(estado.tipo); } }, NOMES[estado.tipo].novo)),
+      grade));
+    desenharCartoes();
+  }
+
+  // Volta do editor para a grade da coleção
+  function voltarParaGrade() {
+    if (!podeSair()) return;
+    estado.atual = null;
+    marcarSujo(false);
+    desenharLista();
+    history.replaceState(null, '', '#' + estado.tipo);
+    $('area').scrollTop = 0;
+  }
+
   function trocarTipo(tipo) {
-    if (tipo === estado.tipo || !podeSair()) return;
+    if ((tipo === estado.tipo && !estado.atual) || !podeSair()) return;
+    var mudou = tipo !== estado.tipo;
     estado.tipo = tipo;
     estado.atual = null;
     marcarSujo(false);
-    document.querySelectorAll('.abas button').forEach(function (b) { b.setAttribute('aria-pressed', b.dataset.tipo === tipo ? 'true' : 'false'); });
-    $('novo').textContent = NOMES[tipo].novo;
-    $('busca').value = '';
-    $('area').innerHTML = '';
-    $('area').appendChild(h('div', { class: 'vazio' }, h('p', null, NOMES[tipo].vazio)));
+    if (mudou) { estado.itens = []; estado.carregado = false; }
+    desenharColecoes();
+    desenharLista();
     carregarLista();
-    carregarTags();
+    if (mudou) carregarTags();
     history.replaceState(null, '', '#' + tipo);
   }
-  document.querySelectorAll('.abas button').forEach(function (b) { b.addEventListener('click', function () { trocarTipo(b.dataset.tipo); }); });
-  $('busca').addEventListener('input', desenharLista);
-  $('novo').addEventListener('click', function () { if (podeSair()) novo(estado.tipo); });
 
   // =========================================================================
   // Abrir, criar, salvar, apagar
@@ -399,8 +476,7 @@
       aviso('Apagado.');
       estado.atual = null;
       marcarSujo(false);
-      $('area').innerHTML = '';
-      $('area').appendChild(h('div', { class: 'vazio' }, h('p', null, NOMES[estado.tipo].vazio)));
+      desenharLista();
       carregarLista();
       history.replaceState(null, '', '#' + estado.tipo);
     }).catch(function (e) { aviso('Não apagou: ' + e.message, true); });
@@ -791,6 +867,7 @@
       h('button', { type: 'button', 'aria-pressed': a.modo === 'form' ? 'true' : 'false', onclick: function () { trocarModo('form'); } }, 'Formulário'),
       h('button', { type: 'button', 'aria-pressed': a.modo === 'md' ? 'true' : 'false', onclick: function () { trocarModo('md'); } }, 'Arquivo Markdown'));
     area.appendChild(h('div', { class: 'barra' },
+      h('button', { type: 'button', class: 'botao-texto voltar', onclick: voltarParaGrade, title: 'Voltar para a lista' }, '← ' + COLECAO[a.tipo].nome),
       h('span', { class: 'estado' }),
       modos, verSite,
       a.tipo === 'dossies' || a.tipo === 'metadossies' ? h('button', { type: 'button', class: 'botao', 'data-acao': 'pdf', title: 'Salva e gera o PDF', onclick: gerarPdf }, 'Gerar PDF') : null,
@@ -1398,12 +1475,10 @@
   // Início
   // =========================================================================
   var hash = location.hash.replace(/^#/, '').split('/');
-  if (NOMES[hash[0]] && hash[0] !== 'noticias') {
-    estado.tipo = hash[0];
-    document.querySelectorAll('.abas button').forEach(function (b) { b.setAttribute('aria-pressed', b.dataset.tipo === hash[0] ? 'true' : 'false'); });
-    $('novo').textContent = NOMES[hash[0]].novo;
-    $('area').querySelector('p').textContent = NOMES[hash[0]].vazio;
-  }
+  if (COLECAO[hash[0]]) estado.tipo = hash[0];
+  desenharColecoes();
+  desenharLista();
+  carregarContagens();
   Promise.all([carregarLista(), carregarTags()]).then(function () {
     if (hash[1]) abrir(estado.tipo, hash[1]);
   });

@@ -6,7 +6,7 @@ O site roda localmente para edição (veja "Rodar no computador") e é publicado
 
 ## Como lançar matérias
 
-Com o servidor local rodando (`python scripts/servidor.py`), abra http://localhost:8000/admin/ em qualquer navegador deste computador. O editor é próprio do site: tem as abas **Matérias**, **Políticos**, **Votações** e **Vídeos**, sugere as tags e subtags que já existem, reduz as fotos ao enviar e mostra a prévia do texto enquanto você escreve. Cada matéria é gravada como um arquivo Markdown em `conteudo/noticias/`, e o servidor atualiza o índice sozinho. Não há etapa de revisão: salvou, aparece no site.
+Com o servidor local rodando (`python scripts/servidor.py`), abra http://localhost:8000/admin/ em qualquer navegador deste computador. O editor é próprio do site. Na lateral ficam as coleções (Matérias, Dossiês, Meta-dossiês, Publicações, Políticos, Casos, Vídeos, Curtos e Votações), com a contagem de cada uma; ao escolher uma, os itens aparecem em cartões, com a foto ou a capa, uma busca e o botão **+ Novo**. Clicar num cartão abre o formulário de edição (o botão **←** volta para os cartões). O editor sugere as tags e subtags que já existem, reduz as fotos ao enviar e mostra a prévia do texto enquanto você escreve. Cada matéria é gravada como um arquivo Markdown em `conteudo/noticias/`, e o servidor atualiza o índice sozinho. Não há etapa de revisão: salvou, aparece no site.
 
 O botão **Arquivo Markdown** mostra e permite editar o arquivo inteiro, como ele fica gravado.
 
