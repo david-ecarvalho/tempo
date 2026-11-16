@@ -1,4 +1,34 @@
 {
- "livros": [],
- "revistas": []
+ "livros": [
+  {
+   "id": "livro-teste",
+   "titulo": "Livro Teste",
+   "autoria": "Tempo Continuum",
+   "editora": "Tempo Continuum",
+   "ano": "2026",
+   "edicao": "",
+   "data": "",
+   "capa": "imagens/publicacoes/images.jpg",
+   "link": "https://www.ebooksbrasil.org/adobeebook/manifestocomunista.pdf",
+   "rotulo_link": "",
+   "assuntos": [],
+   "descricao": "teste"
+  }
+ ],
+ "revistas": [
+  {
+   "id": "revista-teste-n-0",
+   "titulo": "Revista Teste",
+   "autoria": "",
+   "editora": "",
+   "ano": "",
+   "edicao": "N 0",
+   "data": "2026-11",
+   "capa": "imagens/publicacoes/images-2.jpg",
+   "link": "",
+   "rotulo_link": "",
+   "assuntos": [],
+   "descricao": "Teste"
+  }
+ ]
 }
