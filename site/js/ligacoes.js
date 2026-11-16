@@ -4,6 +4,8 @@
    - o caso com a tag "ICE: A nova Gestapo" está ligado a esse dossiê; e assim por diante.
    A ligação vale nos dois sentidos: as duas páginas mostram uma à outra, não importa em qual delas a tag está.
    Dossiê e meta-dossiê também ficam ligados quando o dossiê está na lista "dossies" do meta-dossiê.
+   Hierarquia (do menor para o maior): matéria < caso < dossiê < meta-dossiê. Cada página mostra uma caixa só para
+   os itens maiores ligados a ela; os menores aparecem nas "Fontes no Tempo Continuum".
    Usado pelas páginas (materia.html, dossie.html, caso.html) e pelo editor (admin/editor.js). */
 (function () {
   'use strict';
@@ -53,27 +55,43 @@
     return saida;
   }
 
-  // Para as páginas: quadros (casos, dossiês, meta-dossiês) e a lista de matérias relacionadas
+  // Hierarquia, do menor para o maior: matéria < caso < dossiê < meta-dossiê
+  var NIVEL = { noticias: 0, casos: 1, dossies: 2, metadossies: 3 };
   var MESES = ['jan.', 'fev.', 'mar.', 'abr.', 'maio', 'jun.', 'jul.', 'ago.', 'set.', 'out.', 'nov.', 'dez.'];
   function data(iso) { var p = String(iso || '').slice(0, 10).split('-'); return p.length === 3 ? Number(p[2]) + ' ' + MESES[Number(p[1]) - 1] + ' ' + p[0] : ''; }
-  function paraPagina(lista) {
-    var quadros = [], materias = [];
+  function rotulo(l) {
+    var x = l.item || {};
+    if (l.tipo === 'noticias') return ['Matéria', data(x.data), x.editoria].filter(Boolean).join(' · ');
+    if (l.tipo === 'casos') return 'Caso acompanhado' + (x.status ? ' · ' + String(x.status).toLowerCase() : '');
+    var n = l.tipo === 'dossies' ? (x.capitulos || []).length : idsDossies(x).length;
+    return l.tipo === 'dossies' ? 'Dossiê · ' + n + (n === 1 ? ' capítulo' : ' capítulos') : 'Meta-dossiê · ' + n + (n === 1 ? ' dossiê' : ' dossiês');
+  }
+  // Onde a ligação aparece na página do item atual:
+  // 'caixa' (o outro é maior), 'fonte' (o outro é menor), 'relacionado' (mesmo nível) ou '' (dossiê que já é parte do meta-dossiê)
+  function lugar(tipoAtual, l) {
+    var a = NIVEL[tipoAtual], b = NIVEL[l.tipo];
+    if (b > a) return 'caixa';
+    if (b < a) return tipoAtual === 'metadossies' && l.como === 'lista' ? '' : 'fonte';
+    return 'relacionado';
+  }
+  // Para as páginas: caixas só para os maiores; os menores entram como fontes; os do mesmo nível, como relacionados
+  function paraPagina(lista, tipoAtual) {
+    var caixas = [], fontes = [], relacionados = [];
     lista.forEach(function (l) {
-      var x = l.item || {};
-      if (l.tipo === 'noticias') {
-        materias.push({ titulo: l.titulo, href: l.href, detalhe: [data(x.data), x.editoria].filter(Boolean).join(' · ') });
-        return;
+      var onde = lugar(tipoAtual, l), x = l.item || {};
+      if (onde === 'caixa') {
+        caixas.push({ titulo: l.titulo, href: l.href, rotulo: rotulo(l),
+          acao: l.tipo === 'casos' ? 'Ver o caso →' : l.tipo === 'dossies' ? 'Ler o dossiê →' : 'Ver o meta-dossiê →' });
+      } else if (onde) {
+        (onde === 'fonte' ? fontes : relacionados).push({ titulo: l.titulo, href: l.href, detalhe: rotulo(l), nivel: NIVEL[l.tipo], data: x.data || '' });
       }
-      var n = l.tipo === 'dossies' ? (x.capitulos || []).length : l.tipo === 'metadossies' ? idsDossies(x).length : 0;
-      quadros.push({
-        titulo: l.titulo, href: l.href,
-        rotulo: l.tipo === 'casos' ? 'Caso acompanhado' + (x.status ? ' · ' + String(x.status).toLowerCase() : '')
-          : l.tipo === 'dossies' ? 'Dossiê · ' + n + (n === 1 ? ' capítulo' : ' capítulos')
-          : 'Meta-dossiê · ' + n + (n === 1 ? ' dossiê' : ' dossiês'),
-        acao: l.tipo === 'casos' ? 'Ver o caso →' : l.tipo === 'dossies' ? 'Ler o dossiê →' : 'Ver o meta-dossiê →'
-      });
     });
-    return { ligacoes: quadros, temLigacoes: quadros.length > 0, materiasLigadas: materias, temMateriasLigadas: materias.length > 0 };
+    // Fontes: as maiores primeiro; entre matérias, as mais recentes primeiro
+    var ordem = function (p, q) { return q.nivel - p.nivel || String(q.data).localeCompare(String(p.data)); };
+    fontes.sort(ordem); relacionados.sort(ordem);
+    var nomes = { noticias: 'Matérias relacionadas', casos: 'Casos relacionados', dossies: 'Dossiês relacionados', metadossies: 'Meta-dossiês relacionados' };
+    return { ligacoes: caixas, temLigacoes: caixas.length > 0, fontes: fontes, temFontes: fontes.length > 0,
+      relacionados: relacionados, temRelacionados: relacionados.length > 0, tituloRelacionados: nomes[tipoAtual] || 'Relacionados' };
   }
   // Os quatro índices que as ligações usam
   function carregarIndices(base, aoCarregar) {
@@ -86,5 +104,5 @@
     });
   }
 
-  window.TCLigacoes = { TIPOS: TIPOS, ORDEM: ORDEM, chave: chave, partes: partes, calcular: calcular, paraPagina: paraPagina, carregarIndices: carregarIndices };
+  window.TCLigacoes = { TIPOS: TIPOS, ORDEM: ORDEM, NIVEL: NIVEL, lugar: lugar, chave: chave, partes: partes, calcular: calcular, paraPagina: paraPagina, carregarIndices: carregarIndices };
 })();

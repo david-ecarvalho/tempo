@@ -1501,6 +1501,9 @@
     }).then(function () { carregarIndices(); carregarContagens(); });
   }
   var NOME_TIPO = { noticias: 'Matéria', dossies: 'Dossiê', metadossies: 'Meta-dossiê', casos: 'Caso' };
+  // Hierarquia: matéria < caso < dossiê < meta-dossiê. Caixa só para o maior; o menor vira fonte do maior
+  var ONDE_APARECE = { caixa: ' · aparece em caixa nesta página', fonte: ' · aparece nas fontes desta página',
+    relacionado: ' · aparece em relacionados', '': ' · é parte deste meta-dossiê' };
   function secaoLigacoes(a) {
     var m = a.m, caixa = h('div', { class: 'ligacoes' });
     var tipoSel = h('select', { 'aria-label': 'Tipo do item a ligar' }), itemSel = h('select', { 'aria-label': 'Item a ligar' });
@@ -1549,7 +1552,7 @@
         }
         caixa.appendChild(h('div', { class: 'ligacao' },
           h('span', { class: 'ligacao-tipo' }, NOME_TIPO[l.tipo]),
-          h('span', { class: 'ligacao-titulo' }, l.titulo, h('small', null, 'Ligado ' + onde)),
+          h('span', { class: 'ligacao-titulo' }, l.titulo, h('small', null, 'Ligado ' + onde + ONDE_APARECE[TCLigacoes.lugar(a.tipo, l)])),
           h('div', { class: 'linhas-acoes' },
             h('button', { type: 'button', class: 'botao-mini', onclick: function () { abrirOutro(l.tipo, l.id); } }, 'Abrir'),
             desligar ? h('button', { type: 'button', class: 'botao-mini', onclick: desligar }, 'Desligar')

@@ -247,13 +247,24 @@ footer>div{padding-left:16px !important;padding-right:16px !important}
             <sc-for list="{{tags}}" as="t" hint-placeholder-count="3"><a href="noticias.html" onClick="{{t.ir}}" style="text-decoration: none; padding: 5px 11px; border-radius: 999px; border: 1.5px solid {{c.line}};">{{t.nome}}</a></sc-for>
           </div>
         </sc-if>
-        <sc-if value="{{temMateriasLigadas}}" hint-placeholder-val="{{false}}">
-          <section class="tc-nao-imprimir" aria-label="{{tituloMaterias}}" style="display: flex; flex-direction: column; gap: 4px; border-top: 2px solid {{c.ink}}; padding-top: 16px;">
-            <h2 style="margin: 0 0 8px; font-size: 1.4rem;">{{tituloMaterias}}</h2>
-            <sc-for list="{{materiasLigadas}}" as="ml2" hint-placeholder-count="2">
+        <sc-if value="{{temFontes}}" hint-placeholder-val="{{false}}">
+          <section class="tc-nao-imprimir" aria-label="Fontes no Tempo Continuum" style="display: flex; flex-direction: column; gap: 4px; border-top: 2px solid {{c.ink}}; padding-top: 16px;">
+            <h2 style="margin: 0 0 8px; font-size: 1.4rem;">Fontes no Tempo Continuum</h2>
+            <sc-for list="{{fontes}}" as="ml2" hint-placeholder-count="2">
               <a href="{{ml2.href}}" style="text-decoration: none; display: flex; flex-direction: column; gap: 4px; padding: 12px 0; border-bottom: 1px solid {{c.line}};">
                 <span style="font-size: 12px; color: {{c.muted}};">{{ml2.detalhe}}</span>
                 <span style="font-size: 1.1rem; line-height: 1.3;">{{ml2.titulo}}</span>
+              </a>
+            </sc-for>
+          </section>
+        </sc-if>
+        <sc-if value="{{temRelacionados}}" hint-placeholder-val="{{false}}">
+          <section class="tc-nao-imprimir" aria-label="{{tituloRelacionados}}" style="display: flex; flex-direction: column; gap: 4px; border-top: 2px solid {{c.ink}}; padding-top: 16px;">
+            <h2 style="margin: 0 0 8px; font-size: 1.4rem;">{{tituloRelacionados}}</h2>
+            <sc-for list="{{relacionados}}" as="rl" hint-placeholder-count="2">
+              <a href="{{rl.href}}" style="text-decoration: none; display: flex; flex-direction: column; gap: 4px; padding: 12px 0; border-bottom: 1px solid {{c.line}};">
+                <span style="font-size: 12px; color: {{c.muted}};">{{rl.detalhe}}</span>
+                <span style="font-size: 1.1rem; line-height: 1.3;">{{rl.titulo}}</span>
               </a>
             </sc-for>
           </section>
@@ -414,7 +425,7 @@ class Component extends DCLogic {
       capitulosTexto: (ehMeta ? st.partes.length + (st.partes.length === 1 ? ' dossiê · ' : ' dossiês · ') : '') + nCap(n)
     } : {};
     var lig = TCLigacoes.paraPagina(dos && st.indices ? TCLigacoes.calcular({ tipo: ehMeta ? 'metadossies' : 'dossies', id: dos.id,
-      titulo: dos.titulo, tags: dos.tags, dossies: dos.dossies }, st.indices) : []);
+      titulo: dos.titulo, tags: dos.tags, dossies: dos.dossies }, st.indices) : [], ehMeta ? 'metadossies' : 'dossies');
     var tags = (dos && dos.tags || []).map(function (t) {
       return { nome: TCTags.rotulo(t), ir: function () { try { window.localStorage.setItem('tc-busca-tag', TCTags.limpa(t)); } catch (e) {} } };
     });
@@ -435,8 +446,7 @@ class Component extends DCLogic {
       carregando: st.status === 'carregando', naoEncontrado: st.status === 'erro', temDossie: st.status === 'ok' && !!dos,
       d: d, capitulos: capitulos, apresentacao: TCMarkdown.blocos(partes.apresentacao), temApresentacao: !!partes.apresentacao,
       tags: tags, temTags: tags.length > 0,
-      ligacoes: lig.ligacoes, materiasLigadas: lig.materiasLigadas, temMateriasLigadas: lig.temMateriasLigadas,
-      tituloMaterias: ehMeta ? 'Matérias sobre o tema' : 'Matérias sobre o dossiê',
+      ligacoes: lig.ligacoes, fontes: lig.fontes, temFontes: lig.temFontes, relacionados: lig.relacionados, temRelacionados: lig.temRelacionados, tituloRelacionados: lig.tituloRelacionados,
       pdf: st.pdf || '', temPdf: !!st.pdf, semPdf: !st.pdf, pdfNome: (dos ? dos.id : 'dossie') + '.pdf',
       imprimir: function () { self.imprimirQuandoPronto(); }
     };
