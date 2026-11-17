@@ -261,6 +261,22 @@ def api_salvar(pedido):
     return {"id": id_}
 
 
+# Arquivos só deste computador (site/local/ fica fora do git e da publicação), como o texto do Plano do Movimento
+PASTA_LOCAL = RAIZ / "local"
+
+
+def api_local(pedido):
+    nome, texto = pedido.get("nome"), pedido.get("texto")
+    if not isinstance(nome, str) or not re.fullmatch(r"[a-z0-9][a-z0-9-]{0,60}\.(md|json|txt)", nome) or not isinstance(texto, str):
+        raise ErroApi("pedido inválido")
+    PASTA_LOCAL.mkdir(parents=True, exist_ok=True)
+    destino = PASTA_LOCAL / nome
+    temp = destino.with_name(nome + ".tmp")
+    temp.write_text(texto.replace("\r\n", "\n"), encoding="utf-8", newline="\n")
+    temp.replace(destino)
+    return {"nome": nome}
+
+
 def api_apagar(pedido):
     destino = caminho_item(pedido.get("tipo"), pedido.get("id"))
     apagou = False
@@ -431,6 +447,8 @@ class Manipulador(SimpleHTTPRequestHandler):
                 r = api_imagens(q.get("pasta"))
             elif rota == ("POST", "/api/salvar"):
                 r = api_salvar(json.loads(self._corpo(MAX_TEXTO) or b"{}"))
+            elif rota == ("POST", "/api/local"):
+                r = api_local(json.loads(self._corpo(MAX_TEXTO) or b"{}"))
             elif rota == ("POST", "/api/apagar"):
                 r = api_apagar(json.loads(self._corpo(MAX_TEXTO) or b"{}"))
             elif rota == ("POST", "/api/pdf"):

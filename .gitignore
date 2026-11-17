@@ -1,3 +1,6 @@
+# Só deste computador (o servidor local grava aqui; não vai para o GitHub)
+site/local/
+
 # Gerados
 site/_site/
 motor-imagens/target/
