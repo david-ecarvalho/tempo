@@ -6,18 +6,20 @@ Login
 - Cada voluntário tem usuário e senha em privado/usuarios.json, na raiz do repositório (fora do git e fora da pasta
   que o site serve), com a senha guardada só como hash
   PBKDF2-SHA256 (200 mil voltas, sal próprio). Para criar, trocar a senha ou tirar alguém:
-      python scripts/usuarios.py adicionar <usuario>     (pergunta a senha)
+      python scripts/usuarios.py adicionar <usuario> [--revisor]   (pergunta a senha)
+      python scripts/usuarios.py revisor <usuario> sim|nao
       python scripts/usuarios.py remover <usuario>
       python scripts/usuarios.py listar
 - Ao entrar, o servidor guarda uma sessão na memória e manda o cookie "tc_sessao" (HttpOnly, Secure, SameSite=Strict),
   que vale 12 horas. Reiniciar o servidor desfaz todas as sessões (todo mundo entra de novo).
 - 5 senhas erradas seguidas do mesmo endereço travam o login desse endereço por 10 minutos.
 
-Publicação
-- Depois de salvar, apagar ou enviar imagem, o servidor faz "git add" do conteúdo, um commit com o nome de quem
-  editou e "git push" para o ramo configurado (--ramo, padrão: o ramo atual). O workflow do GitHub publica o site.
-- Os commits são enfileirados numa thread só; se o push falhar (sem rede, conflito), tenta de novo no próximo
-  salvamento e o erro aparece no terminal.
+Publicação com revisão (Antonio, 17/11/2026: "é bom a gente sempre ter que revisar antes de publicar")
+- Salvar, apagar ou enviar imagem muda só os arquivos do servidor: a mudança fica PENDENTE (o site do servidor já
+  mostra, o do GitHub Pages ainda não). O servidor anota quem mexeu em cada arquivo (privado/pendentes.json).
+- No editor, o botão "Publicar" lista as pendências, com quem editou. Quem é revisor (--revisor) pode descartar uma
+  pendência (o arquivo volta a ser o publicado) ou publicar tudo: um commit só, com o nome do revisor e de quem
+  editou cada item, e "git push" para o ramo configurado (--ramo, padrão: o ramo atual). O workflow publica o site.
 """
 import base64
 import hashlib
@@ -50,12 +52,27 @@ def ler_usuarios(arquivo=ARQ_USUARIOS):
         return {}
 
 
-def gravar_usuario(usuario, senha, arquivo=ARQ_USUARIOS):
+def gravar_usuario(usuario, senha, arquivo=ARQ_USUARIOS, revisor=None):
     usuarios = ler_usuarios(arquivo)
     sal = secrets.token_bytes(16)
-    usuarios[usuario] = {"sal": base64.b64encode(sal).decode(), "hash": base64.b64encode(_hash(senha, sal)).decode()}
+    antes = usuarios.get(usuario, {})
+    usuarios[usuario] = {"sal": base64.b64encode(sal).decode(), "hash": base64.b64encode(_hash(senha, sal)).decode(),
+                         "revisor": antes.get("revisor", False) if revisor is None else bool(revisor)}
     Path(arquivo).parent.mkdir(parents=True, exist_ok=True)
     Path(arquivo).write_text(json.dumps(usuarios, ensure_ascii=False, indent=1), encoding="utf-8")
+
+
+def definir_revisor(usuario, revisor, arquivo=ARQ_USUARIOS):
+    usuarios = ler_usuarios(arquivo)
+    if usuario not in usuarios:
+        return False
+    usuarios[usuario]["revisor"] = bool(revisor)
+    Path(arquivo).write_text(json.dumps(usuarios, ensure_ascii=False, indent=1), encoding="utf-8")
+    return True
+
+
+def e_revisor(usuario, arquivo=ARQ_USUARIOS):
+    return bool(ler_usuarios(arquivo).get(usuario, {}).get("revisor"))
 
 
 def remover_usuario(usuario, arquivo=ARQ_USUARIOS):
@@ -134,14 +151,19 @@ def cookie_sessao(token, apagar=False):
     return f"{COOKIE}={'' if apagar else token}; Path=/; Max-Age={idade}; HttpOnly; Secure; SameSite=Strict"
 
 
-# ---------------- git ----------------
+# ---------------- git: pendências e publicação ----------------
+
+PASTAS_PUBLICADAS = ("site/conteudo", "site/imagens", "site/arquivos")
+ARQ_PENDENTES = RAIZ.parent / "privado" / "pendentes.json"
+
 
 class Publicador:
-    """Commit e push em fila, um de cada vez, a partir da pasta do repositório."""
+    """Pendências (o que mudou no servidor e ainda não foi para o GitHub) e a publicação, uma de cada vez."""
 
-    def __init__(self, repo, ramo=None):
+    def __init__(self, repo, ramo=None, arquivo=ARQ_PENDENTES):
         self.repo = Path(repo)
         self.ramo = ramo
+        self.arquivo = Path(arquivo)
         self._trava = threading.Lock()
 
     def _git(self, *args, checar=True):
@@ -150,19 +172,73 @@ class Publicador:
             raise RuntimeError(f"git {' '.join(args)}: {r.stderr.strip() or r.stdout.strip()}")
         return r
 
-    def publicar(self, mensagem, usuario):
-        threading.Thread(target=self._publicar, args=(mensagem, usuario), daemon=True).start()
+    def _ler(self):
+        try:
+            return json.loads(self.arquivo.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            return {}
 
-    def _publicar(self, mensagem, usuario):
+    def _gravar(self, dados):
+        self.arquivo.parent.mkdir(parents=True, exist_ok=True)
+        self.arquivo.write_text(json.dumps(dados, ensure_ascii=False, indent=1), encoding="utf-8")
+
+    def registrar(self, caminhos, usuario, acao):
+        """Anota quem mexeu em cada arquivo (caminho relativo à raiz do repositório)."""
         with self._trava:
-            try:
-                self._git("add", "-A", "site/conteudo", "site/imagens", "site/arquivos", "site/dados")
-                if self._git("diff", "--cached", "--quiet", checar=False).returncode != 0:
-                    self._git("-c", f"user.name={usuario} (editor online)", "-c", "user.email=editor@tempocontinuum",
-                              "commit", "-q", "-m", f"{mensagem} (por {usuario}, pelo editor online)")
-                ramo = self.ramo or self._git("rev-parse", "--abbrev-ref", "HEAD").stdout.strip()
-                self._git("pull", "-q", "--rebase", "origin", ramo, checar=False)
-                self._git("push", "-q", "origin", f"HEAD:{ramo}")
-                print(f"  [git] publicado: {mensagem} (por {usuario})", flush=True)
-            except (RuntimeError, OSError, subprocess.TimeoutExpired) as e:
-                print(f"  [git] não publiquei agora (tento de novo no próximo salvamento): {e}", flush=True)
+            dados = self._ler()
+            for c in caminhos:
+                item = dados.setdefault(c, {"usuarios": [], "acao": acao})
+                if usuario not in item["usuarios"]:
+                    item["usuarios"].append(usuario)
+                item["acao"], item["quando"] = acao, time.strftime("%Y-%m-%d %H:%M")
+            self._gravar(dados)
+
+    def _mudados(self):
+        """[(status, caminho)] do que difere do último commit, só nas pastas que vão para o site."""
+        r = self._git("status", "--porcelain", "-uall", "--", *PASTAS_PUBLICADAS)
+        saida = []
+        for linha in r.stdout.splitlines():
+            st, caminho = linha[:2].strip(), linha[3:].strip().strip('"')
+            if " -> " in caminho:
+                caminho = caminho.split(" -> ", 1)[1]
+            saida.append(("novo" if st == "??" or "A" in st else "apagado" if "D" in st else "alterado", caminho))
+        return saida
+
+    def listar(self):
+        with self._trava:
+            dados = self._ler()
+            return [{"caminho": c, "status": st, "usuarios": dados.get(c, {}).get("usuarios", []),
+                     "quando": dados.get(c, {}).get("quando", "")} for st, c in self._mudados()]
+
+    def descartar(self, caminho):
+        """Volta o arquivo para o que está publicado (ou apaga, se ele é novo)."""
+        with self._trava:
+            pend = dict((c, st) for st, c in self._mudados())
+            if caminho not in pend:
+                raise ValueError("essa pendência não existe mais")
+            if pend[caminho] == "novo":
+                (self.repo / caminho).unlink(missing_ok=True)
+            else:
+                self._git("checkout", "HEAD", "--", caminho)
+            dados = self._ler()
+            dados.pop(caminho, None)
+            self._gravar(dados)
+
+    def publicar(self, revisor):
+        """Um commit com tudo o que está pendente e push. Devolve quantos arquivos foram."""
+        with self._trava:
+            mudados = self._mudados()
+            if not mudados:
+                return 0
+            dados = self._ler()
+            linhas = [f"- {c} ({st}; por {', '.join(dados.get(c, {}).get('usuarios', [])) or '?'})" for st, c in mudados]
+            self._git("add", "-A", *PASTAS_PUBLICADAS, "site/dados")
+            self._git("-c", f"user.name={revisor} (revisão do editor online)", "-c", "user.email=editor@tempocontinuum",
+                      "commit", "-q", "-m", f"Publica {len(mudados)} mudança(s), revisada(s) por {revisor}",
+                      "-m", "\n".join(linhas))
+            ramo = self.ramo or self._git("rev-parse", "--abbrev-ref", "HEAD").stdout.strip()
+            self._git("pull", "-q", "--rebase", "origin", ramo, checar=False)
+            self._git("push", "-q", "origin", f"HEAD:{ramo}")
+            self._gravar({})
+            print(f"  [git] publicado por {revisor}: {len(mudados)} arquivo(s)", flush=True)
+            return len(mudados)
