@@ -215,9 +215,17 @@ class Component extends DCLogic {
       var v = window.localStorage.getItem('tc-tema');
       if (v === 'escuro' || v === 'claro') this.setState({ escuro: v === 'escuro' });
     } catch (e) {}
+    // Ferramentas que só existem no computador (dados/ferramentas-locais.json fica fora do git)
+    var self = this;
+    if (/^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname)) {
+      fetch('dados/ferramentas-locais.json', { cache: 'no-cache' })
+        .then(function (r) { return r.ok ? r.json() : []; })
+        .then(function (l) { if (Array.isArray(l) && l.length) self.setState({ locais: l }); })
+        .catch(function () {});
+    }
   }
   dados() {
-    return [
+    return (this.state.locais || []).concat([
       { tipo: 'Nativa', nome: 'Busca no acervo', categoria: 'Pesquisa', descricao: 'Encontre notícias por palavra, por uma ou mais tags e por período de publicação.', link: 'noticias.html', quem: 'Tempo Continuum' },
       { tipo: 'Nativa', nome: 'Fichas de atores políticos', categoria: 'Perfis', descricao: 'Trajetória, eleições, atuação, posições declaradas e processos de cada político, com as fontes.', link: 'politicos.html', quem: 'Tempo Continuum' },
       { tipo: 'Nativa', nome: 'Acompanhamento de casos', categoria: 'Fiscalização', descricao: 'Investigações acompanhadas do início ao fim, com situação, envolvidos, etapas e documentos.', link: 'politicos.html#casos', quem: 'Tempo Continuum' },
@@ -233,7 +241,7 @@ class Component extends DCLogic {
       { tipo: 'Externa', nome: 'Base dos Dados', categoria: 'Dados abertos', descricao: 'Bases públicas tratadas e prontas para análise, de eleições a indicadores sociais.', link: 'https://basedosdados.org', quem: 'Base dos Dados' },
       { tipo: 'Externa', nome: 'Archive Genocide', categoria: 'Memória e documentação', descricao: 'Arquivo público e gratuito, com busca, de mais de 156 mil vídeos e fotos que documentam o genocídio em Gaza e os crimes de guerra de Israel desde outubro de 2023. Tem filtros por data e tipo, mapas e um memorial com os nomes das vítimas. Atenção: imagens fortes.', link: 'https://archivegenocide.com/', quem: 'Archive Genocide (projeto independente)' },
       { tipo: 'Externa', nome: 'Fiquem Sabendo', categoria: 'Acesso à informação', descricao: 'Agência especializada na Lei de Acesso à Informação, que publica dados obtidos por pedidos públicos.', link: 'https://fiquemsabendo.com.br', quem: 'Fiquem Sabendo' }
-    ];
+    ]);
   }
   renderVals() {
     var self = this;
