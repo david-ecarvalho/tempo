@@ -1,5 +1,5 @@
 {
-  "comentario": "Formatos do Gerador de imagens (gerador-de-imagens.html). Medidas em pixels; x e y são o canto superior esquerdo de cada área. \"exportar\" (opcional) define o tamanho do PNG baixado; o desenho é ampliado proporcionalmente.",
+  "comentario": "Formatos do Gerador de imagens (editor: admin/gerador.js). Medidas em pixels; x e y são o canto superior esquerdo de cada área. \"exportar\" (opcional) define o tamanho do PNG baixado; o desenho é ampliado proporcionalmente.",
   "layouts": [
     {
       "nome": "post-retrato",

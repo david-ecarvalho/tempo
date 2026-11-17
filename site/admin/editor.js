@@ -28,6 +28,8 @@
     { nome: 'Streaming', tipos: [['videos', 'Vídeos', 'vídeo', 'vídeos'], ['curtos', 'Curtos', 'vídeo curto', 'vídeos curtos']] },
     { nome: 'Participação', tipos: [['votacoes', 'Votações', 'votação', 'votações']] }
   ];
+  // Endereço público do site (GitHub Pages): vai no rodapé e no QR code das imagens para redes
+  var SITE_PUBLICO = 'https://tony-f-trinity.github.io/tempo/';
   var COLECAO = {};
   GRUPOS.forEach(function (g) { g.tipos.forEach(function (x) { COLECAO[x[0]] = { nome: x[1], um: x[2], varios: x[3] }; }); });
   function contagemTexto(tipo, n) { var c = COLECAO[tipo]; return n == null ? '…' : n + ' ' + (n === 1 ? c.um : c.varios); }
@@ -126,6 +128,7 @@
 
   function marcarSujo(v) {
     estado.sujo = v !== false;
+    atualizarImagem();
     var el = document.querySelector('.barra .estado');
     if (el) {
       el.textContent = estado.sujo ? 'Alterações não salvas' : (estado.salvoEm ? 'Salvo às ' + estado.salvoEm : 'Sem alterações');
@@ -191,10 +194,33 @@
       nav.appendChild(h('p', { class: 'colecoes-grupo' }, g.nome));
       nav.appendChild(h('ul', { class: 'lista' }, g.tipos.map(function (x) {
         var tipo = x[0];
-        return h('li', null, h('button', { type: 'button', 'aria-current': tipo === estado.tipo ? 'true' : 'false', onclick: function () { trocarTipo(tipo); } },
+        return h('li', null, h('button', { type: 'button', 'aria-current': tipo === estado.tipo && !estado.ferramenta ? 'true' : 'false', onclick: function () { trocarTipo(tipo); } },
           h('span', { class: 't' }, x[1]), h('span', { class: 'm' }, contagemTexto(tipo, estado.contagens[tipo]))));
       })));
     });
+    nav.appendChild(h('p', { class: 'colecoes-grupo' }, 'Ferramentas'));
+    nav.appendChild(h('ul', { class: 'lista' }, h('li', null,
+      h('button', { type: 'button', 'aria-current': estado.ferramenta === 'gerador' ? 'true' : 'false', onclick: abrirGerador },
+        h('span', { class: 't' }, 'Gerador de imagens'), h('span', { class: 'm' }, 'posts e prévias de link')))));
+  }
+
+  // Gerador de imagens livre (sem matéria): os textos ficam guardados neste navegador
+  function abrirGerador() {
+    if (estado.ferramenta === 'gerador' || !podeSair()) return;
+    estado.ferramenta = 'gerador';
+    estado.atual = null;
+    estado.redesenharLigacoes = null;
+    marcarSujo(false);
+    var area = $('area'), lugar = h('div');
+    area.innerHTML = '';
+    area.appendChild(h('div', { class: 'colecao ferramenta' },
+      h('div', { class: 'colecao-topo' }, h('div', { class: 'colecao-titulo' }, h('h1', null, 'Gerador de imagens'))),
+      h('p', { class: 'dica' }, 'Monte imagens para redes sociais e prévias de link, com título que se ajusta sozinho, foto de fundo, logos, camadas e QR code. Para a imagem de uma matéria, abra a matéria: lá o gerador já vem preenchido.'),
+      lugar));
+    TCGerador.montar(lugar, { chave: 'tc-gerador-imagens' });
+    desenharColecoes();
+    history.replaceState(null, '', '#gerador');
+    area.scrollTop = 0;
   }
 
   // Linha de detalhes do item (data, editoria, situação…), igual para o cartão e para a busca
@@ -222,7 +248,7 @@
 
   // ---- Área principal sem item aberto: título da coleção, busca, "+ Novo" e a grade de cartões
   function desenharLista() {
-    if (estado.atual) return;   // com um item aberto, a área mostra o editor
+    if (estado.atual || estado.ferramenta) return;   // com um item ou uma ferramenta aberta, a área mostra o editor
     var area = $('area'), c = COLECAO[estado.tipo];
     var busca = h('input', { type: 'search', id: 'busca', placeholder: 'Buscar em ' + c.nome.toLowerCase(), 'aria-label': 'Buscar em ' + c.nome, autocomplete: 'off' });
     var grade = h('div', { class: 'cartoes', id: 'cartoes' });
@@ -264,6 +290,7 @@
     if (!podeSair()) return;
     estado.redesenharLigacoes = null;
     estado.atual = null;
+    estado.ferramenta = null;
     marcarSujo(false);
     desenharLista();
     history.replaceState(null, '', '#' + estado.tipo);
@@ -271,8 +298,9 @@
   }
 
   function trocarTipo(tipo) {
-    if ((tipo === estado.tipo && !estado.atual) || !podeSair()) return;
+    if ((tipo === estado.tipo && !estado.atual && !estado.ferramenta) || !podeSair()) return;
     var mudou = tipo !== estado.tipo;
+    estado.ferramenta = null;
     estado.tipo = tipo;
     estado.atual = null;
     marcarSujo(false);
@@ -315,6 +343,7 @@
     if (!podeSair()) return;
     api('item?tipo=' + tipo + '&id=' + encodeURIComponent(id)).then(function (r) {
       var daLista = estado.itens.filter(function (i) { return i.id === id; })[0];
+      estado.ferramenta = null;
       estado.atual = { tipo: tipo, id: id, m: modeloDeArquivo(tipo, r), modo: 'form', antigo: r.formato === 'json', pdf: daLista ? daLista.pdf || '' : '' };
       estado.salvoEm = null;
       marcarSujo(false);
@@ -345,6 +374,7 @@
       ? { titulo: '', linha: '', data: agoraLocal(), editoria: EDITORIAS[0], tags: [], autor: 'Redação', foto: '', legenda: '', credito: '', destaque: false, corpo: '' }
       : { nome: '', iniciais: '', foto: '', categoria: CATEGORIAS[2], cargo_curto: '', partido: '', uf: '', chamada: '', subtitulo: '', atualizado: hoje(),
           selos: [], dados: ROTULOS_DADOS.map(function (r) { return { rotulo: r, valor: '' }; }), eleicoes: [], nota_eleicoes: '', corpo: TCMarkdown.MODELO_FICHA };
+    estado.ferramenta = null;
     estado.atual = { tipo: tipo, id: null, m: m, modo: 'form' };
     if (tipo === 'votacoes') {
       estado.salvoEm = null;
@@ -954,7 +984,44 @@
       h('section', { class: 'secao' },
         h('h2', null, 'Texto'),
         h('p', { class: 'dica' }, 'Escrito em Markdown. Use T2 para os intertítulos, citação para falas de entrevistados e parágrafos curtos, de 2 a 4 frases. Uma linha em branco separa os parágrafos.'),
-        campoMarkdown(m, 'corpo', { rotulo: 'Texto da matéria' })));
+        campoMarkdown(m, 'corpo', { rotulo: 'Texto da matéria' })),
+      secaoImagem(a));
+  }
+
+  // =========================================================================
+  // Imagem para redes (gerador.js), preenchida com a matéria enquanto ela é escrita
+  // =========================================================================
+  function dadosDaImagem(a) {
+    var m = a.m, foto = m.foto || '';
+    if (foto && !/^https?:/.test(foto)) foto = TCMarkdown.caminhoImagem(foto);
+    return {
+      titulo: m.titulo || '',
+      selo: m.editoria || '',
+      rodape1: 'Leia a matéria completa',
+      rodape2: SITE_PUBLICO.replace(/^https?:\/\//, '').replace(/\/$/, ''),
+      link: a.id ? SITE_PUBLICO + enderecoNoSite(a.tipo, a.id) : '',
+      nome: a.id || '',
+      fundo: foto,
+      logos: ['logos/logo-escuro.svg'],
+      aviso: a.id ? '' : 'O link e o QR code entram quando a matéria for criada (o endereço sai da data e do título).'
+    };
+  }
+  function secaoImagem(a) {
+    var lugar = h('div');
+    a.gerador = a.gerador || {};
+    var g = TCGerador.montar(lugar, { automatico: true, memoria: a.gerador, item: a.id ? a.tipo + '/' + a.id : null, rotulo: 'da matéria' });
+    estado.imagem = { g: g, a: a };
+    g.preencher(dadosDaImagem(a));
+    return h('section', { class: 'secao' },
+      h('h2', null, 'Imagem para redes'),
+      h('p', { class: 'dica' }, 'Título, editoria (no selo), foto, link do QR code e nome do arquivo vêm da matéria e mudam enquanto você escreve. Quando a matéria estiver pronta, é só baixar. O que for ajustado aqui não vai para o arquivo da matéria.'),
+      lugar);
+  }
+  function atualizarImagem() {
+    var im = estado.imagem;
+    if (!im) return;
+    if (!im.g.raiz.isConnected || im.a !== estado.atual) { estado.imagem = null; return; }
+    im.g.preencher(dadosDaImagem(im.a));
   }
 
   function formFicha(a) {
@@ -1600,6 +1667,7 @@
   if (COLECAO[hash[0]]) estado.tipo = hash[0];
   desenharColecoes();
   desenharLista();
+  if (hash[0] === 'gerador') abrirGerador();
   carregarContagens();
   carregarIndices();
   Promise.all([carregarLista(), carregarTags()]).then(function () {

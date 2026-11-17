@@ -23,7 +23,8 @@ RAIZ = Path(__file__).resolve().parent.parent
 SAIDA = RAIZ / "_site"
 
 PASTAS = ["js", "dados", "conteudo", "imagens", "logos", "arquivos"]
-IGNORAR = shutil.ignore_patterns("__pycache__", "*.pyc", ".DS_Store", "Thumbs.db", "desktop.ini")
+# js/motor/ é o motor do Gerador de imagens, que só o editor usa: fica de fora do site publicado
+IGNORAR = shutil.ignore_patterns("__pycache__", "*.pyc", ".DS_Store", "Thumbs.db", "desktop.ini", "motor")
 
 def main():
     subprocess.run([sys.executable, str(RAIZ / "scripts" / "gerar-indice.py")], check=True)

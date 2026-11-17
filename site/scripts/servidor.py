@@ -28,6 +28,8 @@ import sys
 import threading
 import time
 import unicodedata
+import urllib.error
+import urllib.request
 from functools import partial
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -379,6 +381,36 @@ def api_enviar_imagem(pasta, nome, tipo, corpo):
     return {"caminho": f"imagens/{pasta}/{destino.name}"}
 
 
+def api_imagem_externa(endereco):
+    """Busca uma foto de outro site para o Gerador de imagens do editor.
+    O navegador não deixa desenhar no canvas uma imagem de outro site sem permissão dele (CORS);
+    vinda daqui, ela é da mesma origem. Só imagens, só de endereços públicos, até MAX_IMAGEM."""
+    u = urlparse(endereco or "")
+    if u.scheme not in ("http", "https") or not u.hostname:
+        raise ErroApi("link inválido")
+    try:
+        for info in socket.getaddrinfo(u.hostname, u.port or (443 if u.scheme == "https" else 80)):
+            ip = ipaddress.ip_address(info[4][0].split("%")[0])
+            if not ip.is_global:
+                raise ErroApi("só links de sites públicos")
+    except socket.gaierror as e:
+        raise ErroApi("não encontrei esse site", 502) from e
+    pedido = urllib.request.Request(endereco, headers={"User-Agent": "Mozilla/5.0 (editor Tempo Continuum)", "Accept": "image/*"})
+    try:
+        with urllib.request.urlopen(pedido, timeout=20) as r:
+            tipo = (r.headers.get("Content-Type") or "").split(";")[0].strip().lower()
+            if tipo not in TIPOS_IMAGEM and tipo != "image/avif":
+                raise ErroApi("o link não é de uma imagem JPG, PNG, WebP, GIF ou AVIF", 415)
+            corpo = r.read(MAX_IMAGEM + 1)
+    except urllib.error.HTTPError as e:
+        raise ErroApi(f"o site respondeu {e.code}", 502) from e
+    except (urllib.error.URLError, TimeoutError) as e:
+        raise ErroApi("não consegui baixar a imagem", 502) from e
+    if len(corpo) > MAX_IMAGEM:
+        raise ErroApi("imagem grande demais", 413)
+    return corpo, tipo
+
+
 class Manipulador(SimpleHTTPRequestHandler):
     extensions_map = {
         **SimpleHTTPRequestHandler.extensions_map,
@@ -443,6 +475,14 @@ class Manipulador(SimpleHTTPRequestHandler):
                 r = api_item(q.get("tipo"), q.get("id"))
             elif rota == ("GET", "/api/ecidadania"):
                 r = api_ecidadania(q.get("consulta"))
+            elif rota == ("GET", "/api/imagem-externa"):
+                corpo, tipo = api_imagem_externa(q.get("url"))
+                self.send_response(200)
+                self.send_header("Content-Type", tipo)
+                self.send_header("Content-Length", str(len(corpo)))
+                self.end_headers()
+                self.wfile.write(corpo)
+                return
             elif rota == ("GET", "/api/imagens"):
                 r = api_imagens(q.get("pasta"))
             elif rota == ("POST", "/api/salvar"):

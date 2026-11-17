@@ -1,11 +1,11 @@
 # Motor do Gerador de imagens (Rust → WebAssembly)
 
-Desenha as imagens da página `site/gerador-de-imagens.html`. Roda no navegador de quem usa:
-nenhuma foto, logo ou texto é enviado ao site.
+Desenha as imagens do Gerador de imagens, que fica no editor (`site/admin/`, na matéria e em Ferramentas).
+Roda no navegador: nenhuma foto, logo ou texto é enviado a outro lugar.
 
 - **Entrada:** o formato (um item de `site/dados/layouts-imagens.json`) e o que a pessoa preencheu.
 - **Saída:** os pixels da imagem pronta, mais um relatório (tamanho do título, avisos).
-- **A interface** (campos, botões, prévia, download) continua em `site/js/gerador-imagens.js`,
+- **A interface** (campos, botões, prévia, download) continua em `site/admin/gerador.js`,
   que só chama o motor.
 
 ## Pastas
@@ -34,7 +34,7 @@ sh motor-imagens/compilar.sh                                     # Linux/macOS
 ```
 
 O resultado vai para `site/js/motor/` (`motor_imagens.js` e `motor_imagens_bg.wasm`). É essa pasta que
-vai para o servidor junto com o site; a pasta `motor-imagens/` não precisa ser publicada.
+o editor usa; a pasta `motor-imagens/` não precisa ser publicada.
 
 Testes (rodam no PC, sem navegador): `cargo test --release`, dentro de `motor-imagens/`.
 
