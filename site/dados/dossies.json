@@ -17,6 +17,23 @@
   "pdf": ""
  },
  {
+  "id": "ligacoes-entre-mbl-e-refit",
+  "titulo": "Ligações entre MBL e Refit",
+  "linha": "Lorem Ipsum",
+  "data": "2026-11-17",
+  "editado": "",
+  "autor": "Redação",
+  "capa": "",
+  "tags": [],
+  "destaque": false,
+  "capitulos": [
+   "Primeiro capítulo",
+   "Segundo capítulo",
+   "Fontes"
+  ],
+  "pdf": ""
+ },
+ {
   "id": "as-privatizacoes-no-brasil",
   "titulo": "As Privatizações no Brasil",
   "linha": "",
