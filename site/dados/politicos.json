@@ -1,5 +1,16 @@
 [
  {
+  "id": "jair-bolsonaro",
+  "nome": "Jair Bolsonaro",
+  "iniciais": "",
+  "foto": "",
+  "categoria": "Deputado federal",
+  "cargo_curto": "",
+  "partido": "",
+  "uf": "",
+  "chamada": ""
+ },
+ {
   "id": "jones-manoel",
   "nome": "Jones Manoel",
   "iniciais": "JM",

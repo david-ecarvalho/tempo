@@ -1,5 +1,45 @@
 [
  {
+  "id": "a-historia-completa-de-israel",
+  "titulo": "A história completa de israel",
+  "linha": "Lorem Ipsum",
+  "data": "2026-11-17",
+  "editado": "",
+  "autor": "Redação",
+  "capa": "",
+  "tags": [],
+  "destaque": false,
+  "dossies": [
+   {
+    "id": "crimes-de-guerra-eua",
+    "titulo": "Crimes de Guerra EUA",
+    "capitulos": 3
+   }
+  ],
+  "capitulos": 3,
+  "pdf": ""
+ },
+ {
+  "id": "covid-19-no-mundo",
+  "titulo": "Covid-19 no Mundo",
+  "linha": "",
+  "data": "2026-11-17",
+  "editado": "",
+  "autor": "Redação",
+  "capa": "",
+  "tags": [],
+  "destaque": false,
+  "dossies": [
+   {
+    "id": "a-covid-no-brasil",
+    "titulo": "A Covid No Brasil",
+    "capitulos": 3
+   }
+  ],
+  "capitulos": 3,
+  "pdf": ""
+ },
+ {
   "id": "a-segunda-volta-de-trump",
   "titulo": "A segunda volta de Trump",
   "linha": "Os dossiês do Tempo Continuum sobre o segundo mandato de Donald Trump, da caçada a imigrantes à repressão de quem resiste",

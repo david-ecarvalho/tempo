@@ -1,5 +1,39 @@
 [
  {
+  "id": "a-covid-no-brasil",
+  "titulo": "A Covid No Brasil",
+  "linha": "Lorem Ipsum",
+  "data": "2026-11-17",
+  "editado": "",
+  "autor": "Redação",
+  "capa": "",
+  "tags": [],
+  "destaque": false,
+  "capitulos": [
+   "Primeiro capítulo",
+   "Segundo capítulo",
+   "Fontes"
+  ],
+  "pdf": ""
+ },
+ {
+  "id": "as-privatizacoes-no-brasil",
+  "titulo": "As Privatizações no Brasil",
+  "linha": "",
+  "data": "2026-11-16",
+  "editado": "",
+  "autor": "Redação",
+  "capa": "",
+  "tags": [],
+  "destaque": false,
+  "capitulos": [
+   "Primeiro capítulo",
+   "Segundo capítulo",
+   "Fontes"
+  ],
+  "pdf": ""
+ },
+ {
   "id": "o-novo-genocidio-indigena",
   "titulo": "O Novo Genocídio Indígena",
   "linha": "",

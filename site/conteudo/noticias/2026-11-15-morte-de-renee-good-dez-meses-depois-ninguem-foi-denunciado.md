@@ -5,7 +5,7 @@ data: "2026-11-15T10:00:00"
 editoria: "Internacional"
 tags: ["Morte de Renée Good", "ICE", "Estados Unidos", "imigração", "violência policial"]
 autor: "Redação"
-foto: ""
+foto: "https://media-cldnry.s-nbcnews.com/image/upload/t_fit-1000w,f_avif,q_auto:best/rockcms/2026-01/260121-renee-good-jg-6634fb.jpg"
 legenda: ""
 credito: ""
 destaque: false
