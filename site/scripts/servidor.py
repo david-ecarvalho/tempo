@@ -9,7 +9,8 @@
   e-Cidadania e gerar o PDF de um dossiê ou meta-dossiê (com o Edge ou o Chrome, sem abrir janela). Por segurança, só aceita pedidos do próprio computador.
 
 Modo online (--online, ver scripts/online.py): o editor aceita pedidos de fora, mas só de quem entrou com usuário e
-senha, e cada mudança vira um commit com push para o GitHub. Para rodar atrás de um proxy com HTTPS (Caddy, nginx).
+senha. As mudanças ficam pendentes no servidor até um revisor publicar (um commit com push para o GitHub). Para rodar
+atrás de um proxy com HTTPS (Caddy, nginx).
 
 Uso:  python scripts/servidor.py            (só neste computador)
       python scripts/servidor.py --rede     (outros aparelhos da mesma rede Wi-Fi também acessam)
@@ -491,7 +492,33 @@ class Manipulador(SimpleHTTPRequestHandler):
             return True
         if rota == ("GET", "/api/eu"):
             u = self._usuario()
-            self._responder(200 if u else 401, {"usuario": u, "online": True} if u else {"erro": "entre de novo"})
+            self._responder(200 if u else 401, {"usuario": u, "online": True, "revisor": online.e_revisor(u)} if u
+                            else {"erro": "entre de novo"})
+            return True
+        if rota[1] in ("/api/pendentes", "/api/publicar", "/api/descartar"):
+            u = self._usuario()
+            if not u or not self._mesma_origem():
+                self._responder(401, {"erro": "entre com seu usuário e senha", "entrar": True})
+                return True
+            try:
+                if rota == ("GET", "/api/pendentes"):
+                    self._responder(200, {"pendentes": self.publicador.listar(), "revisor": online.e_revisor(u)})
+                    return True
+                if not online.e_revisor(u):
+                    self._responder(403, {"erro": "só quem revisa pode publicar ou descartar"})
+                    return True
+                if rota == ("POST", "/api/publicar"):
+                    n = self.publicador.publicar(u)
+                    self._responder(200, {"publicados": n})
+                elif rota == ("POST", "/api/descartar"):
+                    pedido = json.loads(self._corpo(4096) or b"{}")
+                    self.publicador.descartar(str(pedido.get("caminho") or ""))
+                    atualizar_indices(forcar=True)
+                    self._responder(200, {"ok": True})
+                else:
+                    self._responder(404, {"erro": "rota desconhecida"})
+            except (RuntimeError, ValueError, OSError) as e:
+                self._responder(400, {"erro": f"não consegui ({e})"})
             return True
         return False
 
@@ -555,13 +582,15 @@ class Manipulador(SimpleHTTPRequestHandler):
             elif rota == ("GET", "/api/imagens"):
                 r = api_imagens(q.get("pasta"))
             elif rota == ("POST", "/api/salvar"):
-                r = api_salvar(json.loads(self._corpo(MAX_TEXTO) or b"{}"))
+                pedido = json.loads(self._corpo(MAX_TEXTO) or b"{}")
+                r = api_salvar(pedido)
             elif rota == ("POST", "/api/local"):
                 r = api_local(json.loads(self._corpo(MAX_TEXTO) or b"{}"))
             elif rota == ("POST", "/api/apagar"):
-                r = api_apagar(json.loads(self._corpo(MAX_TEXTO) or b"{}"))
-            elif rota == ("POST", "/api/pdf"):
                 pedido = json.loads(self._corpo(MAX_TEXTO) or b"{}")
+                r = api_apagar(pedido)
+            elif rota == ("POST", "/api/pdf"):
+                pedido = json.loads(self._corpo(MAX_TEXTO) or b"{}")  # (PDF sai junto na próxima publicação)
                 r = api_pdf(pedido.get("tipo"), pedido.get("id"), self.server.server_address[1])
             elif rota == ("POST", "/api/imagem"):
                 tipo = (self.headers.get("Content-Type") or "").split(";")[0].strip().lower()
@@ -573,15 +602,24 @@ class Manipulador(SimpleHTTPRequestHandler):
         except (ValueError, OSError) as e:
             return self._responder(400, {"erro": f"não consegui concluir ({e})"})
         if self.ONLINE and metodo == "POST" and rota[1] in ("/api/salvar", "/api/apagar", "/api/imagem", "/api/pdf"):
-            self.publicador.publicar(self._mensagem_commit(rota[1], q, r), self._usuario())
+            caminhos = self._caminhos_mudados(rota[1], locals().get("pedido") or {}, r)
+            if caminhos:
+                self.publicador.registrar(caminhos, self._usuario(), rota[1].rsplit("/", 1)[1])
         self._responder(200, r)
 
-    def _mensagem_commit(self, rota, q, r):
-        if rota == "/api/imagem":
-            return f"Imagem {q.get('pasta')}/{q.get('nome')}"
-        item = (r or {}).get("id") if isinstance(r, dict) else None
-        verbo = {"/api/salvar": "Salva", "/api/apagar": "Apaga", "/api/pdf": "PDF de"}[rota]
-        return f"{verbo} {item}" if item else f"{verbo} item"
+    @staticmethod
+    def _caminhos_mudados(rota, pedido, r):
+        """Arquivos (relativos à raiz do repositório) que a ação mudou, para anotar quem editou."""
+        def rel(c):
+            return Path(c).resolve().relative_to(RAIZ.parent).as_posix()
+        with contextlib.suppress(ErroApi, ValueError, KeyError, TypeError):
+            if rota == "/api/salvar":
+                return [rel(caminho_item(pedido["tipo"], r["id"]))]
+            if rota == "/api/apagar":
+                return [rel(caminho_item(pedido["tipo"], pedido["id"]))]
+            if rota == "/api/imagem":
+                return [rel(RAIZ / r["caminho"])]
+        return []
 
     def end_headers(self):
         self.send_header("Cache-Control", "no-store")
