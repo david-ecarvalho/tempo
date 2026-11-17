@@ -100,6 +100,8 @@
     return fetch('/api/' + url, { method: corpo !== undefined ? 'POST' : 'GET', headers: cab, body: corpo, cache: 'no-store' })
       .then(function (r) {
         return r.json().catch(function () { return {}; }).then(function (j) {
+          // editor online: sessão vencida ou sem login, vai para a tela de entrar
+          if (r.status === 401 && j.entrar) { location.href = 'entrar.html'; return new Promise(function () {}); }
           if (!r.ok) throw new Error(j.erro || ('erro ' + r.status));
           return j;
         });
@@ -1685,4 +1687,19 @@
   Promise.all([carregarLista(), carregarTags()]).then(function () {
     if (hash[1]) abrir(estado.tipo, hash[1]);
   });
+
+  // Editor online: mostra quem está logado e o botão Sair (no computador local, /api/eu não existe e nada aparece)
+  fetch('/api/eu', { headers: { 'X-TC-Editor': '1' }, cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
+    if (!j || !j.online) return;
+    var acoes = document.querySelector('.topo-acoes');
+    if (!acoes) return;
+    var sair = document.createElement('button');
+    sair.type = 'button';
+    sair.className = 'botao-texto';
+    sair.textContent = 'Sair (' + j.usuario + ')';
+    sair.onclick = function () {
+      fetch('/api/sair', { method: 'POST', headers: { 'X-TC-Editor': '1' } }).then(function () { location.href = 'entrar.html'; });
+    };
+    acoes.appendChild(sair);
+  }).catch(function () {});
 })();
