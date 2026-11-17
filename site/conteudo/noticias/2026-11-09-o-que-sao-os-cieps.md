@@ -51,5 +51,3 @@ O maior problema, porém, foi a falta de continuidade. Os governos que vieram en
 A experiência dos CIEPs influenciou programas federais, como os CIACs (depois chamados de CAICs), lançados no início dos anos 1990, e voltou ao debate sempre que o país discute educação integral. O Plano Nacional de Educação estabeleceu metas de ampliar o número de escolas e alunos em tempo integral, e o governo federal criou em 2023 o Programa Escola em Tempo Integral.
 
 Quarenta anos depois do primeiro CIEP, a pergunta que Darcy e Brizola fizeram continua de pé: o que a escola pública precisa oferecer para que a criança pobre tenha as mesmas chances que as outras? A resposta deles foi uma escola aberta o dia inteiro, que alimenta, cuida e ensina. Os prédios espalhados pelo Rio são a lembrança concreta de que isso já foi tentado em grande escala no Brasil.
-
-Teste do editor online (apagar).
