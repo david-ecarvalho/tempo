@@ -43,6 +43,7 @@ A divergência é antiga. Em 2022, Jones já tinha criticado o discurso do PCO s
 
 ## O que vem pela frente
 
+Várias coisas, isso inclue: 
 Uma proposta como a anunciada enfrentaria resistência grande na Câmara, onde a bancada alinhada a Israel é numerosa, e possíveis questionamentos sobre liberdade de expressão. Ainda não se sabe se o PSOL vai encampar o projeto como bancada. Para Jones, porém, o simples fato de colocar o tema em debate no Parlamento já é parte da luta: tirar a causa palestina das redes e das ruas e levá-la para dentro das instituições.
 
 ## Fontes
