@@ -1,5 +1,18 @@
 [
  {
+  "id": "2026-11-17-essa-e-uma-materia-teste",
+  "titulo": "Essa é uma matéria teste ",
+  "linha": "Teste inicial",
+  "data": "2026-11-17T15:21:00",
+  "editoria": "Trabalho",
+  "tags": [
+   "software livre"
+  ],
+  "autor": "Redação",
+  "foto": "",
+  "destaque": false
+ },
+ {
   "id": "2026-11-15-morte-de-renee-good-dez-meses-depois-ninguem-foi-denunciado",
   "titulo": "Morte de Renée Good: dez meses depois, ninguém foi denunciado pela morte da cidadã americana baleada por agente do ICE",
   "linha": "A poeta de 37 anos foi morta dentro do carro em Minneapolis, em janeiro. O governo Trump chamou o caso de legítima defesa, travou a investigação e agora é processado pela família",
