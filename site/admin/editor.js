@@ -199,29 +199,40 @@
       })));
     });
     nav.appendChild(h('p', { class: 'colecoes-grupo' }, 'Ferramentas'));
-    nav.appendChild(h('ul', { class: 'lista' }, h('li', null,
-      h('button', { type: 'button', 'aria-current': estado.ferramenta === 'gerador' ? 'true' : 'false', onclick: abrirGerador },
-        h('span', { class: 't' }, 'Gerador de imagens'), h('span', { class: 'm' }, 'posts e prévias de link')))));
+    nav.appendChild(h('ul', { class: 'lista' }, FERRAMENTAS.filter(function (f) { return !f.existe || f.existe(); }).map(function (f) {
+      return h('li', null, h('button', { type: 'button', 'aria-current': estado.ferramenta === f.chave ? 'true' : 'false', onclick: function () { abrirFerramenta(f.chave); } },
+        h('span', { class: 't' }, f.nome), h('span', { class: 'm' }, f.resumo)));
+    })));
   }
 
-  // Gerador de imagens livre (sem matéria): os textos ficam guardados neste navegador
-  function abrirGerador() {
-    if (estado.ferramenta === 'gerador' || !podeSair()) return;
-    estado.ferramenta = 'gerador';
+  // Ferramentas da lateral. Os Planos de Fundação só aparecem se site/local/planos/ existir neste computador.
+  var FERRAMENTAS = [
+    { chave: 'gerador', nome: 'Gerador de imagens', resumo: 'posts e prévias de link',
+      dica: 'Monte imagens para redes sociais e prévias de link, com título que se ajusta sozinho, foto de fundo, logos, camadas e QR code. Para a imagem de uma matéria, abra a matéria: lá o gerador já vem preenchido.',
+      montar: function (lugar) { TCGerador.montar(lugar, { chave: 'tc-gerador-imagens' }); } },
+    { chave: 'planos', nome: 'Planos de Fundação', resumo: 'só neste computador', existe: function () { return !!window.TCPlanos; },
+      dica: 'Os dois planos lado a lado: o do Tempo Continuum como coletivo e a proposta de movimento político. Clique em qualquer ponto do mapa para ver o que ele recebe e entrega; no fim de cada aba, o plano inteiro pode ser editado em Markdown. Fica só neste computador (site/local/), fora do git.',
+      montar: function (lugar, sub) { lugar.classList.add('pl-lugar'); TCPlanos.montar(lugar, sub); } }
+  ];
+  function abrirFerramenta(chave, sub) {
+    var f = FERRAMENTAS.filter(function (x) { return x.chave === chave && (!x.existe || x.existe()); })[0];
+    if (!f || estado.ferramenta === chave || !podeSair()) return;
+    estado.ferramenta = chave;
     estado.atual = null;
     estado.redesenharLigacoes = null;
     marcarSujo(false);
     var area = $('area'), lugar = h('div');
     area.innerHTML = '';
     area.appendChild(h('div', { class: 'colecao ferramenta' },
-      h('div', { class: 'colecao-topo' }, h('div', { class: 'colecao-titulo' }, h('h1', null, 'Gerador de imagens'))),
-      h('p', { class: 'dica' }, 'Monte imagens para redes sociais e prévias de link, com título que se ajusta sozinho, foto de fundo, logos, camadas e QR code. Para a imagem de uma matéria, abra a matéria: lá o gerador já vem preenchido.'),
+      h('div', { class: 'colecao-topo' }, h('div', { class: 'colecao-titulo' }, h('h1', null, f.nome))),
+      h('p', { class: 'dica' }, f.dica),
       lugar));
-    TCGerador.montar(lugar, { chave: 'tc-gerador-imagens' });
+    history.replaceState(null, '', '#' + chave);
+    f.montar(lugar, sub);
     desenharColecoes();
-    history.replaceState(null, '', '#gerador');
     area.scrollTop = 0;
   }
+
 
   // Linha de detalhes do item (data, editoria, situação…), igual para o cartão e para a busca
   function metaDe(i) {
@@ -1667,7 +1678,7 @@
   if (COLECAO[hash[0]]) estado.tipo = hash[0];
   desenharColecoes();
   desenharLista();
-  if (hash[0] === 'gerador') abrirGerador();
+  if (hash[0] === 'gerador' || hash[0] === 'planos') abrirFerramenta(hash[0], hash[1]);
   carregarContagens();
   carregarIndices();
   Promise.all([carregarLista(), carregarTags()]).then(function () {
